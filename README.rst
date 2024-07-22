@@ -11,27 +11,8 @@ TODO
 
 v1:
 
-* Better Sprite sorting
-* Three rooms
-* Final boss
-
-v2:
-
-* Polished levels/scenes
-* One character all abilities
-* Music/SFX
-* Cutscenes
-
-v3:
-* Three levels/complete "story"
-* Enhanced AI
-* Three characters, all abilities
-
-Currently out of scope:
-
-* Lighting
-* Camera effects
 * Leveling
+* Server stuffs
 
 License
 -------

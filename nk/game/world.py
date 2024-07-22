@@ -7,7 +7,6 @@ from nk.game.models.attack_profile import AttackProfile
 from nk.game.models.attack_type import AttackType
 from nk.game.models.character import Character, NPC, Player
 from nk.game.models.direction import Direction
-from nk.game.world_callback import WorldCallback
 
 
 class World:
@@ -28,26 +27,26 @@ class World:
 
         # initialize enemies
         self.enemies: list[NPC] = []
-        for level_enemy in self.level.enemies:
-            enemy = NPC(
-                position=(0.5 + level_enemy.x, 0.5 + level_enemy.y),
-                character_type=level_enemy.character_type,
-            )
-            self.enemies.append(enemy)
-            self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
+        # TODO model for adding enemies
+        # for level_enemy in self.level.enemies:
+        #     enemy = NPC(
+        #         position=(0.5 + level_enemy.x, 0.5 + level_enemy.y),
+        #         character_type=level_enemy.character_type,
+        #     )
+        #     self.enemies.append(enemy)
+        #     self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
 
     def update(
         self,
         dt: float,
         player_movement_direction: Direction,
-        world_callback: WorldCallback,
     ):
         self.player.movement_direction = player_movement_direction
         self.player.update(dt)
         if self.player.should_process_attack:
             self.process_attack_damage(self.player, self.enemies)
         for enemy in self.enemies:
-            enemy.ai(dt, self.player, world_callback)
+            enemy.ai(dt, self.player)
             enemy.update(dt)
             if not enemy.alive and not enemy.body_removal_processed:
                 enemy.body_removal_processed = True

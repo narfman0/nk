@@ -12,6 +12,8 @@ class ActionEnum(Enum):
     CHARACTER_SWAP = 3
     PLAYER_HEAL = 4
     PLAYER_INVICIBILITY = 5
+    ZOOM_OUT = 6
+    ZOOM_IN = 7
 
 
 def read_input_player_move_direction():
@@ -59,4 +61,9 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 actions.append(ActionEnum.ATTACK)
+        if event.type == pygame.MOUSEWHEEL:
+            if event.y < 0:
+                actions.append(ActionEnum.ZOOM_OUT)
+            else:
+                actions.append(ActionEnum.ZOOM_IN)
     return actions

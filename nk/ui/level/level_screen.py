@@ -13,18 +13,13 @@ from nk.ui.level.input import (
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.renderables import *
 from nk.ui.screen import Screen, ScreenManager
-from nk.game.models.character import Character, NPC
+from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 from nk.game.world import World
-from nk.game.world_callback import WorldCallback
 from nk.settings import *
 
 LOGGER = logging.getLogger(__name__)
-SCREEN_SCALE = 4
-SCREEN_WIDTH = WIDTH // SCREEN_SCALE
-SCREEN_HEIGHT = HEIGHT // SCREEN_SCALE
-CAMERA_OFFSET_X = SCREEN_WIDTH // 2
-CAMERA_OFFSET_Y = SCREEN_HEIGHT // 2
+DEFAULT_SCREEN_SCALE = 5
 
 
 @dataclass
@@ -35,11 +30,13 @@ class CharacterStruct:
     last_movement_direction: Direction
 
 
-class LevelScreen(Screen, WorldCallback):
+class LevelScreen(Screen):
     def __init__(self, screen_manager: ScreenManager, world: World):
         self.screen_manager = screen_manager
         self.world = world
         self.projectile_image_dict = {}
+        self.screen_scale = DEFAULT_SCREEN_SCALE
+        self.recalculate_screen_scale_derivatives()
         self.player_struct = CharacterStruct(
             self.world.player,
             None,
@@ -61,10 +58,10 @@ class LevelScreen(Screen, WorldCallback):
         player_actions = read_input_player_actions(events)
         self.handle_player_actions(player_actions)
         player_move_direction = read_input_player_move_direction()
-        self.world.update(dt, player_move_direction, self)
+        self.world.update(dt, player_move_direction)
         self.cam_x, self.cam_y = cartesian_to_isometric(
-            self.world.player.position.x * self.world.map.tile_half_width,
-            self.world.player.position.y * self.world.map.tile_half_width,
+            self.world.player.position.x * self.world.map.tile_width // 2,
+            self.world.player.position.y * self.world.map.tile_width // 2,
         )
         if (
             self.world.player.alive
@@ -94,6 +91,12 @@ class LevelScreen(Screen, WorldCallback):
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible
             print(f"Player invincibility set to {self.world.player.invincible}")
+        if ActionEnum.ZOOM_OUT in player_actions:
+            # TODO self.screen_scale -= 1
+            self.recalculate_screen_scale_derivatives()
+        if ActionEnum.ZOOM_IN in player_actions:
+            # TODO self.screen_scale += 1
+            self.recalculate_screen_scale_derivatives()
 
     def draw(self, dest_surface: pygame.Surface):
         renderables = create_renderable_list()
@@ -114,7 +117,7 @@ class LevelScreen(Screen, WorldCallback):
             key = renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y)
             renderables.add(SpriteRenderable(key, character_struct.sprite_group))
 
-        surface = pygame.Surface(size=(SCREEN_WIDTH, SCREEN_HEIGHT))
+        surface = pygame.Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
             blit_coords = (blit_x - self.cam_x, blit_y - self.cam_y)
@@ -122,7 +125,7 @@ class LevelScreen(Screen, WorldCallback):
         for renderable in renderables:
             renderable.draw(surface)
         pygame.transform.scale_by(
-            surface, dest_surface=dest_surface, factor=SCREEN_SCALE
+            surface, dest_surface=dest_surface, factor=self.screen_scale
         )
 
     def generate_projectile_renderables(self):
@@ -169,11 +172,12 @@ class LevelScreen(Screen, WorldCallback):
         for character_struct in self.character_structs:
             character_struct.sprite_group.update(dt)
 
-    def ai_attack_callback(self, npc: NPC):
-        for character_struct in self.character_structs:
-            if character_struct.character == npc:
-                character_struct.sprite.change_animation("attack")
-                character_struct.sprite.move(npc.facing_direction)
+    # TODO movement and attack animation change
+    # def ai_attack_callback(self, npc: NPC):
+    #     for character_struct in self.character_structs:
+    #         if character_struct.character == npc:
+    #             character_struct.sprite.change_animation("attack")
+    #             character_struct.sprite.move(npc.facing_direction)
 
     def generate_map_renderables(self, ground: bool):
         """We can statically generate the blit coords once in the beginning, avoiding a bunch of coordinate conversions."""
@@ -201,19 +205,25 @@ class LevelScreen(Screen, WorldCallback):
         y: float,
         image: pygame.Surface,
     ):
-        cartesian_x = x * self.world.map.tile_half_width
-        cartesian_y = y * self.world.map.tile_half_width
+        cartesian_x = x * self.world.map.tile_width // 2
+        cartesian_y = y * self.world.map.tile_width // 2
         iso_x, iso_y = cartesian_to_isometric(cartesian_x, cartesian_y)
-        x = iso_x + CAMERA_OFFSET_X - image.get_width() // 2
-        y = iso_y + CAMERA_OFFSET_Y - image.get_height() // 2
+        x = iso_x + self.camera_offset_x - image.get_width() // 2
+        y = iso_y + self.camera_offset_y - image.get_height() // 2
         return (x, y)
 
     def update_player_sprite(self):
         sprite = CharacterSprite(self.world.player.character_type)
         sprite.set_position(
-            SCREEN_WIDTH // 2 - sprite.image.get_width() // 2,
-            SCREEN_HEIGHT // 2 - sprite.image.get_height() // 2,
+            self.screen_width // 2 - sprite.image.get_width() // 2,
+            self.screen_height // 2 - sprite.image.get_height() // 2,
         )
         self.player_struct.sprite = sprite
         self.player_struct.sprite_group.empty()
         self.player_struct.sprite_group.add(sprite)
+
+    def recalculate_screen_scale_derivatives(self):
+        self.screen_width = WIDTH // self.screen_scale
+        self.screen_height = HEIGHT // self.screen_scale
+        self.camera_offset_x = self.screen_width // 2
+        self.camera_offset_y = self.screen_height // 2
