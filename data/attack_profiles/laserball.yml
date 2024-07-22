@@ -1,0 +1,6 @@
+name: laserball
+image_path: laserball
+speed: 2.5
+radius: 0.25
+emitter_offset_x: -1.8
+emitter_offset_y: -1.8

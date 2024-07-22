@@ -1,0 +1,56 @@
+idle:
+  E:
+    images:
+    - droid_assassin1.png 
+    - droid_assassin2.png 
+    - droid_assassin3.png 
+    - droid_assassin4.png 
+    - droid_assassin5.png 
+    - droid_assassin6.png 
+    - droid_assassin7.png 
+    - droid_assassin8.png 
+    - droid_assassin9.png 
+    - droid_assassin10.png 
+run:
+  E:
+    images:
+    - droid_assassin30.png 
+    - droid_assassin31.png
+    - droid_assassin32.png
+    - droid_assassin33.png
+    - droid_assassin34.png
+    - droid_assassin35.png
+    - droid_assassin36.png
+    - droid_assassin37.png 
+attack:
+  E:
+    images:
+    - droid_assassin11.png
+    - droid_assassin12.png
+    - droid_assassin13.png
+    - droid_assassin14.png
+    - droid_assassin15.png
+    - droid_assassin16.png
+    - droid_assassin17.png
+    - droid_assassin18.png
+    - droid_assassin19.png
+    - droid_assassin20.png
+    - droid_assassin21.png
+    - droid_assassin22.png
+    - droid_assassin23.png
+    - droid_assassin24.png
+    - droid_assassin25.png
+    - droid_assassin26.png
+    - droid_assassin27.png
+    - droid_assassin28.png
+    - droid_assassin29.png
+death:
+  E:
+    images:
+    - droid_assassin38.png 
+    - droid_assassin39.png
+    - droid_assassin40.png
+    - droid_assassin41.png
+    - droid_assassin42.png
+    - droid_assassin43.png
+    - droid_assassin44.png

@@ -1,0 +1,12 @@
+mass: 10
+dash_cooldown: 0.25
+dash_duration: 0.25
+dash_scalar: 3
+run_force: 25000
+running_stop_threshold: 2
+max_velocity: 5
+radius: 0.4
+attack_distance: 1.5
+attack_duration: 1.9
+attack_time_until_damage: 1.6
+hp_max: 1

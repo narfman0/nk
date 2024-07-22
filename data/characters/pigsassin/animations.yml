@@ -1,0 +1,45 @@
+idle:
+  E:
+    images:
+    - pigsassin1.png
+    - pigsassin2.png
+    - pigsassin3.png
+    - pigsassin4.png
+    - pigsassin5.png
+    - pigsassin6.png
+    - pigsassin7.png
+    - pigsassin8.png
+run:
+  E:
+    images:
+    - pigsassin9.png
+    - pigsassin10.png
+    - pigsassin11.png
+    - pigsassin12.png
+    - pigsassin13.png
+    - pigsassin14.png
+    - pigsassin15.png
+    - pigsassin16.png
+death:
+  E:
+    images:
+    - pigsassin42.png
+    - pigsassin43.png
+    - pigsassin44.png
+    - pigsassin45.png
+    - pigsassin46.png
+    - pigsassin47.png
+    - pigsassin48.png
+    - pigsassin49.png
+    - pigsassin50.png
+attack:
+  E:
+    images:
+    - pigsassin17.png
+    - pigsassin18.png
+    - pigsassin19.png
+    - pigsassin20.png
+    - pigsassin21.png
+    - pigsassin22.png
+    - pigsassin23.png
+    - pigsassin24.png 
