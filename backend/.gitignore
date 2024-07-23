@@ -91,7 +91,6 @@ ENV/
 .ropeproject
 
 *.avi
-config.ini
 output/
 .vscode/
 nk.zip

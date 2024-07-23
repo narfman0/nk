@@ -1,0 +1,3 @@
+message Person {
+  optional string message = 1;
+}
