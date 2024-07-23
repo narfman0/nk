@@ -1,3 +1,5 @@
-message Person {
-  optional string message = 1;
+syntax = "proto3";
+
+message Message {
+  optional string text = 1;
 }
