@@ -5,4 +5,4 @@ pyyaml
 dataclass-wizard
 sortedcontainers
 websocket-client
-protobuf
+betterproto
