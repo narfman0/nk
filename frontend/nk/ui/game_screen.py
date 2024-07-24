@@ -5,7 +5,7 @@ import pygame
 from pygame.event import Event
 
 from nk.util.math import cartesian_to_isometric
-from nk.ui.level.input import (
+from frontend.nk.ui.input import (
     ActionEnum,
     read_input_player_move_direction,
     read_input_player_actions,
