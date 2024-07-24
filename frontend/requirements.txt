@@ -4,5 +4,5 @@ pytmx
 pyyaml
 dataclass-wizard
 sortedcontainers
-websocket-client
 betterproto
+websockets

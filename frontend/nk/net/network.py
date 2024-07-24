@@ -1,28 +1,49 @@
 import logging
 from typing import Optional
-import websocket
+from websockets.sync.client import connect as ws_connect
+
 from os import environ
+from queue import Queue
+from threading import Thread
 
 from nk.proto import Message
 
 LOGGER = logging.getLogger(__name__)
+USE_WSAPP = False
+
+
+def network_run(received: Queue[Message], to_send: Queue[Message]):
+    host = environ.get("WEBSOCKET_HOST", "localhost")
+    port = environ.get("WEBSOCKET_PORT", "7666")
+    url = f"ws://{host}:{port}/ws"
+    ws = ws_connect(url)
+
+    while True:
+        while not to_send.empty():
+            message = to_send.get()
+            ws.send(bytes(message))
+        try:
+            while True:
+                data = ws.recv(timeout=0.001)
+                received.put(Message().parse(data))
+        except TimeoutError:
+            pass
 
 
 class Network:
+
     def __init__(self):
-        self.ws = websocket.WebSocket()
-        host = environ.get("WEBSOCKET_HOST", "localhost")
-        port = environ.get("WEBSOCKET_PORT", "7666")
-        self.ws.connect(f"ws://{host}:{port}/ws")
+        self._received_messages: Queue[Message] = Queue()
+        self._to_send: Queue[Message] = Queue()
+        self.network_thread = Thread(
+            target=network_run,
+            name="network thread",
+            args=(self._received_messages, self._to_send),
+        ).start()
 
     def send(self, message: Message):
-        self.ws.send_bytes(bytes(message))
+        self._to_send.put(message)
 
-    def recv(self) -> Optional[Message]:
-        response = Message().parse(self.ws.recv())
-        if response.text_message:
-            LOGGER.warn(response.text_message.text)
-        return response
-
-    def close(self):
-        self.ws.close()
+    def next(self) -> Optional[Message]:
+        if not self._received_messages.empty():
+            return self._received_messages.get()

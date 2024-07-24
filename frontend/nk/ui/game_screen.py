@@ -77,6 +77,11 @@ class GameScreen(Screen):
         self.world.player.facing_direction = player_move_direction
         self.update_character_structs(dt)
 
+        message = self.network.next()
+        while message is not None:
+            LOGGER.info(message)
+            message = self.network.next()
+
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
             if not self.world.player.dashing:
