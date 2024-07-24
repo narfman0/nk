@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 from websockets.sync.client import connect as ws_connect
+import os
 
 from os import environ
 from queue import Queue
@@ -27,7 +28,9 @@ def network_run(received: Queue[Message], to_send: Queue[Message]):
                 data = ws.recv(timeout=0.001)
                 received.put(Message().parse(data))
         except TimeoutError:
-            pass
+            pass  # expected
+        except:
+            os._exit(1)
 
 
 class Network:
