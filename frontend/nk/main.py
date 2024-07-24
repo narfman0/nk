@@ -5,7 +5,7 @@ import pygame
 from nk.game.world import World
 from nk.settings import *
 from nk.ui.screen import ScreenManager
-from nk.ui.level.level_screen import LevelScreen
+from nk.ui.level.game_screen import GameScreen
 from nk.util.logging import initialize_logging
 
 LOGGER = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ def main():
 
     world = World()
     screen_manager = ScreenManager()
-    screen_manager.push(LevelScreen(screen_manager, world))
+    screen_manager.push(GameScreen(screen_manager, world))
 
     if ENABLE_PROFILING:
         import cProfile, pstats, io

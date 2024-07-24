@@ -30,7 +30,7 @@ class CharacterStruct:
     last_movement_direction: Direction
 
 
-class LevelScreen(Screen):
+class GameScreen(Screen):
     def __init__(self, screen_manager: ScreenManager, world: World):
         self.screen_manager = screen_manager
         self.world = world
