@@ -98,4 +98,4 @@ bin/
 *_config.*
 *.tiled-session
 
-backend/proto/**/*.py
+nk/proto/**/*.py

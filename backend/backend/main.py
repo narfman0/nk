@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from backend.proto.message import Message
+from nk.proto.message import Message, TextMessage
 
 app = FastAPI()
 
@@ -13,8 +13,9 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_bytes()
             msg = Message().parse(data)
-            await websocket.send_bytes(
-                bytes(Message(text=f"Message text was: {msg.text}"))
-            )
+            if msg.text_message:
+                text = f"Message text was: {msg.text_message.text}"
+                text_message = TextMessage(text=text)
+                await websocket.send_bytes(bytes(Message(text_message=text_message)))
     except WebSocketDisconnect:
         print("Received WebSocketDisconnect")

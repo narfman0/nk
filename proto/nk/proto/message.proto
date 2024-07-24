@@ -1,5 +1,11 @@
 syntax = "proto3";
 
-message Message {
+message TextMessage {
   string text = 1;
+}
+
+message Message {
+  oneof payload {
+    TextMessage text_message = 1;
+  }
 }
