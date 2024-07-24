@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "nk/proto/heartbeat.proto";
 import "nk/proto/player_joined.proto";
 import "nk/proto/player_join_request.proto";
 import "nk/proto/player_left.proto";
@@ -15,5 +16,6 @@ message Message {
     nk.proto.PlayerLeft player_left = 3;
     nk.proto.PlayerJoinRequest player_join_request = 4;
     nk.proto.PlayerUpdate player_update = 5;
+    nk.proto.Heartbeat heartbeat = 6;
   }
 }
