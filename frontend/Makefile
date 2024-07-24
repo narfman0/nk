@@ -47,6 +47,9 @@ run-main:
 
 release: run-test release-test release-prod clean
 
+headless:
+	python -m nk.headless
+
 b: run-black
 m: run-main
 main: init m
