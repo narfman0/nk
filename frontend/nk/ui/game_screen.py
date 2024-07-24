@@ -25,7 +25,7 @@ from nk.proto import Message, PlayerJoinRequest
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
-TICKS_BEFORE_UPDATE = 10
+TICKS_BEFORE_UPDATE = 60
 
 
 @dataclass

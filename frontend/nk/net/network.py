@@ -42,7 +42,9 @@ class Network:
             target=network_run,
             name="network thread",
             args=(self._received_messages, self._to_send),
-        ).start()
+            daemon=True,
+        )
+        self.network_thread.start()
 
     def send(self, message: Message):
         self._to_send.append(message)
