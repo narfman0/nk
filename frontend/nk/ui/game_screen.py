@@ -77,10 +77,6 @@ class GameScreen(Screen):
         if ActionEnum.DASH in player_actions:
             if not self.world.player.dashing:
                 self.world.player.dash()
-        if ActionEnum.CHARACTER_SWAP in player_actions:
-            if not self.world.player.swapping:
-                self.world.player.swap()
-                self.update_player_sprite()
         if ActionEnum.ATTACK in player_actions:
             if self.world.player.alive and not self.world.player.attacking:
                 self.world.player.attack()

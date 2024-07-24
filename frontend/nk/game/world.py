@@ -5,7 +5,7 @@ from nk.game.models.projectile import Projectile
 from nk.game.map import Map
 from nk.game.models.attack_profile import AttackProfile
 from nk.game.models.attack_type import AttackType
-from nk.game.models.character import Character, NPC, Player
+from nk.game.models.character import Character, NPC
 from nk.game.models.direction import Direction
 
 
@@ -20,7 +20,7 @@ class World:
 
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
-        self.player = Player(
+        self.player = Character(
             position=(0.5 + tile_x, 0.5 + tile_y), character_type="pigsassin"
         )
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)

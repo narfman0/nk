@@ -9,7 +9,6 @@ from nk.game.models.direction import Direction
 class ActionEnum(Enum):
     DASH = 1
     ATTACK = 2
-    CHARACTER_SWAP = 3
     PLAYER_HEAL = 4
     PLAYER_INVICIBILITY = 5
     ZOOM_OUT = 6
@@ -50,8 +49,6 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 actions.append(ActionEnum.DASH)
-            elif event.key == pygame.K_e or event.key == pygame.K_q:
-                actions.append(ActionEnum.CHARACTER_SWAP)
             elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                 actions.append(ActionEnum.ATTACK)
             elif event.key == pygame.K_F2:
