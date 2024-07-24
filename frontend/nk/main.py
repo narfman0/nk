@@ -2,10 +2,9 @@ import logging
 from pstats import SortKey
 import pygame
 
-from nk.game.world import World
 from nk.settings import *
 from nk.ui.screen import ScreenManager
-from nk.ui.game_screen import GameScreen
+from nk.ui.load_screen import LoadScreen
 from nk.util.logging import initialize_logging
 
 LOGGER = logging.getLogger(__name__)
@@ -19,9 +18,8 @@ def main():
     running = True
     clock = pygame.time.Clock()
 
-    world = World()
     screen_manager = ScreenManager()
-    screen_manager.push(GameScreen(screen_manager, world))
+    screen_manager.push(LoadScreen(screen_manager))
 
     if ENABLE_PROFILING:
         import cProfile, pstats, io
@@ -38,10 +36,11 @@ def main():
                 running = False
             else:
                 events.append(event)
-
-        screen_manager.current.update(dt, events)
+        # current screen can change in update, so let's save current_screen
+        current_screen = screen_manager.current
+        current_screen.update(dt, events)
         surface.fill((0, 0, 0))
-        screen_manager.current.draw(surface)
+        current_screen.draw(surface)
         pygame.display.update()
 
     if ENABLE_PROFILING:
