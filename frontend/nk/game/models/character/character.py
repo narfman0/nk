@@ -53,7 +53,7 @@ class Character(CharacterProperties):
             self.body._set_type(pymunk.Body.DYNAMIC)
 
     def update(self, dt: float):
-        if self.alive and self.movement_direction and not self.attacking:
+        if self.alive and self.movement_direction:
             self.facing_direction = self.movement_direction
             self.body.angle = self.facing_direction.angle
             dash_scalar = self.dash_scalar if self.dashing else 1.0
