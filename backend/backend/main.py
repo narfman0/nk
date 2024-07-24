@@ -39,6 +39,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 await broadcast(Message(player_joined=PlayerJoined(uuid=player.uuid)))
             elif msg.text_message._serialized_on_wire:
                 await broadcast(msg)
+            elif msg.player_update._serialized_on_wire:
+                await broadcast(msg)
             logger.debug(f"Handled message: {msg} from {player.uuid}")
     except WebSocketDisconnect:
         print("Received WebSocketDisconnect")

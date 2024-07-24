@@ -1,9 +1,10 @@
 import logging
 from dataclasses import dataclass
-import uuid
+from uuid import UUID
 
 import pygame
 from pygame.event import Event
+from pymunk import Vec2d
 
 from nk.util.math import cartesian_to_isometric
 from nk.ui.input import (
@@ -39,7 +40,6 @@ class GameScreen(Screen):
         self.world = world
         self.network = network
         self.projectile_image_dict = {}
-        self.uuid = uuid.uuid4()
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.player_struct = CharacterStruct(
@@ -59,7 +59,9 @@ class GameScreen(Screen):
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
         self.network.send(
-            Message(player_join_request=PlayerJoinRequest(uuid=str(self.uuid)))
+            Message(
+                player_join_request=PlayerJoinRequest(uuid=str(self.world.player.uuid))
+            )
         )
 
     def update(self, dt: float, events: list[Event]):
@@ -80,11 +82,27 @@ class GameScreen(Screen):
             self.update_player_sprite()
         self.world.player.facing_direction = player_move_direction
         self.update_character_structs(dt)
+        self.update_network()
 
-        message = self.network.next()
-        while message is not None:
-            LOGGER.info(message)
+    def update_network(self):
+        while self.network.has_messages():
             message = self.network.next()
+            LOGGER.info(message)
+            if message.player_update._serialized_on_wire:
+                uuid = UUID(message.player_update.uuid)
+                npc = self.world.get_npc_by_uuid(uuid)
+                if npc:
+                    npc.body.position = Vec2d(
+                        message.player_update.x, message.player_update.y
+                    )
+                else:
+                    npc = self.world.add_npc(
+                        uuid=uuid, x=message.player_update.x, y=message.player_update.y
+                    )
+                    sprite = CharacterSprite(npc.character_type)
+                    self.character_structs.append(
+                        CharacterStruct(npc, sprite, pygame.sprite.Group(sprite), None)
+                    )
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:

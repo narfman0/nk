@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package nk.proto;
+
+message PlayerUpdate {
+    string uuid = 1;
+    float x = 2;
+    float y = 3;
+}

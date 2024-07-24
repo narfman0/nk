@@ -1,4 +1,6 @@
 import pymunk
+from uuid import UUID
+from typing import Optional
 
 from nk.game.models.level import Level
 from nk.game.models.projectile import Projectile
@@ -27,6 +29,7 @@ class World:
 
         # initialize enemies
         self.enemies: list[NPC] = []
+        self.npcs: list[NPC] = []
         # TODO model for adding enemies
         # for level_enemy in self.level.enemies:
         #     enemy = NPC(
@@ -45,6 +48,8 @@ class World:
         self.player.update(dt)
         if self.player.should_process_attack:
             self.process_attack_damage(self.player, self.enemies)
+        for npc in self.npcs:
+            npc.update(dt)
         for enemy in self.enemies:
             enemy.ai(dt, self.player)
             enemy.update(dt)
@@ -101,3 +106,18 @@ class World:
         for enemy in enemies:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
                 enemy.handle_damage_received(1)
+
+    def add_npc(self, uuid: UUID, x: float, y: float) -> NPC:
+        npc = NPC(
+            uuid=uuid,
+            position=(0.5 + x, 0.5 + y),
+            character_type=self.player.character_type,
+        )
+        self.npcs.append(npc)
+        self.space.add(npc.body, npc.shape, npc.hitbox_shape)
+        return npc
+
+    def get_npc_by_uuid(self, uuid: UUID) -> Optional[Character]:
+        for npc in self.npcs:
+            if npc.uuid == uuid:
+                return npc

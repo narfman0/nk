@@ -26,9 +26,14 @@ class Character(CharacterProperties):
     hp: int = 1
     invincible: bool = False
 
-    def __init__(self, position: tuple[float, float], character_type: str):
+    def __init__(
+        self,
+        position: tuple[float, float],
+        character_type: str,
+        uuid: None | UUID = None,
+    ):
         self.character_type = character_type
-        self.uuid = generate_uuid()
+        self.uuid = generate_uuid() if not uuid else uuid
         self.apply_character_properties()
         self.hp = self.hp_max
         self.body = pymunk.Body()
