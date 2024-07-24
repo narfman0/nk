@@ -37,7 +37,11 @@ def network_async(received: deque[Message], to_send: deque[Message]):
 
 
 def network_sync(received: deque[Message], to_send: deque[Message]):
-    ws = ws_connect(url)
+    try:
+        ws = ws_connect(url)
+    except TimeoutError:
+        LOGGER.error(f"Timed out connected to {url}")
+        os._exit(1)
     while True:
         while to_send:
             message = to_send.popleft()
