@@ -45,9 +45,6 @@ run-test:
 run-main:
 	python -m nk.main
 
-ws:
-	python -m nk.ws
-
 release: run-test release-test release-prod clean
 
 b: run-black

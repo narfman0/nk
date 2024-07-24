@@ -13,6 +13,7 @@ class ActionEnum(Enum):
     PLAYER_INVICIBILITY = 5
     ZOOM_OUT = 6
     ZOOM_IN = 7
+    HELLO_WORLD_NET = 8
 
 
 def read_input_player_move_direction():
@@ -55,6 +56,8 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
                 actions.append(ActionEnum.PLAYER_HEAL)
             elif event.key == pygame.K_F3:
                 actions.append(ActionEnum.PLAYER_INVICIBILITY)
+            elif event.key == pygame.K_h:
+                actions.append(ActionEnum.HELLO_WORLD_NET)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 actions.append(ActionEnum.ATTACK)

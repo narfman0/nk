@@ -16,7 +16,9 @@ from nk.ui.screen import Screen, ScreenManager
 from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 from nk.game.world import World
+from nk.net.network import Network
 from nk.settings import *
+from nk.proto import Message, TextMessage
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
@@ -31,9 +33,10 @@ class CharacterStruct:
 
 
 class GameScreen(Screen):
-    def __init__(self, screen_manager: ScreenManager, world: World):
+    def __init__(self, screen_manager: ScreenManager, world: World, network: Network):
         self.screen_manager = screen_manager
         self.world = world
+        self.network = network
         self.projectile_image_dict = {}
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
@@ -53,6 +56,7 @@ class GameScreen(Screen):
 
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
+        self.network.send(Message(text_message=TextMessage(text="Hello, World!")))
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -93,6 +97,8 @@ class GameScreen(Screen):
         if ActionEnum.ZOOM_IN in player_actions:
             # TODO self.screen_scale += 1
             self.recalculate_screen_scale_derivatives()
+        if ActionEnum.HELLO_WORLD_NET in player_actions:
+            self.network.send(Message(text_message=TextMessage(text="Hello, World!")))
 
     def draw(self, dest_surface: pygame.Surface):
         renderables = create_renderable_list()
