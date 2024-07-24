@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+import uuid
 
 import pygame
 from pygame.event import Event
@@ -18,7 +19,7 @@ from nk.game.models.direction import Direction
 from nk.game.world import World
 from nk.net.network import Network
 from nk.settings import *
-from nk.proto import Message, TextMessage
+from nk.proto import Message, PlayerJoinRequest, TextMessage
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
@@ -38,6 +39,7 @@ class GameScreen(Screen):
         self.world = world
         self.network = network
         self.projectile_image_dict = {}
+        self.uuid = uuid.uuid4()
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.player_struct = CharacterStruct(
@@ -56,7 +58,9 @@ class GameScreen(Screen):
 
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
-        self.network.send(Message(text_message=TextMessage(text="Hello, World!")))
+        self.network.send(
+            Message(player_join_request=PlayerJoinRequest(uuid=str(self.uuid)))
+        )
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)

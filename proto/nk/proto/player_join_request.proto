@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package nk.proto;
+
+message PlayerJoinRequest {
+  string uuid = 1;
+}

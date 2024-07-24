@@ -44,6 +44,9 @@ class Network:
     def send(self, message: Message):
         self._to_send.put(message)
 
+    def has_messages(self) -> bool:
+        return not self._received_messages.empty()
+
     def next(self) -> Optional[Message]:
-        if not self._received_messages.empty():
+        if self.has_messages():
             return self._received_messages.get()
