@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from nk.proto.message import Message, TextMessage
+from nk.proto import Message, TextMessage
 
 app = FastAPI()
 

@@ -97,5 +97,3 @@ nk.zip
 bin/
 *_config.*
 *.tiled-session
-
-nk/proto/**/*.py

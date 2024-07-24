@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-message TextMessage {
-  string text = 1;
-}
+import "nk/proto/text_message.proto";
+
+package nk.proto;
 
 message Message {
   oneof payload {
-    TextMessage text_message = 1;
+    nk.proto.TextMessage text_message = 1;
   }
 }

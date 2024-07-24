@@ -1,6 +1,6 @@
 import websocket
 
-from nk.proto.message import Message, TextMessage
+from nk.proto import Message, TextMessage
 
 ws = websocket.WebSocket()
 ws.connect("ws://localhost:7666/ws")

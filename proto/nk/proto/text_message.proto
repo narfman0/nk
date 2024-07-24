@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package nk.proto;
+
+message TextMessage {
+  string text = 1;
+}
