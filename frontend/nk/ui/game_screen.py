@@ -19,11 +19,13 @@ from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 from nk.game.world import World
 from nk.net.network import Network
+from nk.net.builders import build_player_update_from_character, build_text
 from nk.settings import *
-from nk.proto import Message, PlayerJoinRequest, TextMessage
+from nk.proto import Message, PlayerJoinRequest
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
+TICKS_BEFORE_UPDATE = 10
 
 
 @dataclass
@@ -63,6 +65,7 @@ class GameScreen(Screen):
                 player_join_request=PlayerJoinRequest(uuid=str(self.world.player.uuid))
             )
         )
+        self.network_ticks_til_update = TICKS_BEFORE_UPDATE
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -103,6 +106,10 @@ class GameScreen(Screen):
                     self.character_structs.append(
                         CharacterStruct(npc, sprite, pygame.sprite.Group(sprite), None)
                     )
+        self.network_ticks_til_update -= 1
+        if self.network_ticks_til_update <= 0:
+            self.network_ticks_til_update = TICKS_BEFORE_UPDATE
+            self.network.send(build_player_update_from_character(self.world.player))
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -125,7 +132,7 @@ class GameScreen(Screen):
             # TODO self.screen_scale += 1
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.HELLO_WORLD_NET in player_actions:
-            self.network.send(Message(text_message=TextMessage(text="Hello, World!")))
+            self.network.send(build_text("Hello, World!"))
 
     def draw(self, dest_surface: pygame.Surface):
         renderables = create_renderable_list()
