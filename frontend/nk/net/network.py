@@ -1,5 +1,7 @@
+import asyncio
 import logging
 from typing import Optional
+from websockets.client import connect as wsaconnect, WebSocketClientProtocol
 from websockets.sync.client import connect as ws_connect
 import os
 
@@ -11,14 +13,31 @@ from nk.proto import Message
 
 LOGGER = logging.getLogger(__name__)
 USE_WSAPP = False
+host = environ.get("WEBSOCKET_HOST", "localhost")
+port = environ.get("WEBSOCKET_PORT", "7666")
+url = f"ws://{host}:{port}/ws"
 
 
-def network_run(received: deque[Message], to_send: deque[Message]):
-    host = environ.get("WEBSOCKET_HOST", "localhost")
-    port = environ.get("WEBSOCKET_PORT", "7666")
-    url = f"ws://{host}:{port}/ws"
+def network_async(received: deque[Message], to_send: deque[Message]):
+    async def process():
+        async with wsaconnect(url) as websocket:
+
+            async def read(websocket: WebSocketClientProtocol):
+                async for message in websocket:
+                    await received.append(Message().parse(message))
+
+            async def write(websocket: WebSocketClientProtocol):
+                while True:
+                    if to_send:
+                        await websocket.send(bytes(to_send.popleft()))
+
+        await asyncio.gather(read(websocket), write(websocket))
+
+    asyncio.run(process())
+
+
+def network_sync(received: deque[Message], to_send: deque[Message]):
     ws = ws_connect(url)
-
     while True:
         while to_send:
             message = to_send.popleft()
@@ -39,7 +58,7 @@ class Network:
         self._received_messages: deque[Message] = deque()
         self._to_send: deque[Message] = deque()
         self.network_thread = Thread(
-            target=network_run,
+            target=network_sync,
             name="network thread",
             args=(self._received_messages, self._to_send),
             daemon=True,
