@@ -13,3 +13,6 @@ clean:
 deploy: build
 	cp -r $(BUILD_DIR)nk/* ../frontend/nk
 	cp -r $(BUILD_DIR)nk/* ../backend/backend
+
+watch:
+	python -m watcher

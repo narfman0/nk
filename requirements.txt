@@ -1,0 +1,5 @@
+watchdog
+betterproto[compiler]
+-r frontend/requirements.txt
+-r frontend/requirements_test.txt
+-r backend/requirements.txt
