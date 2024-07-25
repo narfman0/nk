@@ -5,7 +5,7 @@ from fastapi import FastAPI, WebSocket
 
 from backend.logging import initialize_logging
 from backend.models import Player
-from backend.handler_old import handle_connected
+from backend.backend.handler import handle_connected
 
 initialize_logging()
 logger = logging.getLogger(__name__)
