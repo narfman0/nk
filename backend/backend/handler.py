@@ -3,7 +3,7 @@ import logging
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from nk.proto import Message, PlayerJoined
+from nk.proto import Message, PlayerJoined, PlayerLeft
 from backend.models import Player
 
 logger = logging.getLogger(__name__)
@@ -36,5 +36,5 @@ async def handle_connected(websocket: WebSocket, player: Player):
             logger.debug(f"Handled message: {msg} from {player.uuid}")
     except WebSocketDisconnect:
         print("Received WebSocketDisconnect")
-        # TODO emit player left
+        broadcast(Message(player_left=PlayerLeft(uuid=player.uuid)))
         players.remove(player)
