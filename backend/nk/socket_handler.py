@@ -3,9 +3,9 @@ import logging
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
+from nk.models import Player
 from nk.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
-from backend.models import Player
-from backend.world import players
+from nk.world import players
 
 logger = logging.getLogger(__name__)
 

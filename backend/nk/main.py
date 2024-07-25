@@ -2,9 +2,9 @@ from queue import Queue
 
 from fastapi import FastAPI, WebSocket
 
-from backend.socket_handler import handle_connected
-from backend.logging import initialize_logging
-from backend.models import Player
+from nk.socket_handler import handle_connected
+from nk.logging import initialize_logging
+from nk.models import Player
 
 initialize_logging()
 app = FastAPI()
