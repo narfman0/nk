@@ -60,11 +60,6 @@ class GameScreen(Screen):
 
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
-        self.network.send(
-            Message(
-                player_join_request=PlayerJoinRequest(uuid=str(self.world.player.uuid))
-            )
-        )
         self.network_ticks_til_update = TICKS_BEFORE_UPDATE
 
     def update(self, dt: float, events: list[Event]):

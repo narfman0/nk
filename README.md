@@ -1,23 +1,26 @@
 # nk
 
-space squad-y mmo RPG!
+space squad-y multiplayer RPG!
 
 ## Getting Started
 
-I'll make this easier eventually, but for now:
+* Activate a venv and `pip install -r requirements.txt`
+* Start server by navigating to backend and run with `make`
+* Start frontend by navigating to frontend and running wth `make m`
 
-* Install protobuf compiler
-* Install [betterproto](https://pypi.org/project/betterproto/)
-* From proto directory, `make deploy`
-* From backend directory, create venv+install deps+`make`
-* From frontend directory, create venv+install deps+`make m`
+Tweak your IDE/vs code run configurations to mirror that behavior :D
+
+## Development
+
+* Install protobuf compiler and ensure it is on PATH
+* From proto directory, make changes and use `make deploy` to cp to other projects
 
 ## TODO
 
 v1:
 
-* Leveling
-* Server stuffs
+* Modeling enemies+combat
+* Login + character persistence
 
 ## License
 
