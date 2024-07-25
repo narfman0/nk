@@ -1,8 +1,9 @@
 import logging
 
 from fastapi import WebSocket
+from starlette.websockets import WebSocketDisconnect
 
-from nk.proto import Message, PlayerJoined, PlayerJoinResponse
+from nk.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
 from backend.models import Player
 from backend.world import players
 
@@ -39,3 +40,15 @@ def handle_player_join_request(player: Player, msg: Message):
     response = PlayerJoinResponse(success=True, x=17, y=27)
     player.messages.put(Message(player_join_response=response))
     broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
+
+
+async def handle_connected(websocket: WebSocket, player: Player):
+    try:
+        while True:
+            await send_messages(player, websocket)
+            data = await websocket.receive_bytes()
+            receive_messages(player, Message().parse(data))
+    except WebSocketDisconnect:
+        logger.info(f"Disconnected from {player}")
+        broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
+        players.remove(player)
