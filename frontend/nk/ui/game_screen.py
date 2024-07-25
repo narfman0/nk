@@ -127,10 +127,10 @@ class GameScreen(Screen):
             self.world.player.invincible = not self.world.player.invincible
             print(f"Player invincibility set to {self.world.player.invincible}")
         if ActionEnum.ZOOM_OUT in player_actions:
-            # TODO self.screen_scale -= 1
+            # TODO self.screen_scale = max(3, self.screen_scale - 1)
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.ZOOM_IN in player_actions:
-            # TODO self.screen_scale += 1
+            # TODO self.screen_scale = min(6, self.screen_scale + 1)
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.HELLO_WORLD_NET in player_actions:
             self.network.send(build_text("Hello, World!"))
