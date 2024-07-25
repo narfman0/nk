@@ -85,8 +85,8 @@ class GameScreen(Screen):
     def update_network(self):
         while self.network.has_messages():
             message = self.network.next()
-            LOGGER.info(message)
             if message.player_update._serialized_on_wire:
+                LOGGER.info(message.player_update)
                 uuid = UUID(message.player_update.uuid)
                 npc = self.world.get_npc_by_uuid(uuid)
                 if npc:
