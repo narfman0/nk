@@ -19,7 +19,7 @@ from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 from nk.game.world import World
 from nk.net.network import Network
-from nk.net.builders import build_player_update_from_character, build_text
+from nk.net.builders import build_hb, build_player_update_from_character, build_text
 from nk.settings import *
 from nk.proto import Message, PlayerJoinRequest
 
@@ -110,6 +110,7 @@ class GameScreen(Screen):
         if self.network_ticks_til_update <= 0:
             self.network_ticks_til_update = TICKS_BEFORE_UPDATE
             self.network.send(build_player_update_from_character(self.world.player))
+        self.network.send(build_hb())
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:

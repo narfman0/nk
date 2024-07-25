@@ -1,5 +1,9 @@
 from nk.game.models.character import Character
-from nk.proto import Message, TextMessage, PlayerUpdate
+from nk.proto import Heartbeat, Message, TextMessage, PlayerUpdate
+
+
+def build_hb() -> Message:
+    return Message(heartbeat=Heartbeat())
 
 
 def build_player_update_from_character(character: Character) -> Message:
