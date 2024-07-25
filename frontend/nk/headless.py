@@ -7,7 +7,7 @@ from nk.net.network import Network
 from nk.proto import Message, PlayerJoinRequest, PlayerUpdate
 from nk.util.logging import initialize_logging
 
-UPDATE_FREQUENCY = 10.0
+UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)
 
 
