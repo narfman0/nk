@@ -22,14 +22,14 @@ def main():
     while True:
         if next_update_time < time.time():
             next_update_time = time.time() + UPDATE_FREQUENCY
-            x = center_x + sin(i / 50) * 2
-            y = center_y + cos(i / 50) * 2
+            x = center_x + sin(i / 5) * 2
+            y = center_y + cos(i / 5) * 2
+            i += UPDATE_FREQUENCY
             network.send(Message(player_update=PlayerUpdate(uuid=str(uuid), x=x, y=y)))
             logger.info(f"Sent: {(x,y)}")
         while network.has_messages():
             logger.info(f"Received: {network.next()}")
         network.send(Message())  # workaround for stimulating msg reception
-        i += 1
         time.sleep(0.1)
 
 
