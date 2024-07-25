@@ -3,9 +3,9 @@ from queue import Queue
 
 from fastapi import FastAPI, WebSocket
 
+from backend.handler import handle_connected
 from backend.logging import initialize_logging
 from backend.models import Player
-from backend.handler import handle_connected
 
 initialize_logging()
 logger = logging.getLogger(__name__)
