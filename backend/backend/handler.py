@@ -34,9 +34,10 @@ async def handle_connected(websocket: WebSocket, player: Player):
 
     async def producer_handler(websocket: WebSocket):
         while True:
-            message = await player.messages.get()
-            logger.debug(f"Sending message {message} to {player.uuid}")
-            await websocket.send_bytes(bytes(message))
+            if not player.messages.empty():
+                message = player.messages.get()
+                logger.debug(f"Sending message {message} to {player.uuid}")
+                await websocket.send_bytes(bytes(message))
 
     consumer_task = asyncio.create_task(consumer_handler(websocket))
     producer_task = asyncio.create_task(producer_handler(websocket))

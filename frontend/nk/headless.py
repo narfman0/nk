@@ -4,7 +4,7 @@ import uuid
 from math import sin, cos
 
 from nk.net.network import Network
-from nk.proto import Message, TextMessage, PlayerJoinRequest, PlayerUpdate
+from nk.proto import Message, PlayerJoinRequest, PlayerUpdate
 from nk.util.logging import initialize_logging
 
 logger = logging.getLogger(__name__)
