@@ -4,7 +4,7 @@ from uuid import uuid4
 from math import sin, cos
 
 from nk.net.network import Network
-from nk.proto import Message, PlayerJoinRequest, PlayerUpdate
+from nk.proto import Message, PlayerJoinRequest, CharacterUpdate
 from nk.util.logging import initialize_logging
 
 UPDATE_FREQUENCY = 0.1
@@ -36,7 +36,9 @@ def main():
             x = center_x + sin(i / 5) * 2
             y = center_y + cos(i / 5) * 2
             i += UPDATE_FREQUENCY
-            network.send(Message(player_update=PlayerUpdate(uuid=str(uuid), x=x, y=y)))
+            network.send(
+                Message(character_update=CharacterUpdate(uuid=str(uuid), x=x, y=y))
+            )
             logger.info(f"Sent: {(x,y)}")
         while network.has_messages():
             logger.info(f"Received: {network.next()}")

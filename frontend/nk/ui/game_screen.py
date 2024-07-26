@@ -19,7 +19,7 @@ from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 from nk.game.world import World
 from nk.net.network import Network
-from nk.net.builders import build_player_update_from_character, build_text
+from nk.net.builders import build_character_update_from_character, build_text
 from nk.settings import *
 
 LOGGER = logging.getLogger(__name__)
@@ -84,17 +84,19 @@ class GameScreen(Screen):
     def update_network(self):
         while self.network.has_messages():
             message = self.network.next()
-            if message.player_update._serialized_on_wire:
-                LOGGER.info(message.player_update)
-                uuid = UUID(message.player_update.uuid)
+            if message.character_update._serialized_on_wire:
+                LOGGER.info(message.character_update)
+                uuid = UUID(message.character_update.uuid)
                 npc = self.world.get_npc_by_uuid(uuid)
                 if npc:
                     npc.body.position = Vec2d(
-                        message.player_update.x, message.player_update.y
+                        message.character_update.x, message.character_update.y
                     )
                 else:
                     npc = self.world.add_npc(
-                        uuid=uuid, x=message.player_update.x, y=message.player_update.y
+                        uuid=uuid,
+                        x=message.character_update.x,
+                        y=message.character_update.y,
                     )
                     sprite = CharacterSprite(npc.character_type)
                     self.character_structs.append(
@@ -103,7 +105,7 @@ class GameScreen(Screen):
         self.network_ticks_til_update -= 1
         if self.network_ticks_til_update <= 0:
             self.network_ticks_til_update = TICKS_BEFORE_UPDATE
-            self.network.send(build_player_update_from_character(self.world.player))
+            self.network.send(build_character_update_from_character(self.world.player))
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
