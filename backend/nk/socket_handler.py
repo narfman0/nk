@@ -4,15 +4,18 @@ import logging
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from nk.models import Player
 from nk.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
-from nk.world import players
+from nk.world.world import World
+from nk.world.models import Player
 
 logger = logging.getLogger(__name__)
+# Locally, this is the world directly. When deployed, this might be a handle to
+# a message forwarder to the larger system.
+world = World()
 
 
 async def broadcast(origin: Player | None, message: Message):
-    for remote_player in players:
+    for remote_player in world.get_players():
         if not origin == remote_player:
             await remote_player.messages.put(message)
 
@@ -35,14 +38,14 @@ async def handle_messages(player: Player, msg: Message):
 
 async def handle_player_join_request(player: Player, msg: Message):
     player.uuid = msg.player_join_request.uuid
-    players.append(player)
+    world.get_players().append(player)
     logger.info(f"Player join request success: {player.uuid}")
     response = PlayerJoinResponse(success=True, x=17, y=27)
     await player.messages.put(Message(player_join_response=response))
     await broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
 
-async def handle_connected(websocket: WebSocket, player: Player):
+async def handle_connected(websocket: WebSocket):
     async def consumer():
         async for data in websocket.iter_bytes():
             await handle_messages(player, Message().parse(data))
@@ -61,9 +64,10 @@ async def handle_connected(websocket: WebSocket, player: Player):
         for task in pending:
             task.cancel()
 
+    player = Player(uuid=None, messages=asyncio.Queue())
     try:
         await handler()
     except WebSocketDisconnect:
         logger.info(f"Disconnected from {player}")
         broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
-        players.remove(player)
+        world.get_players().remove(player)
