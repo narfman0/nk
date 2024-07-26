@@ -6,7 +6,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from nk.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
 from nk.world.world import World
-from nk.world.models import Player
+from nk.world.models import Character
 
 logger = logging.getLogger(__name__)
 # Locally, this is the world directly. When deployed, this might be a handle to
@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 world = World()
 
 
-async def broadcast(origin: Player | None, message: Message):
+async def broadcast(origin: Character | None, message: Message):
     for remote_player in world.get_players():
         if not origin == remote_player:
             await remote_player.messages.put(message)
 
 
-async def send_messages(player: Player, websocket: WebSocket):
+async def send_messages(player: Character, websocket: WebSocket):
     message = await player.messages.get()
     logger.debug(f"Sending message {message} to {player.uuid}")
     await websocket.send_bytes(bytes(message))
 
 
-async def handle_messages(player: Player, msg: Message):
+async def handle_messages(player: Character, msg: Message):
     if msg.player_join_request._serialized_on_wire:
         await handle_player_join_request(player, msg)
     elif msg.text_message._serialized_on_wire:
@@ -36,10 +36,10 @@ async def handle_messages(player: Player, msg: Message):
     logger.debug(f"Handled message: {msg} from {player.uuid}")
 
 
-async def handle_player_join_request(player: Player, msg: Message):
+async def handle_player_join_request(player: Character, msg: Message):
     player.uuid = msg.player_join_request.uuid
     world.get_players().append(player)
-    logger.info(f"Player join request success: {player.uuid}")
+    logger.info(f"Join request success: {player.uuid}")
     response = PlayerJoinResponse(success=True, x=17, y=27)
     await player.messages.put(Message(player_join_response=response))
     await broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
@@ -64,7 +64,7 @@ async def handle_connected(websocket: WebSocket):
         for task in pending:
             task.cancel()
 
-    player = Player(uuid=None, messages=asyncio.Queue())
+    player = Character(uuid=None, messages=asyncio.Queue())
     try:
         await handler()
     except WebSocketDisconnect:

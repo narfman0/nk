@@ -6,6 +6,6 @@ from nk.proto import Message
 
 
 @dataclass
-class Player:
+class Character:
     uuid: uuid.UUID
     messages: Queue[Message]

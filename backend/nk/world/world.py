@@ -1,12 +1,12 @@
 import logging
-from nk.world.models import Player
+from nk.world.models import Character
 
 logger = logging.getLogger(__name__)
 
 
 class World:
     def __init__(self):
-        self.players: list[Player] = []
+        self.players: list[Character] = []
 
-    def get_players(self) -> list[Player]:
+    def get_players(self) -> list[Character]:
         return self.players
