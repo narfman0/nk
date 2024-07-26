@@ -11,7 +11,7 @@ from nk.world import players
 logger = logging.getLogger(__name__)
 
 
-async def broadcast(origin: Player, message: Message):
+async def broadcast(origin: Player | None, message: Message):
     for remote_player in players:
         if not origin == remote_player:
             await remote_player.messages.put(message)

@@ -1,7 +1,6 @@
 import sys
 import time
 import logging
-from typing import Optional
 import subprocess
 
 from watchdog.observers import Observer
@@ -9,7 +8,7 @@ from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 
 class EventHandler(FileSystemEventHandler):
-    def __init__(self, logger: Optional[logging.Logger] = None) -> None:
+    def __init__(self, logger: logging.Logger | None = None) -> None:
         super().__init__()
         self.logger = logger or logging.root
 

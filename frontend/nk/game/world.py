@@ -1,6 +1,5 @@
 import pymunk
 from uuid import UUID
-from typing import Optional
 
 from nk.game.models.level import Level
 from nk.game.models.projectile import Projectile
@@ -117,7 +116,7 @@ class World:
         self.space.add(npc.body, npc.shape, npc.hitbox_shape)
         return npc
 
-    def get_npc_by_uuid(self, uuid: UUID) -> Optional[Character]:
+    def get_npc_by_uuid(self, uuid: UUID) -> Character | None:
         for npc in self.npcs:
             if npc.uuid == uuid:
                 return npc

@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from queue import Queue
 
 from os import environ
@@ -34,6 +33,6 @@ class Network:
     def has_messages(self) -> bool:
         return not self._received_messages.empty()
 
-    def next(self) -> Optional[Message]:
+    def next(self) -> Message | None:
         if self.has_messages():
             return self._received_messages.get()
