@@ -40,7 +40,6 @@ def main():
             logger.info(f"Sent: {(x,y)}")
         while network.has_messages():
             logger.info(f"Received: {network.next()}")
-        network.send(Message())  # workaround for stimulating msg reception
         time.sleep(0.1)
 
 

@@ -1,5 +1,5 @@
+from asyncio import Queue
 from dataclasses import dataclass
-from queue import Queue
 import uuid
 
 from nk.proto import Message

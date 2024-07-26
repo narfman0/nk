@@ -21,7 +21,6 @@ from nk.game.world import World
 from nk.net.network import Network
 from nk.net.builders import build_player_update_from_character, build_text
 from nk.settings import *
-from nk.proto import Message, PlayerJoinRequest
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
@@ -105,7 +104,6 @@ class GameScreen(Screen):
         if self.network_ticks_til_update <= 0:
             self.network_ticks_til_update = TICKS_BEFORE_UPDATE
             self.network.send(build_player_update_from_character(self.world.player))
-        self.network.send(Message())
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
