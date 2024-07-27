@@ -5,7 +5,7 @@ import pygame
 from nk.settings import *
 from nk.ui.screen import ScreenManager
 from nk.ui.load_screen import LoadScreen
-from nk.util.logging import initialize_logging
+from nk_shared.util.logging import initialize_logging
 
 LOGGER = logging.getLogger(__name__)
 

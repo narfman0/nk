@@ -1,5 +1,5 @@
 import unittest
-from nk.util import logging
+from nk_shared.util import logging
 
 
 class TestLogging(unittest.TestCase):

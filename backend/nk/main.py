@@ -4,9 +4,9 @@ import logging
 
 from fastapi import FastAPI, WebSocket
 from pygame.time import Clock
+from nk_shared.util.logging import initialize_logging
 
 from nk.socket_handler import handle_connected
-from nk.logging import initialize_logging
 
 logger = logging.getLogger(__name__)
 

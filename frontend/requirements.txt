@@ -6,3 +6,4 @@ dataclass-wizard
 sortedcontainers
 betterproto
 websockets
+#-e ../shared

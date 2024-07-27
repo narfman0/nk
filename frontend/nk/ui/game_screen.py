@@ -6,7 +6,7 @@ import pygame
 from pygame.event import Event
 from pymunk import Vec2d
 
-from nk.util.math import cartesian_to_isometric
+from nk_shared.util.math import cartesian_to_isometric
 from nk.ui.input import (
     ActionEnum,
     read_input_player_move_direction,
