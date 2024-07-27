@@ -124,23 +124,8 @@ class Character(CharacterProperties):
         self.hitbox_shape.sensor = True
 
     def apply_character_properties(self):
-        # TODO need datastore for these properties.
-        pigsassin_yaml = """
-        mass: 10
-        dash_cooldown: 0.25
-        dash_duration: 0.25
-        dash_scalar: 3
-        run_force: 25000
-        running_stop_threshold: 2
-        max_velocity: 5
-        radius: 0.5
-        attack_distance: 0.5
-        attack_duration: 0.8
-        attack_time_until_damage: 0.4
-        hp_max: 1"""
-        character_properties = CharacterProperties.from_yaml(pigsassin_yaml)
-        # path = f"data/characters/{self.character_type}/character.yml"
-        # character_properties = CharacterProperties.from_yaml_file(path)
+        path = f"../data/characters/{self.character_type}/character.yml"
+        character_properties = CharacterProperties.from_yaml_file(path)
         self.__dict__.update(character_properties.__dict__)
 
 

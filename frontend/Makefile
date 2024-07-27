@@ -30,8 +30,8 @@ pyinstaller: clean
 	pyinstaller --noconfirm --onefile --console \
 		-n nk --uac-admin \
 		app.py
-	cp -r data/ dist/
-	cp data/installer/*.dll dist/
+	cp -r ../data/ dist/
+	cp ../data/installer/*.dll dist/
 	cp README.* dist/
 	7z a nk.zip dist/*
 	7z rn nk.zip dist nk

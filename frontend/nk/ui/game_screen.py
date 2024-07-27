@@ -163,7 +163,7 @@ class GameScreen(Screen):
         for projectile in self.world.projectiles:
             image = self.projectile_image_dict.get(projectile.attack_profile.image_path)
             if image is None:
-                path = f"data/projectiles/{projectile.attack_profile.image_path}.png"
+                path = f"../data/projectiles/{projectile.attack_profile.image_path}.png"
                 image = pygame.image.load(path).convert_alpha()
                 self.projectile_image_dict[projectile.attack_profile.image_path] = image
             blit_x, blit_y = self.calculate_draw_coordinates(

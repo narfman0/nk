@@ -7,7 +7,7 @@ import pytmx
 class Map:
     def __init__(self, area: str):
         self.area = area
-        self._tmxdata = pytmx.load_pygame(f"data/tiled/{area}.tmx")
+        self._tmxdata = pytmx.load_pygame(f"../data/tiled/{area}.tmx")
 
     def get_start_tile(self):
         return map(int, self._tmxdata.properties.get("StartXY").split(","))

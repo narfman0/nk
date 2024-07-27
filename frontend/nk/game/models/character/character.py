@@ -116,7 +116,7 @@ class Character(CharacterProperties):
             self.dash_time_remaining = self.dash_duration
 
     def apply_character_properties(self):
-        path = f"data/characters/{self.character_type}/character.yml"
+        path = f"../data/characters/{self.character_type}/character.yml"
         character_properties = CharacterProperties.from_yaml_file(path)
         self.__dict__.update(character_properties.__dict__)
 

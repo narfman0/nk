@@ -15,7 +15,7 @@ class World:
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
-        self.level = Level.from_yaml_file(f"data/levels/{level_name}.yml")
+        self.level = Level.from_yaml_file(f"../data/levels/{level_name}.yml")
         self.map = Map(self.level.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
 
@@ -62,7 +62,7 @@ class World:
                     attack_profile = self.attack_profiles.get(enemy.attack_profile_name)
                     if not attack_profile:
                         attack_profile = AttackProfile.from_yaml_file(
-                            f"data/attack_profiles/{enemy.attack_profile_name}.yml"
+                            f"../data/attack_profiles/{enemy.attack_profile_name}.yml"
                         )
                         self.attack_profiles[enemy.attack_profile_name] = attack_profile
                     speed = enemy.facing_direction.to_vector().scale_to_length(
