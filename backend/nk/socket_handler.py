@@ -37,7 +37,8 @@ async def handle_player_join_request(player: Player, msg: Message):
     player.uuid = msg.player_join_request.uuid
     world.get_players().append(player)
     logger.info(f"Join request success: {player.uuid}")
-    response = PlayerJoinResponse(success=True, x=17, y=27)
+    startx, starty = world.map.get_start_tile()
+    response = PlayerJoinResponse(success=True, x=startx, y=starty)
     await player.messages.put(Message(player_join_response=response))
     await broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
