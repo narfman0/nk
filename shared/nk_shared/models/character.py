@@ -29,7 +29,7 @@ class Character(CharacterProperties):
     def __init__(
         self,
         position: tuple[float, float],
-        character_type: str = "pigsassin",
+        character_type: str,
         uuid: None | UUID = None,
     ):
         self.character_type = character_type

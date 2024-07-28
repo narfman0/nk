@@ -3,7 +3,7 @@ import time
 from uuid import uuid4
 from math import sin, cos
 
-from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdate
+from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdate, CharacterType
 from nk_shared.util.logging import initialize_logging
 
 from nk.net import Network
@@ -38,7 +38,11 @@ def main():
             y = center_y + cos(i / 5) * 2
             i += UPDATE_FREQUENCY
             network.send(
-                Message(character_update=CharacterUpdate(uuid=str(uuid), x=x, y=y))
+                Message(
+                    character_update=CharacterUpdate(
+                        uuid=str(uuid), x=x, y=y, character_type=CharacterType.PIGSASSIN
+                    )
+                )
             )
             logger.info(f"Sent: {(x,y)}")
         while network.has_messages():

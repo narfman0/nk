@@ -2,8 +2,18 @@ syntax = "proto3";
 
 package proto;
 
+enum CharacterType{
+    INVALID = 0;
+    PIGSASSIN = 1;
+    ASSAULT_DROID = 2;
+    DROID_ASSASSIN = 3;
+    SAMURAI = 4;
+    SHADOW_GUARDIAN = 5;
+}
+
 message CharacterUpdate {
     string uuid = 1;
     float x = 2;
     float y = 3;
+    CharacterType character_type = 4;
 }

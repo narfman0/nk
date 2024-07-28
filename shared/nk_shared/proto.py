@@ -6,11 +6,21 @@ from dataclasses import dataclass
 import betterproto
 
 
+class CharacterType(betterproto.Enum):
+    INVALID = 0
+    PIGSASSIN = 1
+    ASSAULT_DROID = 2
+    DROID_ASSASSIN = 3
+    SAMURAI = 4
+    SHADOW_GUARDIAN = 5
+
+
 @dataclass
 class CharacterUpdate(betterproto.Message):
     uuid: str = betterproto.string_field(1)
     x: float = betterproto.float_field(2)
     y: float = betterproto.float_field(3)
+    character_type: "CharacterType" = betterproto.enum_field(4)
 
 
 @dataclass

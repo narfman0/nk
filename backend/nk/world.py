@@ -2,8 +2,9 @@ import logging
 import random
 from math import sin, cos
 
+from nk_shared.builders import build_character_update_from_character
 from nk_shared.models import Character
-from nk_shared.proto import Message, CharacterUpdate
+from nk_shared.proto import CharacterType
 
 from nk.models import Player
 
@@ -17,7 +18,9 @@ class World:
         self.enemies: list[Character] = []
         for _i in range(5):
             pos = (20 + random.randint(-3, 3), 27 + random.randint(-3, 3))
-            enemy = Character(position=pos)
+            enemy = Character(
+                position=pos, character_type=CharacterType.PIGSASSIN.name.lower()
+            )
             enemy.temp_center = pos  # we'll remove this eventually
             self.enemies.append(enemy)
         self.i = 0.0
@@ -36,9 +39,7 @@ class World:
                 x += sin(self.i / 5) * 2
                 y += cos(self.i / 5) * 2
                 enemy.body.position = (x, y)
-                msg = Message(
-                    character_update=CharacterUpdate(uuid=str(enemy.uuid), x=x, y=y)
-                )
+                msg = build_character_update_from_character(enemy)
                 for player in self.players:
                     player.messages.put_nowait(msg)
 

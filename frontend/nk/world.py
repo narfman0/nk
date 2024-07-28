@@ -10,6 +10,7 @@ from nk_shared.models import (
     Level,
     Projectile,
 )
+from nk_shared.proto import CharacterType
 
 
 class World:
@@ -24,7 +25,8 @@ class World:
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
         self.player = Character(
-            position=(0.5 + tile_x, 0.5 + tile_y), character_type="pigsassin"
+            position=(0.5 + tile_x, 0.5 + tile_y),
+            character_type=CharacterType.PIGSASSIN.name.lower(),
         )
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
@@ -99,8 +101,8 @@ class World:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
                 enemy.handle_damage_received(1)
 
-    def add_npc(self, uuid: UUID, x: float, y: float) -> Character:
-        npc = Character(uuid=uuid, position=(x, y))
+    def add_npc(self, uuid: UUID, x: float, y: float, character_type: str) -> Character:
+        npc = Character(uuid=uuid, position=(x, y), character_type=character_type)
         self.npcs.append(npc)
         self.space.add(npc.body, npc.shape, npc.hitbox_shape)
         return npc

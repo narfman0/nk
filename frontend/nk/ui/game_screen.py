@@ -6,12 +6,13 @@ import pygame
 from pygame.event import Event
 from pymunk import Vec2d
 
+from nk_shared.builders import build_character_update_from_character, build_text
 from nk_shared.models.character import Character
 from nk_shared.models.direction import Direction
+from nk_shared.proto import CharacterType
 from nk_shared.util.math import cartesian_to_isometric
 
 from nk.net import Network
-from nk.net.builders import build_character_update_from_character, build_text
 from nk.settings import *
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
@@ -93,10 +94,14 @@ class GameScreen(Screen):
                         message.character_update.x, message.character_update.y
                     )
                 else:
+                    character_type = CharacterType(
+                        message.character_update.character_type
+                    ).name.lower()
                     npc = self.world.add_npc(
                         uuid=uuid,
                         x=message.character_update.x,
                         y=message.character_update.y,
+                        character_type=character_type,
                     )
                     sprite = CharacterSprite(npc.character_type)
                     self.character_structs.append(
