@@ -43,7 +43,7 @@ class EventHandler(FileSystemEventHandler):
         self.handle_changes(event)
 
     def handle_changes(self, event: FileSystemEvent) -> None:
-        subprocess.run(["make", "deploy"])
+        subprocess.run(["make"])
 
 
 if __name__ == "__main__":
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         format="%(asctime)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    path = sys.argv[1] if len(sys.argv) > 1 else "./nk"
+    path = sys.argv[1] if len(sys.argv) > 1 else "./proto"
     event_handler = EventHandler()
     observer = Observer()
     observer.schedule(event_handler, path, recursive=True)

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "proto/character_update.proto";
+import "proto/player_joined.proto";
+import "proto/player_join_request.proto";
+import "proto/player_join_response.proto";
+import "proto/player_left.proto";
+import "proto/text_message.proto";
+
+package proto;
+
+message Message {
+  oneof payload {
+    proto.CharacterUpdate character_update = 5;
+    proto.PlayerJoined player_joined = 2;
+    proto.PlayerLeft player_left = 3;
+    proto.PlayerJoinRequest player_join_request = 4;
+    proto.PlayerJoinResponse player_join_response = 6;
+    proto.TextMessage text_message = 1;
+  }
+}
