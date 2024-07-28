@@ -1,12 +1,13 @@
 import logging
-from pygame.event import Event
 import os
 
-from nk.game.world import World
+from pygame.event import Event
+from nk_shared.proto import Message, PlayerJoinRequest
+
+from nk.net.network import Network
 from nk.ui.screen import Screen, ScreenManager
 from nk.ui.game_screen import GameScreen
-from nk.net.network import Network
-from nk_shared.proto import Message, PlayerJoinRequest
+from nk.world import World
 
 logger = logging.getLogger(__name__)
 

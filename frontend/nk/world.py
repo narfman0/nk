@@ -1,13 +1,15 @@
 import pymunk
 from uuid import UUID
 
-from nk_shared.models.level import Level
-from nk_shared.models.projectile import Projectile
-from nk.game.map import Map
-from nk_shared.models.attack_profile import AttackProfile
-from nk_shared.models.attack_type import AttackType
-from nk_shared.models.character import Character
-from nk_shared.models.direction import Direction
+from nk_shared.map import Map
+from nk_shared.models import (
+    AttackProfile,
+    AttackType,
+    Character,
+    Direction,
+    Level,
+    Projectile,
+)
 
 
 class World:

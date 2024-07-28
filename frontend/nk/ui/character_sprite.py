@@ -2,7 +2,6 @@ import pygame
 import yaml
 
 from nk_shared.models.direction import Direction
-from nk.settings import FPS
 
 
 class CharacterSprite(pygame.sprite.Sprite):

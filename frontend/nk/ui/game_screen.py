@@ -6,20 +6,21 @@ import pygame
 from pygame.event import Event
 from pymunk import Vec2d
 
+from nk_shared.models.character import Character
+from nk_shared.models.direction import Direction
 from nk_shared.util.math import cartesian_to_isometric
+
+from nk.net.network import Network
+from nk.net.builders import build_character_update_from_character, build_text
+from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
     ActionEnum,
     read_input_player_move_direction,
     read_input_player_actions,
 )
-from nk.ui.character_sprite import CharacterSprite
 from nk.ui.renderables import *
 from nk.ui.screen import Screen, ScreenManager
-from nk_shared.models.character import Character
-from nk_shared.models.direction import Direction
-from nk.game.world import World
-from nk.net.network import Network
-from nk.net.builders import build_character_update_from_character, build_text
+from nk.world import World
 from nk.settings import *
 
 LOGGER = logging.getLogger(__name__)
