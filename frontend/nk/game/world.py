@@ -98,11 +98,7 @@ class World:
                 enemy.handle_damage_received(1)
 
     def add_npc(self, uuid: UUID, x: float, y: float) -> Character:
-        npc = Character(
-            uuid=uuid,
-            position=(0.5 + x, 0.5 + y),
-            character_type=self.player.character_type,
-        )
+        npc = Character(uuid=uuid, position=(x, y))
         self.npcs.append(npc)
         self.space.add(npc.body, npc.shape, npc.hitbox_shape)
         return npc
