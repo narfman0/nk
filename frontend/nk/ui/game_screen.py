@@ -203,13 +203,6 @@ class GameScreen(Screen):
         for character_struct in self.character_structs:
             character_struct.sprite_group.update(dt)
 
-    # TODO movement and attack animation change
-    # def ai_attack_callback(self, npc: NPC):
-    #     for character_struct in self.character_structs:
-    #         if character_struct.character == npc:
-    #             character_struct.sprite.change_animation("attack")
-    #             character_struct.sprite.move(npc.facing_direction)
-
     def generate_map_renderables(self, ground: bool):
         """We can statically generate the blit coords once in the beginning, avoiding a bunch of coordinate conversions."""
         ground_ids = self.world.map.get_ground_layer_ids()

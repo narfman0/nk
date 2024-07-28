@@ -6,7 +6,7 @@ from nk.game.models.projectile import Projectile
 from nk.game.map import Map
 from nk.game.models.attack_profile import AttackProfile
 from nk.game.models.attack_type import AttackType
-from nk.game.models.character import Character, NPC
+from nk.game.models.character import Character
 from nk.game.models.direction import Direction
 
 
@@ -26,17 +26,8 @@ class World:
         )
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
-        # initialize enemies
-        self.enemies: list[NPC] = []
-        self.npcs: list[NPC] = []
-        # TODO model for adding enemies
-        # for level_enemy in self.level.enemies:
-        #     enemy = NPC(
-        #         position=(0.5 + level_enemy.x, 0.5 + level_enemy.y),
-        #         character_type=level_enemy.character_type,
-        #     )
-        #     self.enemies.append(enemy)
-        #     self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
+        self.enemies: list[Character] = []
+        self.npcs: list[Character] = []
 
     def update(
         self,
@@ -106,8 +97,8 @@ class World:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
                 enemy.handle_damage_received(1)
 
-    def add_npc(self, uuid: UUID, x: float, y: float) -> NPC:
-        npc = NPC(
+    def add_npc(self, uuid: UUID, x: float, y: float) -> Character:
+        npc = Character(
             uuid=uuid,
             position=(0.5 + x, 0.5 + y),
             character_type=self.player.character_type,
