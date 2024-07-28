@@ -10,5 +10,5 @@ build_dir:
 clean:
 	rm -rf $(BUILD_DIR)
 
-watch:
+watch: build
 	python -m watcher
