@@ -5,7 +5,7 @@ from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
 from nk.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
-from nk.world.models import Player
+from nk.models import Player
 from nk.world import world
 
 logger = logging.getLogger(__name__)

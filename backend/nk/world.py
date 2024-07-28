@@ -1,11 +1,10 @@
 import logging
 import random
 from math import sin, cos
-from uuid import uuid4
 
 from nk_shared.models import Character
 
-from nk.world.models import Player
+from nk.models import Player
 from nk.proto import Message, CharacterUpdate
 
 UPDATE_FREQUENCY = 0.1
@@ -42,3 +41,8 @@ class World:
                 )
                 for player in self.players:
                     player.messages.put_nowait(msg)
+
+
+# Locally, this is the world directly. When deployed, this might be a handle to
+# a message forwarder to the larger system.
+world = World()
