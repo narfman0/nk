@@ -20,7 +20,11 @@ async def lifespan(app: FastAPI):
         while True:
             dt = clock.tick(60) / 1000.0
             world.update(dt)
-            await asyncio.sleep(max(0.01, 0.016 - dt))
+            try:
+                await asyncio.sleep(max(0.01, 0.016 - dt))
+            except asyncio.CancelledError:
+                logger.warn("World uplodate loop sleep cancelled, killing")
+                break
 
     asyncio.gather(world_updater())
     yield

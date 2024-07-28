@@ -3,7 +3,7 @@ from uuid import UUID, uuid4 as generate_uuid
 
 import pymunk
 
-from nk.game.models.character import CharacterProperties
+from nk.game.models.character_properties import CharacterProperties
 from nk.game.models.direction import Direction
 
 
