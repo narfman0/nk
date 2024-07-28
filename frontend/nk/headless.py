@@ -3,9 +3,10 @@ import time
 from uuid import uuid4
 from math import sin, cos
 
-from nk.net.network import Network
 from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdate
 from nk_shared.util.logging import initialize_logging
+
+from nk.net import Network
 
 UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)

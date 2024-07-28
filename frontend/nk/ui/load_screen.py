@@ -4,7 +4,7 @@ import os
 from pygame.event import Event
 from nk_shared.proto import Message, PlayerJoinRequest
 
-from nk.net.network import Network
+from nk.net import Network
 from nk.ui.screen import Screen, ScreenManager
 from nk.ui.game_screen import GameScreen
 from nk.world import World

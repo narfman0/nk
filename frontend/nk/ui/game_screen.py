@@ -10,8 +10,9 @@ from nk_shared.models.character import Character
 from nk_shared.models.direction import Direction
 from nk_shared.util.math import cartesian_to_isometric
 
-from nk.net.network import Network
+from nk.net import Network
 from nk.net.builders import build_character_update_from_character, build_text
+from nk.settings import *
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
     ActionEnum,
@@ -21,7 +22,6 @@ from nk.ui.input import (
 from nk.ui.renderables import *
 from nk.ui.screen import Screen, ScreenManager
 from nk.world import World
-from nk.settings import *
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
