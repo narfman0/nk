@@ -29,6 +29,7 @@ async def handle_messages(player: Player, msg: Message):
     elif msg.text_message._serialized_on_wire:
         await broadcast(player, msg)
     elif msg.character_update._serialized_on_wire:
+        world.handle_character_update(msg.character_update)
         await broadcast(player, msg)
     logger.debug(f"Handled message: {msg} from {player.uuid}")
 
@@ -67,5 +68,5 @@ async def handle_connected(websocket: WebSocket):
         await handler()
     except WebSocketDisconnect:
         logger.info(f"Disconnected from {player}")
-        broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
-        world.get_players().remove(player)
+    broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
+    world.get_players().remove(player)

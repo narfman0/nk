@@ -25,6 +25,7 @@ class Character(CharacterProperties):
     should_process_attack: bool = False
     hp: int = 0
     invincible: bool = False
+    body_removal_processed: bool = False
 
     def __post_init__(self):
         self.apply_character_properties()
