@@ -3,8 +3,8 @@ from uuid import UUID, uuid4 as generate_uuid
 
 import pymunk
 
-from nk.game.models.character_properties import CharacterProperties
-from nk.game.models.direction import Direction
+from nk_shared.models.character_properties import CharacterProperties
+from nk_shared.models.direction import Direction
 
 
 @dataclass
@@ -29,7 +29,7 @@ class Character(CharacterProperties):
     def __init__(
         self,
         position: tuple[float, float],
-        character_type: str,
+        character_type: str = "pigsassin",
         uuid: None | UUID = None,
     ):
         self.character_type = character_type

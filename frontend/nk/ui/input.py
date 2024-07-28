@@ -3,7 +3,7 @@ from enum import Enum
 import pygame
 from pygame.event import Event
 
-from nk.game.models.direction import Direction
+from nk_shared.models.direction import Direction
 
 
 class ActionEnum(Enum):

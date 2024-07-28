@@ -1,7 +1,7 @@
 import pygame
 import yaml
 
-from nk.game.models.direction import Direction
+from nk_shared.models.direction import Direction
 from nk.settings import FPS
 
 

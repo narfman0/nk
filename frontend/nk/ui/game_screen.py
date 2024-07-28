@@ -15,8 +15,8 @@ from nk.ui.input import (
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.renderables import *
 from nk.ui.screen import Screen, ScreenManager
-from nk.game.models.character import Character
-from nk.game.models.direction import Direction
+from nk_shared.models.character import Character
+from nk_shared.models.direction import Direction
 from nk.game.world import World
 from nk.net.network import Network
 from nk.net.builders import build_character_update_from_character, build_text

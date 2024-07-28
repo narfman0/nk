@@ -1,4 +1,4 @@
-from nk.game.models.character import Character
+from nk_shared.models.character import Character
 from nk.proto import Message, TextMessage, CharacterUpdate
 
 

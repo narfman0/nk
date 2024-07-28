@@ -3,7 +3,9 @@ import random
 from math import sin, cos
 from uuid import uuid4
 
-from nk.world.models import Character, Player
+from nk_shared.models import Character
+
+from nk.world.models import Player
 from nk.proto import Message, CharacterUpdate
 
 UPDATE_FREQUENCY = 0.1
@@ -14,13 +16,10 @@ class World:
     def __init__(self):
         self.players: list[Player] = []
         self.enemies: list[Character] = []
-        for i in range(5):
-            enemy = Character(uuid=uuid4())
-            enemy.temp_center = (
-                20 + random.randint(-3, 3),
-                27 + random.randint(-3, 3),
-            )  # we'll remove this eventually
-            enemy.body.position = enemy.temp_center
+        for _i in range(5):
+            pos = (20 + random.randint(-3, 3), 27 + random.randint(-3, 3))
+            enemy = Character(position=pos)
+            enemy.temp_center = pos  # we'll remove this eventually
             self.enemies.append(enemy)
         self.i = 0.0
         self.next_update_time = 0.0

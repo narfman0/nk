@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclass_wizard import YAMLWizard
 
-from nk.game.models.attack_type import AttackType
+from nk_shared.models.attack_type import AttackType
 
 
 @dataclass
