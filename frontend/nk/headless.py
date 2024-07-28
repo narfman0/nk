@@ -4,7 +4,7 @@ from uuid import uuid4
 from math import sin, cos
 
 from nk.net.network import Network
-from nk.proto import Message, PlayerJoinRequest, CharacterUpdate
+from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdate
 from nk_shared.util.logging import initialize_logging
 
 UPDATE_FREQUENCY = 0.1

@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
             try:
                 await asyncio.sleep(max(0.01, 0.016 - dt))
             except asyncio.CancelledError:
-                logger.warn("World uplodate loop sleep cancelled, killing")
+                logger.warn("World update loop sleep cancelled, killing")
                 break
 
     asyncio.gather(world_updater())

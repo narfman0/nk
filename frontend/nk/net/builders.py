@@ -1,5 +1,5 @@
 from nk_shared.models.character import Character
-from nk.proto import Message, TextMessage, CharacterUpdate
+from nk_shared.proto import Message, TextMessage, CharacterUpdate
 
 
 def build_character_update_from_character(character: Character) -> Message:

@@ -4,7 +4,7 @@ from websockets import ConnectionClosed, WebSocketClientProtocol
 from websockets.client import connect
 from queue import Queue
 
-from nk.proto import Message
+from nk_shared.proto import Message
 
 LOGGER = logging.getLogger(__name__)
 

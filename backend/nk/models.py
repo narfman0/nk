@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from nk_shared.models import Character
 
-from nk.proto import Message
+from nk_shared.proto import Message
 
 
 @dataclass

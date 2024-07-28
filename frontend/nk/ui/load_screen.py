@@ -6,7 +6,7 @@ from nk.game.world import World
 from nk.ui.screen import Screen, ScreenManager
 from nk.ui.game_screen import GameScreen
 from nk.net.network import Network
-from nk.proto import Message, PlayerJoinRequest
+from nk_shared.proto import Message, PlayerJoinRequest
 
 logger = logging.getLogger(__name__)
 

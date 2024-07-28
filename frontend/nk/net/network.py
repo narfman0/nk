@@ -4,7 +4,7 @@ from queue import Queue
 from os import environ
 from threading import Thread
 
-from nk.proto import Message
+from nk_shared.proto import Message
 from nk.net.sync import handle_websocket
 
 LOGGER = logging.getLogger(__name__)

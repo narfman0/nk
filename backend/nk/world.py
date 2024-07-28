@@ -5,7 +5,7 @@ from math import sin, cos
 from nk_shared.models import Character
 
 from nk.models import Player
-from nk.proto import Message, CharacterUpdate
+from nk_shared.proto import Message, CharacterUpdate
 
 UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)

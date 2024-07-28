@@ -11,8 +11,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 deploy: build
-	cp -r $(BUILD_DIR)nk/* ../frontend/nk
-	cp -r $(BUILD_DIR)nk/* ../backend/nk
+	cp -r $(BUILD_DIR)nk/* ../shared/nk_shared
 
 watch:
 	python -m watcher
