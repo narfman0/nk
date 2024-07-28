@@ -8,3 +8,9 @@ from nk_shared.proto import Message
 @dataclass
 class Player(Character):
     messages: Queue[Message] = Queue()
+
+
+@dataclass
+class NPC(Character):
+    center_x: int = None
+    center_y: int = None

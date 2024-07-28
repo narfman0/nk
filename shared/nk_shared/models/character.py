@@ -9,6 +9,7 @@ from nk_shared.models.direction import Direction
 
 @dataclass
 class Character(CharacterProperties):
+    character_type: str = "pigsassin"
     uuid: UUID = field(default_factory=generate_uuid)
     facing_direction: Direction = Direction.S
     movement_direction: Direction = None
@@ -22,23 +23,14 @@ class Character(CharacterProperties):
     attack_time_remaining: float = 0
     attack_damage_time_remaining: float = 0
     should_process_attack: bool = False
-    character_type: str = None
-    hp: int = 1
+    hp: int = 0
     invincible: bool = False
 
-    def __init__(
-        self,
-        position: tuple[float, float],
-        character_type: str,
-        uuid: None | UUID = None,
-    ):
-        self.character_type = character_type
-        self.uuid = generate_uuid() if not uuid else uuid
+    def __post_init__(self):
         self.apply_character_properties()
         self.hp = self.hp_max
         self.body = pymunk.Body()
         self.body.character = self
-        self.body.position = position
         self.shape = pymunk.Circle(self.body, self.radius)
         self.shape.mass = self.mass
         self.hitbox_shape = pymunk.Segment(

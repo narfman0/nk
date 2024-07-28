@@ -1,1 +1,10 @@
 tmx_path: level1
+enemy_groups:
+  - character_type: shadow_guardian
+    count: 5
+    center_x: 16
+    center_y: 26
+  - character_type: shadow_guardian
+    count: 5
+    center_x: 16
+    center_y: 12

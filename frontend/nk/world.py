@@ -25,9 +25,9 @@ class World:
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
         self.player = Character(
-            position=(0.5 + tile_x, 0.5 + tile_y),
             character_type=CharacterType.PIGSASSIN.name.lower(),
         )
+        self.player.body.position = (0.5 + tile_x, 0.5 + tile_y)
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
         self.enemies: list[Character] = []
@@ -102,7 +102,8 @@ class World:
                 enemy.handle_damage_received(1)
 
     def add_npc(self, uuid: UUID, x: float, y: float, character_type: str) -> Character:
-        npc = Character(uuid=uuid, position=(x, y), character_type=character_type)
+        npc = Character(uuid=uuid, character_type=character_type)
+        npc.body.position = (x, y)
         self.npcs.append(npc)
         self.space.add(npc.body, npc.shape, npc.hitbox_shape)
         return npc
