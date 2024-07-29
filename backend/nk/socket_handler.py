@@ -28,8 +28,10 @@ async def handle_messages(player: Player, msg: Message):
         await handle_player_join_request(player, msg)
     elif msg.text_message._serialized_on_wire:
         await broadcast(player, msg)
+    elif msg.character_attacked._serialized_on_wire:
+        world.handle_character_attacked(msg.character_attacked)
     elif msg.character_updated._serialized_on_wire:
-        world.handle_character_update(msg.character_updated)
+        world.handle_character_updated(msg.character_updated)
         await broadcast(player, msg)
     logger.debug(f"Handled message: {msg} from {player.uuid}")
 

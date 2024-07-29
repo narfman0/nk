@@ -54,25 +54,26 @@ class World:
         self,
         dt: float,
         characters: list[Character],
-        enemies: list[Character],
+        targets: list[Character],
     ):
         for character in characters:
             character.update(dt)
             if character.should_process_attack:
-                self.process_attack_damage(character, enemies)
+                self.process_attack_damage(character, targets)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
                 self.space.remove(
                     character.body, character.shape, character.hitbox_shape
                 )
 
-    def process_attack_damage(self, attacker: Character, enemies: list[Character]):
+    def process_attack_damage(self, attacker: Character, targets: list[Character]):
         attacker.should_process_attack = False
-        for enemy in enemies:
-            if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
+        for target in targets:
+            if attacker.hitbox_shape.shapes_collide(target.shape).points:
                 damage = 1  # TODO different dmg amounts
-                enemy.handle_damage_received(damage)
-                msg = builders.build_character_damaged(enemy, damage)
+                target.handle_damage_received(damage)
+                logger.info(f"Target {target.uuid} now has {target.hp} hp")
+                msg = builders.build_character_damaged(target, damage)
                 for player in self.players:
                     player.messages.put_nowait(msg)
 
@@ -101,12 +102,25 @@ class World:
                 for player in self.players:
                     player.messages.put_nowait(msg)
 
-    def handle_character_update(self, character_updated: CharacterUpdated):
+    def handle_character_attacked(self, details: CharacterUpdated):
+        character = self.get_character_by_uuid(details.uuid)
+        if not character:
+            logger.warn(f"No character maching uuid: {details.uuid}")
+        logger.info(details)
+        character.attack()
+
+    def handle_character_updated(self, details: CharacterUpdated):
+        character = self.get_character_by_uuid(details.uuid)
+        if not character:
+            logger.warn(f"No character maching uuid: {details.uuid}")
+        character.body.position = (details.x, details.y)
+        character.moving_direction = details.moving_direction
+        character.facing_direction = details.facing_direction
+
+    def get_character_by_uuid(self, uuid) -> Character | None:
         for character in self.players + self.enemies:
-            if str(character.uuid) == character_updated.uuid:
-                character.body.position = (character_updated.x, character_updated.y)
-                character.moving_direction = character_updated.moving_direction
-                character.facing_direction = character_updated.facing_direction
+            if str(character.uuid) == uuid:
+                return character
 
     def closest_player(self, x: float, y: float) -> Player | None:
         closest, min_dst = None, float("inf")
@@ -119,15 +133,15 @@ class World:
         return closest
 
     def spawn_enemy(self, character_type: CharacterType, center_x: int, center_y: int):
-        enemy = Enemy(
+        character = Enemy(
             character_type=character_type,
             center_y=center_y,
             center_x=center_x,
             start_x=center_x,
             start_y=center_y,
         )
-        self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
-        self.enemies.append(enemy)
+        self.space.add(character.body, character.shape, character.hitbox_shape)
+        self.enemies.append(character)
 
 
 # Locally, this is the world directly. When deployed, this might be a handle to

@@ -91,7 +91,7 @@ class GameScreen(Screen):
                 self.network.send(builders.build_character_attacked(self.world.player))
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
-            self.world.player.handle_healing_received(1)
+            self.world.player.handle_healing_received(1.0)
             print(f"Player now has {self.world.player.hp} hp")
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible

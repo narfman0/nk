@@ -46,7 +46,9 @@ def main():
             )
             logger.info(f"Sent: {(x,y)}")
         while network.has_messages():
-            logger.info(f"Received: {network.next()}")
+            msg = network.next()
+            if msg.character_attacked._serialized_on_wire:
+                logger.info(f"Received: {msg.character_attacked}")
         time.sleep(0.1)
 
 

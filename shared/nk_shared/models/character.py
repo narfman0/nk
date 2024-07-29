@@ -24,7 +24,7 @@ class Character(CharacterProperties):
     attack_time_remaining: float = 0
     attack_damage_time_remaining: float = 0
     should_process_attack: bool = False
-    hp: int = 0
+    hp: float = 0
     invincible: bool = False
     body_removal_processed: bool = False
     start_x: float = 0
@@ -32,7 +32,7 @@ class Character(CharacterProperties):
 
     def __post_init__(self):
         self.apply_character_properties()
-        self.hp = self.hp_max
+        self.hp = float(self.hp_max)
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
@@ -43,13 +43,13 @@ class Character(CharacterProperties):
         )
         self.hitbox_shape.sensor = True
 
-    def handle_damage_received(self, dmg: int):
+    def handle_damage_received(self, dmg: float):
         if not self.invincible:
             self.hp = max(0, self.hp - dmg)
             if not self.alive:
                 self.body._set_type(pymunk.Body.STATIC)
 
-    def handle_healing_received(self, amount: int):
+    def handle_healing_received(self, amount: float):
         self.hp = min(self.hp_max, self.hp + amount)
         if self.alive:
             self.body._set_type(pymunk.Body.DYNAMIC)
