@@ -43,8 +43,8 @@ class GameScreen(Screen):
         self.projectile_image_dict = {}
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
-        self.game_state.enemy_added_callback = self.enemy_added_callback
-        self.game_state.character_attacked_callback = self.character_attacked_callback
+        self.game_state.character_added_callback = self.handle_character_added
+        self.game_state.character_attacked_callback = self.handle_character_attacked
         self.player_struct = CharacterStruct(
             self.world.player,
             None,
@@ -229,13 +229,13 @@ class GameScreen(Screen):
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
 
-    def enemy_added_callback(self, character: Character):
+    def handle_character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type.name.lower())
         self.character_structs.append(
             CharacterStruct(character, sprite, pygame.sprite.Group(sprite), None)
         )
 
-    def character_attacked_callback(self, character: Character):
+    def handle_character_attacked(self, character: Character):
         for str in self.character_structs:
             if str.character == character:
                 str.sprite.change_animation("attack")

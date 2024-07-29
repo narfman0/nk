@@ -17,15 +17,10 @@ logger = logging.getLogger(__name__)
 
 class GameState:
 
-    def __init__(
-        self,
-        network_initialized_callback: Callable | None = None,
-        enemy_added_callback: Callable | None = None,
-        character_attacked_callback: Callable | None = None,
-    ):
-        self.network_initialized_callback = network_initialized_callback
-        self.enemy_added_callback = enemy_added_callback
-        self.character_attacked_callback = character_attacked_callback
+    def __init__(self):
+        self.network_initialized_callback = None
+        self.character_added_callback = None
+        self.character_attacked_callback = None
         self.network_ticks_til_update = TICKS_BEFORE_UPDATE
         self.world = World()
         self.network = Network()
@@ -87,23 +82,32 @@ class GameState:
     def handle_character_updated(self, message: Message):
         details = message.character_updated
         uuid = UUID(details.uuid)
-        character = self.world.get_enemy_by_uuid(uuid)
+        if self.world.player.uuid == uuid:
+            return
+        character = self.world.get_character_by_uuid(uuid)
         if character:
             character.body.position = Vec2d(details.x, details.y)
             character.facing_direction = details.facing_direction
             character.moving_direction = details.moving_direction
         else:
-            # TODO this might be a player? check character_type?
-            character = self.world.add_enemy(
-                uuid=uuid,
-                start_x=details.x,
-                start_y=details.y,
-                character_type=CharacterType(details.character_type),
-                facing_direction=details.facing_direction,
-                moving_direction=details.moving_direction,
-            )
-            if self.enemy_added_callback:
-                self.enemy_added_callback(character)
+            # TODO develop better friend foe system
+            if details.character_type == CharacterType.PIGSASSIN:
+                character = self.world.add_player(
+                    uuid=uuid,
+                    start_x=details.x,
+                    start_y=details.y,
+                )
+            else:
+                character = self.world.add_enemy(
+                    uuid=uuid,
+                    start_x=details.x,
+                    start_y=details.y,
+                    character_type=CharacterType(details.character_type),
+                    facing_direction=details.facing_direction,
+                    moving_direction=details.moving_direction,
+                )
+            if self.character_added_callback:
+                self.character_added_callback(character)
 
     def handle_player_join_response(self, message: Message):
         if not message.player_join_response.success:

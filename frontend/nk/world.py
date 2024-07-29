@@ -80,6 +80,11 @@ class World:
         self.enemies.append(character)
         return character
 
+    def add_player(self, **character_kwargs: Unpack[Character]) -> Character:
+        character = self.add_character(**character_kwargs)
+        self.players.append(character)
+        return character
+
     def add_character(self, **character_kwargs: Unpack[Character]) -> Character:
         character = Character(**character_kwargs)
         self.space.add(character.body, character.shape, character.hitbox_shape)
