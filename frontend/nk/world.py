@@ -26,12 +26,11 @@ class World:
 
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
-        self.player = Character(
+        self.player = self.add_character(
             character_type=CharacterType.PIGSASSIN,
             start_x=0.5 + tile_x,
             start_y=0.5 + tile_y,
         )
-        self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
         self.enemies: list[Character] = []
         self.players: list[Character] = []
@@ -77,14 +76,12 @@ class World:
                 self.projectiles.remove(projectile)
 
     def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
-        character = Character(**character_kwargs)
+        character = self.add_character(**character_kwargs)
         self.enemies.append(character)
-        self.space.add(character.body, character.shape, character.hitbox_shape)
         return character
 
-    def add_player(self, **character_kwargs: Unpack[Character]) -> Character:
+    def add_character(self, **character_kwargs: Unpack[Character]) -> Character:
         character = Character(**character_kwargs)
-        self.players.append(character)
         self.space.add(character.body, character.shape, character.hitbox_shape)
         return character
 

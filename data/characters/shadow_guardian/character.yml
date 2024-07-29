@@ -6,4 +6,4 @@ radius: 1.0
 attack_distance: 2.5
 attack_duration: 1.0
 attack_time_until_damage: 0.5
-hp_max: 1
+hp_max: 10

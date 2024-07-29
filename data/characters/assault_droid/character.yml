@@ -3,7 +3,7 @@ run_force: 5000
 running_stop_threshold: 2
 max_velocity: 1.5
 radius: 0.8
-hp_max: 1
+hp_max: 10
 attack_distance: 10
 attack_duration: 0.5
 attack_time_until_damage: 0.2

@@ -84,10 +84,10 @@ class World:
             for enemy in self.enemies:
                 if not enemy.alive:
                     continue
+                enemy.moving_direction = None
                 player = self.closest_player(enemy.position.x, enemy.position.y)
                 if not player:
                     continue
-                enemy.moving_direction = None
                 player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
                 if player_dst_sqrd < enemy.chase_distance**2:
                     enemy.moving_direction = direction_util.direction_to(
@@ -132,7 +132,9 @@ class World:
                     min_dst = dst
         return closest
 
-    def spawn_enemy(self, character_type: CharacterType, center_x: int, center_y: int):
+    def spawn_enemy(
+        self, character_type: CharacterType, center_x: int, center_y: int
+    ) -> Enemy:
         character = Enemy(
             character_type=character_type,
             center_y=center_y,
@@ -142,6 +144,15 @@ class World:
         )
         self.space.add(character.body, character.shape, character.hitbox_shape)
         self.enemies.append(character)
+        return character
+
+    def spawn_player(self, player: Player) -> Player:
+        """Player 'is' a Character, which i don't love, but its already created. Update relevant attrs."""
+        x, y = world.map.get_start_tile()
+        player.body.position = (x, y)
+        self.space.add(player.body, player.shape, player.hitbox_shape)
+        self.players.append(player)
+        return player
 
 
 # Locally, this is the world directly. When deployed, this might be a handle to
