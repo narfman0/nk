@@ -93,10 +93,10 @@ class GameScreen(Screen):
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)
-            print(f"Player now has {self.world.player.hp} hp")
+            LOGGER.info(f"Player now has {self.world.player.hp} hp")
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible
-            print(f"Player invincibility set to {self.world.player.invincible}")
+            LOGGER.info(f"Player invincibility set to {self.world.player.invincible}")
         if ActionEnum.ZOOM_OUT in player_actions:
             # TODO self.screen_scale = max(3, self.screen_scale - 1)
             self.recalculate_screen_scale_derivatives()

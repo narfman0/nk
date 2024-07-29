@@ -1,5 +1,5 @@
 from asyncio import Queue
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from nk_shared.models import Character
 from nk_shared.proto import Message
@@ -7,7 +7,7 @@ from nk_shared.proto import Message
 
 @dataclass
 class Player(Character):
-    messages: Queue[Message] = Queue()
+    messages: Queue[Message] = field(default_factory=Queue)
 
 
 @dataclass

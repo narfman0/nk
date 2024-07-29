@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 async def broadcast(origin: Player | None, message: Message):
     for remote_player in world.get_players():
-        if not origin == remote_player:
+        if origin != remote_player:
             await remote_player.messages.put(message)
 
 

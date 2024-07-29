@@ -73,7 +73,6 @@ class World:
             if attacker.hitbox_shape.shapes_collide(target.shape).points:
                 damage = 1  # TODO different dmg amounts
                 target.handle_damage_received(damage)
-                logger.info(f"Target {target.uuid} now has {target.hp} hp")
                 msg = builders.build_character_damaged(target, damage)
                 for player in self.players:
                     player.messages.put_nowait(msg)
