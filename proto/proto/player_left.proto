@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package proto;
-
-message PlayerLeft {
-    string uuid = 1;
-}

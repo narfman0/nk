@@ -2,8 +2,8 @@ import logging
 import os
 
 from pygame.event import Event
-from nk_shared.proto import Message, PlayerJoinRequest
 
+from nk.game_state import GameState
 from nk.net import Network
 from nk.ui.screen import Screen, ScreenManager
 from nk.ui.game_screen import GameScreen
@@ -15,26 +15,14 @@ logger = logging.getLogger(__name__)
 class LoadScreen(Screen):
     def __init__(self, screen_manager: ScreenManager):
         self.screen_manager = screen_manager
-        self.world = World()
-        self.network = Network()
-        self.network.send(
-            Message(
-                player_join_request=PlayerJoinRequest(uuid=str(self.world.player.uuid))
-            )
+        self.game_state = GameState(
+            network_initialized_callback=self.network_initialized
         )
 
     def update(self, dt: float, events: list[Event]):
         super().update(dt, events)
-        while self.network.has_messages():
-            message = self.network.next()
-            if message.player_join_response._serialized_on_wire:
-                if not message.player_join_response.success:
-                    logger.info(f"Player join request failed, aborting")
-                    os._exit(1)
-                x = message.player_join_response.x
-                y = message.player_join_response.y
-                self.world.player.body.position = (x, y)
-                self.screen_manager.pop()
-                self.screen_manager.push(
-                    GameScreen(self.screen_manager, self.world, self.network)
-                )
+        self.game_state.update(dt)
+
+    def network_initialized(self):
+        self.screen_manager.pop()
+        self.screen_manager.push(GameScreen(self.screen_manager, self.game_state))

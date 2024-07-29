@@ -39,7 +39,7 @@ def main():
             i += UPDATE_FREQUENCY
             network.send(
                 Message(
-                    character_update=CharacterUpdated(
+                    character_updated=CharacterUpdated(
                         uuid=str(uuid), x=x, y=y, character_type=CharacterType.PIGSASSIN
                     )
                 )

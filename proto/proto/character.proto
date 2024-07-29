@@ -13,6 +13,15 @@ enum CharacterType {
     SHADOW_GUARDIAN = 5;
 }
 
+message CharacterAttacked {
+    string uuid = 1;
+}
+
+message CharacterDamaged {
+    string uuid = 1;
+    float damage = 2;
+}
+
 message CharacterUpdated {
     string uuid = 1;
     float x = 2;

@@ -1,3 +1,4 @@
+import logging
 import pymunk
 from typing_extensions import Unpack
 from uuid import UUID
@@ -5,13 +6,13 @@ from uuid import UUID
 from nk_shared.map import Map
 from nk_shared.models import (
     AttackProfile,
-    AttackType,
     Character,
     Zone,
     Projectile,
 )
 from nk_shared.proto import CharacterType, Direction
-from nk_shared.util import direction_util
+
+logger = logging.getLogger(__name__)
 
 
 class World:
@@ -33,6 +34,7 @@ class World:
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
         self.enemies: list[Character] = []
+        self.players: list[Character] = []
 
     def update(
         self,
@@ -41,15 +43,19 @@ class World:
     ):
         self.player.moving_direction = player_moving_direction
         self.player.update(dt)
-        if self.player.should_process_attack:
-            self.process_attack_damage(self.player, self.enemies)
-        for enemy in self.enemies:
-            enemy.update(dt)
-            if not enemy.alive and not enemy.body_removal_processed:
-                enemy.body_removal_processed = True
-                self.space.remove(enemy.body, enemy.shape, enemy.hitbox_shape)
+        self.update_characters(dt, self.enemies)
+        self.update_characters(dt, self.players)
         self.update_projectiles(dt)
         self.space.step(dt)
+
+    def update_characters(self, dt: float, characters: list[Character]):
+        for character in characters:
+            character.update(dt)
+            if not character.alive and not character.body_removal_processed:
+                character.body_removal_processed = True
+                self.space.remove(
+                    character.body, character.shape, character.hitbox_shape
+                )
 
     def update_projectiles(self, dt: float):
         for projectile in self.projectiles:
@@ -70,19 +76,30 @@ class World:
             if should_remove:
                 self.projectiles.remove(projectile)
 
-    def process_attack_damage(self, attacker: Character, enemies: list[Character]):
-        attacker.should_process_attack = False
-        for enemy in enemies:
-            if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
-                enemy.handle_damage_received(1)
-
     def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
-        enemy = Character(**character_kwargs)
-        self.enemies.append(enemy)
-        self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
-        return enemy
+        character = Character(**character_kwargs)
+        self.enemies.append(character)
+        self.space.add(character.body, character.shape, character.hitbox_shape)
+        return character
+
+    def add_player(self, **character_kwargs: Unpack[Character]) -> Character:
+        character = Character(**character_kwargs)
+        self.players.append(character)
+        self.space.add(character.body, character.shape, character.hitbox_shape)
+        return character
 
     def get_enemy_by_uuid(self, uuid: UUID) -> Character | None:
-        for enemy in self.enemies:
-            if enemy.uuid == uuid:
-                return enemy
+        for character in self.enemies:
+            if character.uuid == uuid:
+                return character
+
+    def get_player_by_uuid(self, uuid: UUID) -> Character | None:
+        for character in self.players:
+            if character.uuid == uuid:
+                return character
+
+    def get_character_by_uuid(self, uuid: UUID) -> Character | None:
+        for character in self.players + self.enemies + [self.player]:
+            if character.uuid == uuid:
+                return character
+        logger.info(f"Could not find character with uuid {uuid}")

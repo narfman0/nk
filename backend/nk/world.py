@@ -3,7 +3,7 @@ import random
 
 import pymunk
 
-from nk_shared.builders import build_character_update_from_character
+from nk_shared import builders
 from nk_shared.models import (
     AttackProfile,
     Character,
@@ -46,18 +46,35 @@ class World:
 
     def update(self, dt: float):
         self.update_ai(dt)
-        for enemy in self.enemies:
-            enemy.update(dt)
-            if not enemy.alive and not enemy.body_removal_processed:
-                enemy.body_removal_processed = True
-                self.space.remove(enemy.body, enemy.shape, enemy.hitbox_shape)
+        self.update_characters(dt, self.players, self.enemies)
+        self.update_characters(dt, self.enemies, self.players)
         self.space.step(dt)
+
+    def update_characters(
+        self,
+        dt: float,
+        characters: list[Character],
+        enemies: list[Character],
+    ):
+        for character in characters:
+            character.update(dt)
+            if character.should_process_attack:
+                self.process_attack_damage(character, enemies)
+            if not character.alive and not character.body_removal_processed:
+                character.body_removal_processed = True
+                self.space.remove(
+                    character.body, character.shape, character.hitbox_shape
+                )
 
     def process_attack_damage(self, attacker: Character, enemies: list[Character]):
         attacker.should_process_attack = False
         for enemy in enemies:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
-                enemy.handle_damage_received(1)
+                damage = 1  # TODO different dmg amounts
+                enemy.handle_damage_received(damage)
+                msg = builders.build_character_damaged(enemy, damage)
+                for player in self.players:
+                    player.messages.put_nowait(msg)
 
     def update_ai(self, dt: float):
         self.next_update_time -= dt
@@ -76,17 +93,20 @@ class World:
                         enemy.position, player.position
                     )
                 if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
-                    pass  # TODO enemy.attack()
-                msg = build_character_update_from_character(enemy)
+                    enemy.attack()
+                    msg = builders.build_character_attacked(enemy)
+                    for player in self.players:
+                        player.messages.put_nowait(msg)
+                msg = builders.build_character_updated(enemy)
                 for player in self.players:
                     player.messages.put_nowait(msg)
 
-    def handle_character_update(self, character_update: CharacterUpdated):
+    def handle_character_update(self, character_updated: CharacterUpdated):
         for character in self.players + self.enemies:
-            if str(character.uuid) == character_update.uuid:
-                character.body.position = (character_update.x, character_update.y)
-                character.moving_direction = character_update.moving_direction
-                character.facing_direction = character_update.facing_direction
+            if str(character.uuid) == character_updated.uuid:
+                character.body.position = (character_updated.x, character_updated.y)
+                character.moving_direction = character_updated.moving_direction
+                character.facing_direction = character_updated.facing_direction
 
     def closest_player(self, x: float, y: float) -> Player | None:
         closest, min_dst = None, float("inf")

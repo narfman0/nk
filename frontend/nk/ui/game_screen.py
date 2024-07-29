@@ -1,18 +1,16 @@
 import logging
 from dataclasses import dataclass
-from uuid import UUID
 
 import pygame
 from pygame.event import Event
-from pymunk import Vec2d
 
-from nk_shared.builders import build_character_update_from_character
+from nk_shared import builders
 from nk_shared.models.character import Character
-from nk_shared.proto import CharacterType, Direction
+from nk_shared.proto import Direction
 from nk_shared.util.math import cartesian_to_isometric
 from nk_shared.util import direction_util
 
-from nk.net import Network
+from nk.game_state import GameState
 from nk.settings import *
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
@@ -22,11 +20,9 @@ from nk.ui.input import (
 )
 from nk.ui.renderables import *
 from nk.ui.screen import Screen, ScreenManager
-from nk.world import World
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
-TICKS_BEFORE_UPDATE = 6
 
 
 @dataclass
@@ -38,13 +34,16 @@ class CharacterStruct:
 
 
 class GameScreen(Screen):
-    def __init__(self, screen_manager: ScreenManager, world: World, network: Network):
+
+    def __init__(self, screen_manager: ScreenManager, game_state: GameState):
         self.screen_manager = screen_manager
-        self.world = world
-        self.network = network
+        self.game_state = game_state
+        self.world = game_state.world
+        self.network = game_state.network
         self.projectile_image_dict = {}
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
+        self.game_state.enemy_added_callback = self.enemy_added_callback
         self.player_struct = CharacterStruct(
             self.world.player,
             None,
@@ -61,7 +60,6 @@ class GameScreen(Screen):
 
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
-        self.network_ticks_til_update = TICKS_BEFORE_UPDATE
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -81,38 +79,7 @@ class GameScreen(Screen):
             self.update_player_sprite()
         self.world.player.facing_direction = player_move_direction
         self.update_character_structs(dt)
-        self.update_network()
-
-    def update_network(self):
-        while self.network.has_messages():
-            message = self.network.next()
-            if message.character_update._serialized_on_wire:
-                update = message.character_update
-                uuid = UUID(update.uuid)
-                character = self.world.get_enemy_by_uuid(uuid)
-                if character:
-                    character.body.position = Vec2d(update.x, update.y)
-                    character.facing_direction = update.facing_direction
-                    character.moving_direction = update.moving_direction
-                else:
-                    character = self.world.add_enemy(
-                        uuid=uuid,
-                        start_x=update.x,
-                        start_y=update.y,
-                        character_type=CharacterType(update.character_type),
-                        facing_direction=update.facing_direction,
-                        moving_direction=update.moving_direction,
-                    )
-                    sprite = CharacterSprite(character.character_type.name.lower())
-                    self.character_structs.append(
-                        CharacterStruct(
-                            character, sprite, pygame.sprite.Group(sprite), None
-                        )
-                    )
-        self.network_ticks_til_update -= 1
-        if self.network_ticks_til_update <= 0:
-            self.network_ticks_til_update = TICKS_BEFORE_UPDATE
-            self.network.send(build_character_update_from_character(self.world.player))
+        self.game_state.update(dt)
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -121,6 +88,7 @@ class GameScreen(Screen):
         if ActionEnum.ATTACK in player_actions:
             if self.world.player.alive and not self.world.player.attacking:
                 self.world.player.attack()
+                self.network.send(builders.build_character_attacked(self.world.player))
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1)
@@ -259,3 +227,9 @@ class GameScreen(Screen):
         self.screen_height = HEIGHT // self.screen_scale
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
+
+    def enemy_added_callback(self, character: Character):
+        sprite = CharacterSprite(character.character_type.name.lower())
+        self.character_structs.append(
+            CharacterStruct(character, sprite, pygame.sprite.Group(sprite), None)
+        )

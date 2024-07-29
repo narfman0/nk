@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+message PlayerJoined {
+  string uuid = 1;
+}
+message PlayerJoinRequest {
+  string uuid = 1;
+}
+message PlayerJoinResponse {
+  bool success = 1;
+  float x = 2;
+  float y = 3;
+}
+message PlayerLeft {
+    string uuid = 1;
+}

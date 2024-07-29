@@ -1,14 +1,27 @@
 from nk_shared.models.character import Character
-from nk_shared.proto import (
-    Message,
-    CharacterType,
-    CharacterUpdated,
-)
+from nk_shared import proto
 
 
-def build_character_update_from_character(character: Character) -> Message:
-    return Message(
-        character_update=CharacterUpdated(
+def build_character_attacked(character: Character) -> proto.Message:
+    return proto.Message(
+        character_attacked=proto.CharacterAttacked(
+            uuid=str(character.uuid),
+        )
+    )
+
+
+def build_character_damaged(character: Character, damage: float) -> proto.Message:
+    return proto.Message(
+        character_damaged=proto.CharacterDamaged(
+            uuid=str(character.uuid),
+            damage=damage,
+        )
+    )
+
+
+def build_character_updated(character: Character) -> proto.Message:
+    return proto.Message(
+        character_updated=proto.CharacterUpdated(
             uuid=str(character.uuid),
             x=character.position.x,
             y=character.position.y,

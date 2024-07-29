@@ -1,21 +1,22 @@
 syntax = "proto3";
 
-import "proto/character_updated.proto";
-import "proto/player_joined.proto";
-import "proto/player_join_request.proto";
-import "proto/player_join_response.proto";
-import "proto/player_left.proto";
+import "proto/character.proto";
+import "proto/player.proto";
 import "proto/text_message.proto";
 
 package proto;
 
 message Message {
   oneof payload {
-    proto.CharacterUpdated character_update = 5;
-    proto.PlayerJoined player_joined = 2;
-    proto.PlayerLeft player_left = 3;
-    proto.PlayerJoinRequest player_join_request = 4;
-    proto.PlayerJoinResponse player_join_response = 6;
+    proto.CharacterUpdated character_updated = 200;
+    proto.CharacterAttacked character_attacked = 201;
+    proto.CharacterDamaged character_damaged = 202;
+
+    proto.PlayerJoined player_joined = 100;
+    proto.PlayerLeft player_left = 101;
+    proto.PlayerJoinRequest player_join_request = 102;
+    proto.PlayerJoinResponse player_join_response = 103;
+
     proto.TextMessage text_message = 1;
   }
 }
