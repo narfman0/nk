@@ -1,5 +1,6 @@
 import logging
 import random
+from uuid import UUID
 
 import pymunk
 
@@ -103,23 +104,26 @@ class World:
                     player.messages.put_nowait(msg)
 
     def handle_character_attacked(self, details: CharacterUpdated):
-        character = self.get_character_by_uuid(details.uuid)
+        character = self.get_character_by_uuid(UUID(details.uuid))
         if not character:
             logger.warn(f"No character maching uuid: {details.uuid}")
         logger.info(details)
         character.attack()
 
     def handle_character_updated(self, details: CharacterUpdated):
-        character = self.get_character_by_uuid(details.uuid)
+        character = self.get_character_by_uuid(UUID(details.uuid))
         if not character:
             logger.warn(f"No character maching uuid: {details.uuid}")
         character.body.position = (details.x, details.y)
         character.moving_direction = details.moving_direction
         character.facing_direction = details.facing_direction
 
-    def get_character_by_uuid(self, uuid) -> Character | None:
+    def get_character_by_uuid(self, uuid: UUID) -> Character | None:
+        if isinstance(uuid, str):
+            logger.warn(f"Received uuid as a string: {uuid}, converting")
+            uuid = UUID(uuid)
         for character in self.players + self.enemies:
-            if str(character.uuid) == uuid:
+            if character.uuid == uuid:
                 return character
 
     def closest_player(self, x: float, y: float) -> Player | None:

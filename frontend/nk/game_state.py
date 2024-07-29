@@ -84,7 +84,7 @@ class GameState:
         uuid = UUID(details.uuid)
         if self.world.player.uuid == uuid:
             return
-        character = self.world.get_character_by_uuid(uuid)
+        character = self.world.get_character_by_uuid(UUID(uuid))
         if character:
             character.body.position = Vec2d(details.x, details.y)
             character.facing_direction = details.facing_direction

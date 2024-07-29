@@ -25,6 +25,7 @@ def get_start_pos(network: Network) -> tuple[float, float]:
 
 def main():
     uuid = uuid4()
+    logger.info(f"Starting headless session with uuid: {uuid}")
     network = Network()
     network.send(Message(player_join_request=PlayerJoinRequest(uuid=str(uuid))))
     i = 0
