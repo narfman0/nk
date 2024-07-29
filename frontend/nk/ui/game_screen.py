@@ -6,11 +6,11 @@ import pygame
 from pygame.event import Event
 from pymunk import Vec2d
 
-from nk_shared.builders import build_character_update_from_character, build_text
+from nk_shared.builders import build_character_update_from_character
 from nk_shared.models.character import Character
-from nk_shared.models.direction import Direction
-from nk_shared.proto import CharacterType
+from nk_shared.proto import CharacterType, Direction
 from nk_shared.util.math import cartesian_to_isometric
+from nk_shared.util import direction_util
 
 from nk.net import Network
 from nk.settings import *
@@ -132,8 +132,6 @@ class GameScreen(Screen):
         if ActionEnum.ZOOM_IN in player_actions:
             # TODO self.screen_scale = min(6, self.screen_scale + 1)
             self.recalculate_screen_scale_derivatives()
-        if ActionEnum.HELLO_WORLD_NET in player_actions:
-            self.network.send(build_text("Hello, World!"))
 
     def draw(self, dest_surface: pygame.Surface):
         renderables = create_renderable_list()
@@ -193,7 +191,11 @@ class GameScreen(Screen):
                             character.movement_direction
                             != character_struct.last_movement_direction
                         ):
-                            sprite.move(character.movement_direction.to_isometric())
+                            sprite.move(
+                                direction_util.to_isometric(
+                                    character.movement_direction
+                                )
+                            )
                         sprite.change_animation("run")
                     else:
                         sprite.change_animation("idle")

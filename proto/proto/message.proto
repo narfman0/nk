@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "proto/character_update.proto";
+import "proto/character_updated.proto";
 import "proto/player_joined.proto";
 import "proto/player_join_request.proto";
 import "proto/player_join_response.proto";
@@ -11,7 +11,7 @@ package proto;
 
 message Message {
   oneof payload {
-    proto.CharacterUpdate character_update = 5;
+    proto.CharacterUpdated character_update = 5;
     proto.PlayerJoined player_joined = 2;
     proto.PlayerLeft player_left = 3;
     proto.PlayerJoinRequest player_join_request = 4;

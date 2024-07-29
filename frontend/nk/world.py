@@ -6,11 +6,11 @@ from nk_shared.models import (
     AttackProfile,
     AttackType,
     Character,
-    Direction,
     Level,
     Projectile,
 )
-from nk_shared.proto import CharacterType
+from nk_shared.proto import CharacterType, Direction
+from nk_shared.util import direction_util
 
 
 class World:
@@ -60,9 +60,9 @@ class World:
                             f"../data/attack_profiles/{enemy.attack_profile_name}.yml"
                         )
                         self.attack_profiles[enemy.attack_profile_name] = attack_profile
-                    speed = enemy.facing_direction.to_vector().scale_to_length(
-                        attack_profile.speed
-                    )
+                    speed = direction_util.to_vector(
+                        enemy.facing_direction
+                    ).scale_to_length(attack_profile.speed)
                     projectile = Projectile(
                         x=enemy.position.x + attack_profile.emitter_offset_x,
                         y=enemy.position.y + attack_profile.emitter_offset_y,

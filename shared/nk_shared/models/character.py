@@ -4,7 +4,8 @@ from uuid import UUID, uuid4 as generate_uuid
 import pymunk
 
 from nk_shared.models.character_properties import CharacterProperties
-from nk_shared.models.direction import Direction
+from nk_shared.proto import Direction
+from nk_shared.util import direction_util
 
 
 @dataclass
@@ -53,10 +54,13 @@ class Character(CharacterProperties):
     def update(self, dt: float):
         if self.alive and self.movement_direction:
             self.facing_direction = self.movement_direction
-            self.body.angle = self.facing_direction.angle
+            self.body.angle = direction_util.angle(self.facing_direction)
             dash_scalar = self.dash_scalar if self.dashing else 1.0
             dpos = (
-                self.movement_direction.to_vector() * self.run_force * dash_scalar * dt
+                direction_util.to_vector(self.movement_direction)
+                * self.run_force
+                * dash_scalar
+                * dt
             )
             self.body.apply_force_at_world_point(
                 force=(dpos.x, dpos.y), point=(self.position.x, self.position.y)

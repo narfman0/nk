@@ -1,9 +1,11 @@
 syntax = "proto3";
 
+import "proto/direction.proto";
+
 package proto;
 
-enum CharacterType{
-    INVALID = 0;
+enum CharacterType {
+    INVALID_CHARACTER_TYPE = 0;
     PIGSASSIN = 1;
     ASSAULT_DROID = 2;
     DROID_ASSASSIN = 3;
@@ -11,9 +13,11 @@ enum CharacterType{
     SHADOW_GUARDIAN = 5;
 }
 
-message CharacterUpdate {
+message CharacterUpdated {
     string uuid = 1;
     float x = 2;
     float y = 3;
     CharacterType character_type = 4;
+    Direction facing_direction = 5;
+    Direction moving_direction = 6;
 }

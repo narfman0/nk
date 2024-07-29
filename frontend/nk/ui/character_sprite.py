@@ -1,7 +1,7 @@
 import pygame
 import yaml
 
-from nk_shared.models.direction import Direction
+from nk_shared.proto import Direction
 
 
 class CharacterSprite(pygame.sprite.Sprite):

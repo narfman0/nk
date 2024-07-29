@@ -7,12 +7,12 @@ from nk_shared.builders import build_character_update_from_character
 from nk_shared.models import (
     AttackProfile,
     Character,
-    Direction,
     Level,
     Projectile,
 )
 from nk_shared.map import Map
-from nk_shared.proto import CharacterUpdate
+from nk_shared.proto import CharacterUpdated
+from nk_shared.util import direction_util
 
 from nk.models import NPC, Player
 
@@ -71,7 +71,7 @@ class World:
                 enemy.movement_direction = None
                 player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
                 if player_dst_sqrd < enemy.chase_distance**2:
-                    enemy.movement_direction = Direction.direction_to(
+                    enemy.movement_direction = direction_util.direction_to(
                         enemy.position, player.position
                     )
                 if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
@@ -80,10 +80,12 @@ class World:
                 for player in self.players:
                     player.messages.put_nowait(msg)
 
-    def handle_character_update(self, character_update: CharacterUpdate):
-        for player in self.players:
-            if str(player.uuid) == character_update.uuid:
-                player.body.position = (character_update.x, character_update.y)
+    def handle_character_update(self, character_update: CharacterUpdated):
+        for character in self.players + self.enemies:
+            if str(character.uuid) == character_update.uuid:
+                character.body.position = (character_update.x, character_update.y)
+                character.movement_direction = character_update.moving_direction
+                character.facing_direction = character_update.facing_direction
 
     def closest_player(self, x: float, y: float) -> Player | None:
         closest, min_dst = None, float("inf")
