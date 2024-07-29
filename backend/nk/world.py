@@ -7,7 +7,7 @@ from nk_shared.builders import build_character_update_from_character
 from nk_shared.models import (
     AttackProfile,
     Character,
-    Level,
+    Zone,
     Projectile,
 )
 from nk_shared.map import Map
@@ -22,16 +22,16 @@ logger = logging.getLogger(__name__)
 
 class World:
 
-    def __init__(self, level_name: str = "1"):
+    def __init__(self, zone_name: str = "1"):
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
-        self.level = Level.from_yaml_file(f"../data/levels/{level_name}.yml")
-        self.map = Map(self.level.tmx_path, pygame=False)
+        self.zone = Zone.from_yaml_file(f"../data/zones/{zone_name}.yml")
+        self.map = Map(self.zone.tmx_path, pygame=False)
         self.map.add_map_geometry_to_space(self.space)
         self.players: list[Player] = []
         self.enemies: list[Enemy] = []
-        for enemy_group in self.level.enemy_groups:
+        for enemy_group in self.zone.enemy_groups:
             r = 1 + enemy_group.count // 2  # randomize where group is centered
             for _ in range(enemy_group.count):
                 self.spawn_enemy(

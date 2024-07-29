@@ -11,6 +11,6 @@ class EnemyGroup:
 
 
 @dataclass
-class Level(YAMLWizard):
+class Zone(YAMLWizard):
     tmx_path: str
     enemy_groups: list[EnemyGroup]

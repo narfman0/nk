@@ -7,7 +7,7 @@ from nk_shared.models import (
     AttackProfile,
     AttackType,
     Character,
-    Level,
+    Zone,
     Projectile,
 )
 from nk_shared.proto import CharacterType, Direction
@@ -15,12 +15,12 @@ from nk_shared.util import direction_util
 
 
 class World:
-    def __init__(self, level_name="1"):
+    def __init__(self, zone_name="1"):
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
-        self.level = Level.from_yaml_file(f"../data/levels/{level_name}.yml")
-        self.map = Map(self.level.tmx_path)
+        self.zone = Zone.from_yaml_file(f"../data/zones/{zone_name}.yml")
+        self.map = Map(self.zone.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
 
         # initialize player

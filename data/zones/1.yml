@@ -1,4 +1,4 @@
-tmx_path: level1
+tmx_path: "1"
 enemy_groups:
   - character_type: shadow_guardian
     count: 5
