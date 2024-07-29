@@ -13,7 +13,7 @@ class Character(CharacterProperties):
     character_type: CharacterType = CharacterType.PIGSASSIN
     uuid: UUID = field(default_factory=generate_uuid)
     facing_direction: Direction = Direction.S
-    movement_direction: Direction = None
+    moving_direction: Direction = None
     shape: pymunk.Shape = None
     body: pymunk.Body = None
     hitbox_shape: pymunk.Shape = None
@@ -55,12 +55,12 @@ class Character(CharacterProperties):
             self.body._set_type(pymunk.Body.DYNAMIC)
 
     def update(self, dt: float):
-        if self.alive and self.movement_direction:
-            self.facing_direction = self.movement_direction
+        if self.alive and self.moving_direction:
+            self.facing_direction = self.moving_direction
             self.body.angle = direction_util.angle(self.facing_direction)
             dash_scalar = self.dash_scalar if self.dashing else 1.0
             dpos = (
-                direction_util.to_vector(self.movement_direction)
+                direction_util.to_vector(self.moving_direction)
                 * self.run_force
                 * dash_scalar
                 * dt
@@ -107,8 +107,8 @@ class Character(CharacterProperties):
             self.attacking = True
             self.attack_time_remaining = self.attack_duration
             self.attack_damage_time_remaining = self.attack_time_until_damage
-            if self.movement_direction:  # maybe standing still
-                self.facing_direction = self.movement_direction
+            if self.moving_direction:  # maybe standing still
+                self.facing_direction = self.moving_direction
 
     def dash(self):
         if not self.dashing and self.dash_cooldown_remaining <= 0:

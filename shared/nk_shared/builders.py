@@ -14,6 +14,6 @@ def build_character_update_from_character(character: Character) -> Message:
             y=character.position.y,
             character_type=character.character_type,
             facing_direction=character.facing_direction,
-            movement_direction=character.movement_direction,
+            moving_direction=character.moving_direction,
         )
     )

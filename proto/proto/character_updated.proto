@@ -19,5 +19,5 @@ message CharacterUpdated {
     float y = 3;
     CharacterType character_type = 4;
     Direction facing_direction = 5;
-    Direction movement_direction = 6;
+    Direction moving_direction = 6;
 }

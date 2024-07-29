@@ -34,7 +34,7 @@ class CharacterStruct:
     character: Character
     sprite: CharacterSprite
     sprite_group: pygame.sprite.Group
-    last_movement_direction: Direction
+    last_moving_direction: Direction
 
 
 class GameScreen(Screen):
@@ -93,7 +93,7 @@ class GameScreen(Screen):
                 if character:
                     character.body.position = Vec2d(update.x, update.y)
                     character.facing_direction = update.facing_direction
-                    character.movement_direction = update.movement_direction
+                    character.moving_direction = update.moving_direction
                 else:
                     character = self.world.add_enemy(
                         uuid=uuid,
@@ -101,7 +101,7 @@ class GameScreen(Screen):
                         start_y=update.y,
                         character_type=CharacterType(update.character_type),
                         facing_direction=update.facing_direction,
-                        movement_direction=update.movement_direction,
+                        moving_direction=update.moving_direction,
                     )
                     sprite = CharacterSprite(character.character_type.name.lower())
                     self.character_structs.append(
@@ -188,20 +188,18 @@ class GameScreen(Screen):
             sprite = character_struct.sprite
             if character.alive:
                 if not character.attacking:
-                    if character.movement_direction:
+                    if character.moving_direction:
                         if (
-                            character.movement_direction
-                            != character_struct.last_movement_direction
+                            character.moving_direction
+                            != character_struct.last_moving_direction
                         ):
                             sprite.move(
-                                direction_util.to_isometric(
-                                    character.movement_direction
-                                )
+                                direction_util.to_isometric(character.moving_direction)
                             )
                         sprite.change_animation("run")
                     else:
                         sprite.change_animation("idle")
-                character_struct.last_movement_direction = character.facing_direction
+                character_struct.last_moving_direction = character.facing_direction
             else:
                 if sprite.sprite_name != "death":
                     sprite.change_animation("death", loop=False)

@@ -34,7 +34,7 @@ class CharacterUpdated(betterproto.Message):
     y: float = betterproto.float_field(3)
     character_type: "CharacterType" = betterproto.enum_field(4)
     facing_direction: "Direction" = betterproto.enum_field(5)
-    movement_direction: "Direction" = betterproto.enum_field(6)
+    moving_direction: "Direction" = betterproto.enum_field(6)
 
 
 @dataclass

@@ -37,9 +37,9 @@ class World:
     def update(
         self,
         dt: float,
-        player_movement_direction: Direction,
+        player_moving_direction: Direction,
     ):
-        self.player.movement_direction = player_movement_direction
+        self.player.moving_direction = player_moving_direction
         self.player.update(dt)
         if self.player.should_process_attack:
             self.process_attack_damage(self.player, self.enemies)

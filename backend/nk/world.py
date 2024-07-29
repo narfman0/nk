@@ -69,10 +69,10 @@ class World:
                 player = self.closest_player(enemy.position.x, enemy.position.y)
                 if not player:
                     continue
-                enemy.movement_direction = None
+                enemy.moving_direction = None
                 player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
                 if player_dst_sqrd < enemy.chase_distance**2:
-                    enemy.movement_direction = direction_util.direction_to(
+                    enemy.moving_direction = direction_util.direction_to(
                         enemy.position, player.position
                     )
                 if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
@@ -85,7 +85,7 @@ class World:
         for character in self.players + self.enemies:
             if str(character.uuid) == character_update.uuid:
                 character.body.position = (character_update.x, character_update.y)
-                character.movement_direction = character_update.movement_direction
+                character.moving_direction = character_update.moving_direction
                 character.facing_direction = character_update.facing_direction
 
     def closest_player(self, x: float, y: float) -> Player | None:
