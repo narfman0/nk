@@ -87,20 +87,21 @@ class GameScreen(Screen):
         while self.network.has_messages():
             message = self.network.next()
             if message.character_update._serialized_on_wire:
-                uuid = UUID(message.character_update.uuid)
+                update = message.character_update
+                uuid = UUID(update.uuid)
                 character = self.world.get_enemy_by_uuid(uuid)
                 if character:
-                    character.body.position = Vec2d(
-                        message.character_update.x, message.character_update.y
-                    )
+                    character.body.position = Vec2d(update.x, update.y)
+                    character.facing_direction = update.facing_direction
+                    character.movement_direction = update.movement_direction
                 else:
                     character = self.world.add_enemy(
                         uuid=uuid,
-                        x=message.character_update.x,
-                        y=message.character_update.y,
-                        character_type=CharacterType(
-                            message.character_update.character_type
-                        ),
+                        start_x=update.x,
+                        start_y=update.y,
+                        character_type=CharacterType(update.character_type),
+                        facing_direction=update.facing_direction,
+                        movement_direction=update.movement_direction,
                     )
                     sprite = CharacterSprite(character.character_type.name.lower())
                     self.character_structs.append(

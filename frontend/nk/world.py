@@ -1,4 +1,5 @@
 import pymunk
+from typing_extensions import Unpack
 from uuid import UUID
 
 from nk_shared.map import Map
@@ -26,8 +27,9 @@ class World:
         tile_x, tile_y = self.map.get_start_tile()
         self.player = Character(
             character_type=CharacterType.PIGSASSIN,
+            start_x=0.5 + tile_x,
+            start_y=0.5 + tile_y,
         )
-        self.player.body.position = (0.5 + tile_x, 0.5 + tile_y)
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
         self.enemies: list[Character] = []
@@ -74,11 +76,8 @@ class World:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
                 enemy.handle_damage_received(1)
 
-    def add_enemy(
-        self, uuid: UUID, x: float, y: float, character_type: CharacterType
-    ) -> Character:
-        enemy = Character(uuid=uuid, character_type=character_type)
-        enemy.body.position = (x, y)
+    def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
+        enemy = Character(**character_kwargs)
         self.enemies.append(enemy)
         self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
         return enemy

@@ -27,11 +27,14 @@ class Character(CharacterProperties):
     hp: int = 0
     invincible: bool = False
     body_removal_processed: bool = False
+    start_x: float = 0
+    start_y: float = 0
 
     def __post_init__(self):
         self.apply_character_properties()
         self.hp = self.hp_max
         self.body = pymunk.Body()
+        self.body.position = self.start_x, self.start_y
         self.body.character = self
         self.shape = pymunk.Circle(self.body, self.radius)
         self.shape.mass = self.mass

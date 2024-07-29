@@ -85,7 +85,7 @@ class World:
         for character in self.players + self.enemies:
             if str(character.uuid) == character_update.uuid:
                 character.body.position = (character_update.x, character_update.y)
-                character.movement_direction = character_update.moving_direction
+                character.movement_direction = character_update.movement_direction
                 character.facing_direction = character_update.facing_direction
 
     def closest_player(self, x: float, y: float) -> Player | None:
@@ -103,8 +103,9 @@ class World:
             character_type=character_type,
             center_y=center_y,
             center_x=center_x,
+            start_x=center_x,
+            start_y=center_y,
         )
-        enemy.body.position = (center_x, center_y)
         self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
         self.enemies.append(enemy)
 
