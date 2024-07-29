@@ -44,6 +44,7 @@ class GameScreen(Screen):
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.enemy_added_callback = self.enemy_added_callback
+        self.game_state.character_attacked_callback = self.character_attacked_callback
         self.player_struct = CharacterStruct(
             self.world.player,
             None,
@@ -233,3 +234,9 @@ class GameScreen(Screen):
         self.character_structs.append(
             CharacterStruct(character, sprite, pygame.sprite.Group(sprite), None)
         )
+
+    def character_attacked_callback(self, character: Character):
+        for str in self.character_structs:
+            if str.character == character:
+                str.sprite.change_animation("attack")
+                return

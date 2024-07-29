@@ -21,9 +21,11 @@ class GameState:
         self,
         network_initialized_callback: Callable | None = None,
         enemy_added_callback: Callable | None = None,
+        character_attacked_callback: Callable | None = None,
     ):
         self.network_initialized_callback = network_initialized_callback
         self.enemy_added_callback = enemy_added_callback
+        self.character_attacked_callback = character_attacked_callback
         self.network_ticks_til_update = TICKS_BEFORE_UPDATE
         self.world = World()
         self.network = Network()
@@ -61,6 +63,8 @@ class GameState:
         character = self.world.get_character_by_uuid(UUID(details.uuid))
         if character:
             character.attack()
+            if self.character_attacked_callback:
+                self.character_attacked_callback(character)
         else:
             logger.warn(
                 f"character_attacked no character found with uuid {details.uuid}"
