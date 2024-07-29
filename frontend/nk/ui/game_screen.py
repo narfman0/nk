@@ -54,7 +54,7 @@ class GameScreen(Screen):
         self.update_player_sprite()
         self.character_structs = [self.player_struct]
         for enemy in self.world.enemies:
-            sprite = CharacterSprite(enemy.character_type)
+            sprite = CharacterSprite(enemy.character_type.name.lower())
             self.character_structs.append(
                 CharacterStruct(enemy, sprite, pygame.sprite.Group(sprite), None)
             )
@@ -74,7 +74,7 @@ class GameScreen(Screen):
         )
         if (
             self.world.player.alive
-            and self.world.player.character_type
+            and self.world.player.character_type.name.lower()
             != self.player_struct.sprite.sprite_name
         ):
             # ideally we could pass a callback here but :shrugs:
@@ -88,24 +88,25 @@ class GameScreen(Screen):
             message = self.network.next()
             if message.character_update._serialized_on_wire:
                 uuid = UUID(message.character_update.uuid)
-                npc = self.world.get_npc_by_uuid(uuid)
-                if npc:
-                    npc.body.position = Vec2d(
+                character = self.world.get_enemy_by_uuid(uuid)
+                if character:
+                    character.body.position = Vec2d(
                         message.character_update.x, message.character_update.y
                     )
                 else:
-                    character_type = CharacterType(
-                        message.character_update.character_type
-                    ).name.lower()
-                    npc = self.world.add_npc(
+                    character = self.world.add_enemy(
                         uuid=uuid,
                         x=message.character_update.x,
                         y=message.character_update.y,
-                        character_type=character_type,
+                        character_type=CharacterType(
+                            message.character_update.character_type
+                        ),
                     )
-                    sprite = CharacterSprite(npc.character_type)
+                    sprite = CharacterSprite(character.character_type.name.lower())
                     self.character_structs.append(
-                        CharacterStruct(npc, sprite, pygame.sprite.Group(sprite), None)
+                        CharacterStruct(
+                            character, sprite, pygame.sprite.Group(sprite), None
+                        )
                     )
         self.network_ticks_til_update -= 1
         if self.network_ticks_til_update <= 0:
@@ -245,7 +246,7 @@ class GameScreen(Screen):
         return (x, y)
 
     def update_player_sprite(self):
-        sprite = CharacterSprite(self.world.player.character_type)
+        sprite = CharacterSprite(self.world.player.character_type.name.lower())
         sprite.set_position(
             self.screen_width // 2 - sprite.image.get_width() // 2,
             self.screen_height // 2 - sprite.image.get_height() // 2,

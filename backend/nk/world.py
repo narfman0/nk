@@ -11,10 +11,10 @@ from nk_shared.models import (
     Projectile,
 )
 from nk_shared.map import Map
-from nk_shared.proto import CharacterUpdated
+from nk_shared.proto import CharacterType, CharacterUpdated
 from nk_shared.util import direction_util
 
-from nk.models import NPC, Player
+from nk.models import Enemy, Player
 
 UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)
@@ -30,11 +30,11 @@ class World:
         self.map = Map(self.level.tmx_path, pygame=False)
         self.map.add_map_geometry_to_space(self.space)
         self.players: list[Player] = []
-        self.enemies: list[NPC] = []
+        self.enemies: list[Enemy] = []
         for enemy_group in self.level.enemy_groups:
             for _ in range(enemy_group.count):
                 self.spawn_enemy(
-                    enemy_group.character_type,
+                    CharacterType[enemy_group.character_type.upper()],
                     enemy_group.center_x + random.randint(-3, 3),
                     enemy_group.center_y + random.randint(-3, 3),
                 )
@@ -97,8 +97,8 @@ class World:
                     min_dst = dst
         return closest
 
-    def spawn_enemy(self, character_type: str, center_x: int, center_y: int):
-        enemy = NPC(
+    def spawn_enemy(self, character_type: CharacterType, center_x: int, center_y: int):
+        enemy = Enemy(
             character_type=character_type,
             center_y=center_y,
             center_x=center_x,

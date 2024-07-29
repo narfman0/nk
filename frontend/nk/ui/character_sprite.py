@@ -7,7 +7,7 @@ from nk_shared.proto import Direction
 class CharacterSprite(pygame.sprite.Sprite):
     FRAME_DURATION = 0.1
 
-    def __init__(self, sprite_name, scale: float = 1, offset=(0, 0)):
+    def __init__(self, sprite_name: str, scale: float = 1, offset=(0, 0)):
         super(CharacterSprite, self).__init__()
         self.index = 0
         self.moving = False

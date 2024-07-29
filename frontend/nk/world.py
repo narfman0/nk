@@ -25,13 +25,12 @@ class World:
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
         self.player = Character(
-            character_type=CharacterType.PIGSASSIN.name.lower(),
+            character_type=CharacterType.PIGSASSIN,
         )
         self.player.body.position = (0.5 + tile_x, 0.5 + tile_y)
         self.space.add(self.player.body, self.player.shape, self.player.hitbox_shape)
 
         self.enemies: list[Character] = []
-        self.npcs: list[Character] = []
 
     def update(
         self,
@@ -42,37 +41,11 @@ class World:
         self.player.update(dt)
         if self.player.should_process_attack:
             self.process_attack_damage(self.player, self.enemies)
-        for npc in self.npcs:
-            npc.update(dt)
         for enemy in self.enemies:
-            enemy.ai(dt, self.player)
             enemy.update(dt)
             if not enemy.alive and not enemy.body_removal_processed:
                 enemy.body_removal_processed = True
                 self.space.remove(enemy.body, enemy.shape, enemy.hitbox_shape)
-            if enemy.should_process_attack:
-                if enemy.attack_type == AttackType.MELEE:
-                    self.process_attack_damage(enemy, [self.player])
-                elif enemy.attack_type == AttackType.RANGED:
-                    attack_profile = self.attack_profiles.get(enemy.attack_profile_name)
-                    if not attack_profile:
-                        attack_profile = AttackProfile.from_yaml_file(
-                            f"../data/attack_profiles/{enemy.attack_profile_name}.yml"
-                        )
-                        self.attack_profiles[enemy.attack_profile_name] = attack_profile
-                    speed = direction_util.to_vector(
-                        enemy.facing_direction
-                    ).scale_to_length(attack_profile.speed)
-                    projectile = Projectile(
-                        x=enemy.position.x + attack_profile.emitter_offset_x,
-                        y=enemy.position.y + attack_profile.emitter_offset_y,
-                        dx=speed.x,
-                        dy=speed.y,
-                        origin=enemy,
-                        attack_profile=attack_profile,
-                    )
-                    self.projectiles.append(projectile)
-                    enemy.should_process_attack = False
         self.update_projectiles(dt)
         self.space.step(dt)
 
@@ -101,14 +74,16 @@ class World:
             if attacker.hitbox_shape.shapes_collide(enemy.shape).points:
                 enemy.handle_damage_received(1)
 
-    def add_npc(self, uuid: UUID, x: float, y: float, character_type: str) -> Character:
-        npc = Character(uuid=uuid, character_type=character_type)
-        npc.body.position = (x, y)
-        self.npcs.append(npc)
-        self.space.add(npc.body, npc.shape, npc.hitbox_shape)
-        return npc
+    def add_enemy(
+        self, uuid: UUID, x: float, y: float, character_type: CharacterType
+    ) -> Character:
+        enemy = Character(uuid=uuid, character_type=character_type)
+        enemy.body.position = (x, y)
+        self.enemies.append(enemy)
+        self.space.add(enemy.body, enemy.shape, enemy.hitbox_shape)
+        return enemy
 
-    def get_npc_by_uuid(self, uuid: UUID) -> Character | None:
-        for npc in self.npcs:
-            if npc.uuid == uuid:
-                return npc
+    def get_enemy_by_uuid(self, uuid: UUID) -> Character | None:
+        for enemy in self.enemies:
+            if enemy.uuid == uuid:
+                return enemy

@@ -11,6 +11,6 @@ class Player(Character):
 
 
 @dataclass
-class NPC(Character):
+class Enemy(Character):
     center_x: int = None
     center_y: int = None

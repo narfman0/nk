@@ -12,7 +12,7 @@ def build_character_update_from_character(character: Character) -> Message:
             uuid=str(character.uuid),
             x=character.position.x,
             y=character.position.y,
-            character_type=CharacterType[character.character_type.upper()],
+            character_type=character.character_type,
             facing_direction=character.facing_direction,
             moving_direction=character.movement_direction,
         )
