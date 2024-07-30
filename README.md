@@ -19,8 +19,9 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 v1:
 
-* Modeling enemies+combat+dmg
+* Shooting!
 * Login + character persistence
+* friend/foe system (all pigsassins are players)
 
 ## License
 

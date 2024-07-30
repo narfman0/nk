@@ -26,6 +26,9 @@ init:
 init-dev:
 	pip install -r requirements_test.txt
 
+lint:
+	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
+
 pyinstaller: clean
 	pyinstaller --noconfirm --onefile --console \
 		-n nk --uac-admin \

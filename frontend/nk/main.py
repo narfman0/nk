@@ -1,4 +1,3 @@
-import logging
 from pstats import SortKey
 import pygame
 
@@ -7,8 +6,6 @@ from nk_shared.util.logging import initialize_logging
 from nk.settings import *
 from nk.ui.screen import ScreenManager
 from nk.ui.load_screen import LoadScreen
-
-LOGGER = logging.getLogger(__name__)
 
 
 def main():

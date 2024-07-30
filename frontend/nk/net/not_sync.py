@@ -1,12 +1,13 @@
 import asyncio
 import logging
+from queue import Queue
+
 from websockets import ConnectionClosed, WebSocketClientProtocol
 from websockets.client import connect
-from queue import Queue
 
 from nk_shared.proto import Message
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 async def network_async_runner(
@@ -25,7 +26,7 @@ async def network_async_runner(
     async def handler(websocket: WebSocketClientProtocol):
         consumer_task = asyncio.create_task(consumer_handler(websocket))
         producer_task = asyncio.create_task(producer_handler(websocket))
-        done, pending = await asyncio.wait(
+        _done, pending = await asyncio.wait(
             [consumer_task, producer_task],
             return_when=asyncio.FIRST_COMPLETED,
         )
@@ -36,7 +37,7 @@ async def network_async_runner(
         try:
             await handler(websocket)
         except ConnectionClosed:
-            LOGGER.warn("Connection closed")
+            logger.warning("Connection closed")
 
 
 def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]):

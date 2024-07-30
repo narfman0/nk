@@ -1,7 +1,8 @@
 import logging
-import pymunk
-from typing_extensions import Unpack
 from uuid import UUID
+
+from typing_extensions import Unpack
+import pymunk
 
 from nk_shared.map import Map
 from nk_shared.models import (
@@ -64,9 +65,7 @@ class World:
                 if hasattr(query_info.shape.body, "character"):
                     character = query_info.shape.body.character
                     # let's avoid friendly fire. eventually it'd be cool to have factions.
-                    player_involved = (
-                        projectile.origin == self.player or character == self.player
-                    )
+                    player_involved = self.player in (projectile.origin, character)
                     if player_involved and projectile.origin != character:
                         character.handle_damage_received(1)
                         should_remove = True
@@ -94,17 +93,20 @@ class World:
         for character in self.enemies:
             if character.uuid == uuid:
                 return character
+        return None
 
     def get_player_by_uuid(self, uuid: UUID) -> Character | None:
         for character in self.players:
             if character.uuid == uuid:
                 return character
+        return None
 
     def get_character_by_uuid(self, uuid: UUID | None) -> Character | None:
         if not uuid:
-            logger.warning(f"get_character_by_uuid received null uuid")
-            return
+            logger.warning("get_character_by_uuid received null uuid")
+            return None
         for character in self.players + self.enemies + [self.player]:
             if character.uuid == uuid:
                 return character
-        logger.info(f"Could not find character with uuid {uuid}")
+        logger.info("Could not find character with uuid %s", uuid)
+        return None

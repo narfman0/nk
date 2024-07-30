@@ -1,4 +1,3 @@
-import logging
 from queue import Queue
 
 from os import environ
@@ -6,8 +5,6 @@ from threading import Thread
 
 from nk_shared.proto import Message
 from nk.net.sync import handle_websocket
-
-LOGGER = logging.getLogger(__name__)
 
 host = environ.get("WEBSOCKET_HOST", "localhost")
 port = environ.get("WEBSOCKET_PORT", "7666")
@@ -36,3 +33,4 @@ class Network:
     def next(self) -> Message | None:
         if self.has_messages():
             return self._received_messages.get()
+        return None

@@ -3,6 +3,8 @@ import time
 from uuid import uuid4
 from math import sin, cos
 
+from betterproto import serialized_on_wire
+
 from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdated, CharacterType
 from nk_shared.util.logging import initialize_logging
 
@@ -16,16 +18,16 @@ def get_start_pos(network: Network) -> tuple[float, float]:
     while True:
         while network.has_messages():
             message = network.next()
-            if message.player_join_response._serialized_on_wire:
+            if serialized_on_wire(message.player_join_response):
                 if not message.player_join_response.success:
-                    logger.info(f"Player join request failed")
+                    logger.info("Player join request failed")
                 return (message.player_join_response.x, message.player_join_response.y)
         time.sleep(0.1)
 
 
 def main():
     uuid = uuid4()
-    logger.info(f"Starting headless session with uuid: {uuid}")
+    logger.info("Starting headless session with uuid: %s", uuid)
     network = Network()
     network.send(Message(player_join_request=PlayerJoinRequest(uuid=str(uuid))))
     i = 0
@@ -48,11 +50,11 @@ def main():
                     )
                 )
             )
-            logger.info(f"Sent: {(x,y)}")
+            logger.info("Sent: (%r,%r)}", x, y)
         while network.has_messages():
             msg = network.next()
-            if msg.character_attacked._serialized_on_wire:
-                logger.info(f"Received: {msg.character_attacked}")
+            if serialized_on_wire(msg.character_attacked):
+                logger.info("Received: %s", msg.character_attacked)
         time.sleep(0.1)
 
 

@@ -6,14 +6,14 @@ from websockets.sync.client import connect
 
 from nk_shared.proto import Message
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]):
     try:
         ws = connect(url)
     except TimeoutError:
-        LOGGER.error(f"Timed out connected to {url}")
+        logger.error("Timed out connected to %s", url)
         os._exit(1)
     while True:
         while not to_send.empty():
@@ -25,5 +25,5 @@ def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]
                 received.put(Message().parse(data))
         except TimeoutError:
             pass  # expected
-        except:
+        except:  # noqa
             os._exit(1)

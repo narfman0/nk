@@ -52,7 +52,8 @@ class CharacterSprite(pygame.sprite.Sprite):
                         path_image_map[path] = image
                     animation_direction_images.append(image)
                 self.images[animation_name][direction] = animation_direction_images
-            # let's make it easy to make animation yml, and allow ourselves just to define once for east.
+            # let's make it easy to make animation yml, and allow ourselves
+            # just to define once for east.
             for direction in [
                 Direction.DIRECTION_N,
                 Direction.DIRECTION_NE,

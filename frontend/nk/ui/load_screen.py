@@ -17,7 +17,7 @@ class LoadScreen(Screen):
 
     def update(self, dt: float, events: list[Event]):
         super().update(dt, events)
-        self.game_state.update(dt)
+        self.game_state.update()
 
     def handle_network_initialized(self):
         self.screen_manager.pop()

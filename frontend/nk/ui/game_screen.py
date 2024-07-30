@@ -11,17 +11,23 @@ from nk_shared.util.math import cartesian_to_isometric
 from nk_shared.util import direction_util
 
 from nk.game_state import GameState
-from nk.settings import *
+from nk.settings import WIDTH, HEIGHT
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
     ActionEnum,
     read_input_player_move_direction,
     read_input_player_actions,
 )
-from nk.ui.renderables import *
+from nk.ui.renderables import (
+    create_renderable_list,
+    MapRenderable,
+    renderables_generate_key,
+    SpriteRenderable,
+    BlittableRenderable,
+)
 from nk.ui.screen import Screen, ScreenManager
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
 
 
@@ -34,13 +40,16 @@ class CharacterStruct:
 
 
 class GameScreen(Screen):
+    """UI screen for game state"""
 
     def __init__(self, screen_manager: ScreenManager, game_state: GameState):
+        super().__init__()
         self.screen_manager = screen_manager
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
         self.projectile_image_dict = {}
+        self.cam_x, self.cam_y = 0, 0
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.character_added_callback = self.handle_character_added
@@ -80,7 +89,7 @@ class GameScreen(Screen):
             self.update_player_sprite()
         self.world.player.facing_direction = player_move_direction
         self.update_character_structs(dt)
-        self.game_state.update(dt)
+        self.game_state.update()
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -93,10 +102,10 @@ class GameScreen(Screen):
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)
-            LOGGER.info(f"Player now has {self.world.player.hp} hp")
+            logger.info("Player now has %r hp", self.world.player.hp)
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible
-            LOGGER.info(f"Player invincibility set to {self.world.player.invincible}")
+            logger.info("Player invincibility set to %r", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
             # TODO self.screen_scale = max(3, self.screen_scale - 1)
             self.recalculate_screen_scale_derivatives()
@@ -236,7 +245,7 @@ class GameScreen(Screen):
         )
 
     def handle_character_attacked(self, character: Character):
-        for str in self.character_structs:
-            if str.character == character:
-                str.sprite.change_animation("attack")
+        for cstruct in self.character_structs:
+            if cstruct.character == character:
+                cstruct.sprite.change_animation("attack")
                 return
