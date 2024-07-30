@@ -3,7 +3,7 @@
 import logging
 import random
 from functools import lru_cache
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pymunk
 
@@ -154,7 +154,7 @@ class World:  # pylint: disable=too-many-instance-attributes
 
     def handle_character_attacked(self, details: CharacterUpdated):
         """Call character attack, does nothing if character does not exist"""
-        character = self.get_character_by_uuid(UUID(details.uuid))
+        character = self.get_character_by_uuid(details.uuid)
         if not character:
             logger.warning("No character maching uuid: %s", details.uuid)
         logger.info(details)
@@ -163,18 +163,15 @@ class World:  # pylint: disable=too-many-instance-attributes
     def handle_character_updated(self, details: CharacterUpdated):
         """Apply message details to relevant character. If character
         does not exist, do not do anything."""
-        character = self.get_character_by_uuid(UUID(details.uuid))
+        character = self.get_character_by_uuid(details.uuid)
         if not character:
             logger.warning("No character maching uuid: %s", details.uuid)
         character.body.position = (details.x, details.y)
         character.moving_direction = Direction(details.moving_direction)
         character.facing_direction = Direction(details.facing_direction)
 
-    def get_character_by_uuid(self, uuid: UUID) -> Character | None:
+    def get_character_by_uuid(self, uuid: str) -> Character | None:
         """Retrieve closest player or enemy"""
-        if isinstance(uuid, str):
-            logger.warning("Received uuid as a string: %s, converting", uuid)
-            uuid = UUID(uuid)
         for character in self.players + self.enemies:
             if character.uuid == uuid:
                 return character

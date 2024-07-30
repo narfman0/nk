@@ -1,6 +1,5 @@
 import logging
 from functools import lru_cache
-from uuid import UUID
 
 from typing_extensions import Unpack
 import pymunk
@@ -77,22 +76,19 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.space.add(character.body, character.shape, character.hitbox_shape)
         return character
 
-    def get_enemy_by_uuid(self, uuid: UUID) -> Character | None:
+    def get_enemy_by_uuid(self, uuid: str) -> Character | None:
         for character in self.enemies:
             if character.uuid == uuid:
                 return character
         return None
 
-    def get_player_by_uuid(self, uuid: UUID) -> Character | None:
+    def get_player_by_uuid(self, uuid: str) -> Character | None:
         for character in self.players:
             if character.uuid == uuid:
                 return character
         return None
 
-    def get_character_by_uuid(self, uuid: UUID | None) -> Character | None:
-        if not uuid:
-            logger.warning("get_character_by_uuid received null uuid")
-            return None
+    def get_character_by_uuid(self, uuid: str) -> Character | None:
         for character in self.players + self.enemies + [self.player]:
             if character.uuid == uuid:
                 return character

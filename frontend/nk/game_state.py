@@ -1,6 +1,5 @@
 import logging
 import os
-from uuid import UUID
 from typing import Callable
 
 from betterproto import serialized_on_wire
@@ -60,7 +59,7 @@ class GameState:
         if not details.uuid:
             logger.warning("character_attacked has no associated uuid!")
             return
-        character = self.world.get_character_by_uuid(UUID(details.uuid))
+        character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.attack()
             if self.character_attacked_callback:
@@ -77,7 +76,7 @@ class GameState:
         if not details.uuid:
             logger.warning("character_damaged has no associated uuid!")
             return
-        character = self.world.get_character_by_uuid(UUID(details.uuid))
+        character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.handle_damage_received(details.damage)
         else:
@@ -87,23 +86,22 @@ class GameState:
 
     def handle_character_updated(self, message: Message):
         details = message.character_updated
-        uuid = UUID(details.uuid)
-        if self.world.player.uuid == uuid:
+        if self.world.player.uuid == details.uuid:
             logger.warning("Received character_updated for self")
             return
-        character = self.world.get_character_by_uuid(uuid)
+        character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.body.position = Vec2d(details.x, details.y)
         else:
             if details.character_type == CharacterType.CHARACTER_TYPE_PIGSASSIN:
                 character = self.world.add_player(
-                    uuid=uuid,
+                    uuid=details.uuid,
                     start_x=details.x,
                     start_y=details.y,
                 )
             else:
                 character = self.world.add_enemy(
-                    uuid=uuid,
+                    uuid=details.uuid,
                     start_x=details.x,
                     start_y=details.y,
                     character_type=CharacterType(details.character_type),

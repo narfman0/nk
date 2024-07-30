@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-from uuid import UUID
 
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
@@ -44,7 +43,7 @@ async def handle_messages(player: Player, msg: Message):
 
 async def handle_player_join_request(player: Player, msg: Message):
     """A player has joined. Handle initialization."""
-    player.uuid = UUID(msg.player_join_request.uuid)
+    player.uuid = msg.player_join_request.uuid
     world.spawn_player(player)
     logger.info("Join request success: %s", player.uuid)
     response = PlayerJoinResponse(

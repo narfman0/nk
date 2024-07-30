@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from uuid import UUID, uuid4 as generate_uuid
+from uuid import uuid4 as generate_uuid
 
 import pymunk
 
@@ -11,7 +11,7 @@ from nk_shared.util import direction_util
 @dataclass
 class Character(CharacterProperties):
     character_type: CharacterType = CharacterType.CHARACTER_TYPE_PIGSASSIN
-    uuid: UUID = field(default_factory=generate_uuid)
+    uuid: str = field(default_factory=lambda: str(generate_uuid()))
     facing_direction: Direction = Direction.DIRECTION_S
     moving_direction: Direction = None
     shape: pymunk.Shape = None
