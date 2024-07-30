@@ -1,5 +1,5 @@
 import logging
-from functools import cache
+from functools import lru_cache
 from uuid import UUID
 
 from typing_extensions import Unpack
@@ -119,7 +119,7 @@ class World:  # pylint: disable=too-many-instance-attributes
                 return projectile
         return None
 
-    @cache
+    @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
         path = f"../data/attack_profiles/{attack_profile_name}.yml"
         return AttackProfile.from_yaml_file(path)

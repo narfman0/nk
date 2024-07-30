@@ -2,7 +2,7 @@
 
 import logging
 import random
-from functools import cache
+from functools import lru_cache
 from uuid import UUID, uuid4
 
 import pymunk
@@ -80,6 +80,7 @@ class World:  # pylint: disable=too-many-instance-attributes
                 )
 
     def update_projectiles(self, dt: float):
+        """Projectile movement and collision handling"""
         for projectile in self.projectiles:
             projectile.update(dt)
             should_remove = False
@@ -100,6 +101,7 @@ class World:  # pylint: disable=too-many-instance-attributes
                 logger.debug("Projectile destroyed: %s", projectile.uuid)
 
     def process_ranged_attack(self, character: Character):
+        """Perform a ranged attack"""
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
         speed = direction_util.to_vector(character.facing_direction).scale_to_length(
             attack_profile.speed
@@ -216,11 +218,13 @@ class World:  # pylint: disable=too-many-instance-attributes
         return player
 
     def broadcast(self, message: Message):
+        """Send message to all players"""
         for player in self.players:
             player.messages.put_nowait(message)
 
-    @cache
+    @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
+        """Get model from attack profile name"""
         path = f"../data/attack_profiles/{attack_profile_name}.yml"
         return AttackProfile.from_yaml_file(path)
 

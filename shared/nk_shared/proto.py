@@ -73,11 +73,11 @@ class PlayerLeft(betterproto.Message):
 @dataclass
 class Projectile(betterproto.Message):
     uuid: str = betterproto.string_field(1)
-    x: float = betterproto.float_field(3)
-    y: float = betterproto.float_field(4)
-    dx: float = betterproto.float_field(5)
-    dy: float = betterproto.float_field(6)
-    attack_profile_name: str = betterproto.string_field(7)
+    x: float = betterproto.float_field(2)
+    y: float = betterproto.float_field(3)
+    dx: float = betterproto.float_field(4)
+    dy: float = betterproto.float_field(5)
+    attack_profile_name: str = betterproto.string_field(6)
 
 
 @dataclass

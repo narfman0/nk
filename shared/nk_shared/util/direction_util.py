@@ -1,12 +1,12 @@
 from math import atan2, pi
-from functools import cache
+from functools import lru_cache
 
 from pymunk import Vec2d
 
 from nk_shared.proto import Direction
 
 
-@cache
+@lru_cache
 def to_vector(direction: Direction) -> Vec2d:
     return {
         Direction.DIRECTION_N: Vec2d(0, -1),
@@ -20,7 +20,7 @@ def to_vector(direction: Direction) -> Vec2d:
     }[direction].normalized()
 
 
-@cache
+@lru_cache
 def to_isometric(direction: Direction):
     return {
         Direction.DIRECTION_N: Direction.DIRECTION_NE,
@@ -59,7 +59,7 @@ def direction_to(origin: Vec2d, target: Vec2d):
     return result
 
 
-@cache
+@lru_cache
 def angle(direction: Direction) -> float:
     vectorized = to_vector(direction)
     return atan2(vectorized.y, vectorized.x)
