@@ -87,7 +87,9 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         ):
             # ideally we could pass a callback here but :shrugs:
             self.update_player_sprite()
-        self.world.player.facing_direction = player_move_direction
+        if player_move_direction:
+            self.world.player.facing_direction = player_move_direction
+        assert self.world.player.facing_direction is not None
         self.update_character_structs(dt)
         self.game_state.update()
 

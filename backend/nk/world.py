@@ -2,19 +2,21 @@
 
 import logging
 import random
-from uuid import UUID
+from functools import cache
+from uuid import UUID, uuid4
 
 import pymunk
 
 from nk_shared import builders
 from nk_shared.models import (
     AttackProfile,
+    AttackType,
     Character,
     Zone,
     Projectile,
 )
 from nk_shared.map import Map
-from nk_shared.proto import CharacterType, CharacterUpdated
+from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
 from nk_shared.util import direction_util
 
 from nk.models import Enemy, Player
@@ -54,6 +56,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.update_ai(dt)
         self.update_characters(dt, self.players, self.enemies)
         self.update_characters(dt, self.enemies, self.players)
+        self.update_projectiles(dt)
         self.space.step(dt)
 
     def update_characters(
@@ -66,12 +69,56 @@ class World:  # pylint: disable=too-many-instance-attributes
         for character in characters:
             character.update(dt)
             if character.should_process_attack:
-                self.process_attack_damage(character, targets)
+                if character.attack_type == AttackType.MELEE:
+                    self.process_attack_damage(character, targets)
+                elif character.attack_type == AttackType.RANGED:
+                    self.process_ranged_attack(character)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
                 self.space.remove(
                     character.body, character.shape, character.hitbox_shape
                 )
+
+    def update_projectiles(self, dt: float):
+        for projectile in self.projectiles:
+            projectile.update(dt)
+            should_remove = False
+            for query_info in self.space.shape_query(projectile.shape):
+                if hasattr(query_info.shape.body, "character"):
+                    character: Character = query_info.shape.body.character
+                    # i guess there's friendly fire for now :D
+                    if projectile.origin != character:
+                        dmg = 1
+                        character.handle_damage_received(dmg)
+                        self.broadcast(builders.build_character_damaged(character, dmg))
+                        should_remove = True
+                else:
+                    should_remove = True
+            if should_remove:
+                self.projectiles.remove(projectile)
+                self.broadcast(builders.build_projectile_destroyed(projectile.uuid))
+                logger.info("Projectile destroyed: %s", projectile)
+
+    def process_ranged_attack(self, character: Character):
+        attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
+        speed = direction_util.to_vector(character.facing_direction).scale_to_length(
+            attack_profile.speed
+        )
+        projectile = Projectile(
+            x=character.position.x + attack_profile.emitter_offset_x,
+            y=character.position.y + attack_profile.emitter_offset_y,
+            dx=speed.x,
+            dy=speed.y,
+            origin=character,
+            attack_profile=attack_profile,
+            attack_profile_name=attack_profile.name,
+            origin_uuid=str(character.uuid),
+            uuid=str(uuid4()),
+        )
+        self.projectiles.append(projectile)
+        self.broadcast(builders.build_projectile_created(projectile))
+        character.should_process_attack = False
+        logger.info("Projectile created: %s", projectile)
 
     def process_attack_damage(self, attacker: Character, targets: list[Character]):
         """Attack trigger frame reached, let's find who was hit and apply dmg"""
@@ -80,9 +127,7 @@ class World:  # pylint: disable=too-many-instance-attributes
             if attacker.hitbox_shape.shapes_collide(target.shape).points:
                 damage = 1
                 target.handle_damage_received(damage)
-                msg = builders.build_character_damaged(target, damage)
-                for player in self.players:
-                    player.messages.put_nowait(msg)
+                self.broadcast(builders.build_character_damaged(target, damage))
 
     def update_ai(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
@@ -103,12 +148,8 @@ class World:  # pylint: disable=too-many-instance-attributes
                     )
                 if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
                     enemy.attack()
-                    msg = builders.build_character_attacked(enemy)
-                    for player in self.players:
-                        player.messages.put_nowait(msg)
-                msg = builders.build_character_updated(enemy)
-                for player in self.players:
-                    player.messages.put_nowait(msg)
+                    self.broadcast(builders.build_character_attacked(enemy))
+                self.broadcast(builders.build_character_updated(enemy))
 
     def handle_character_attacked(self, details: CharacterUpdated):
         """Call character attack, does nothing if character does not exist"""
@@ -125,8 +166,8 @@ class World:  # pylint: disable=too-many-instance-attributes
         if not character:
             logger.warning("No character maching uuid: %s", details.uuid)
         character.body.position = (details.x, details.y)
-        character.moving_direction = details.moving_direction
-        character.facing_direction = details.facing_direction
+        character.moving_direction = Direction(details.moving_direction)
+        character.facing_direction = Direction(details.facing_direction)
 
     def get_character_by_uuid(self, uuid: UUID) -> Character | None:
         """Retrieve closest player or enemy"""
@@ -174,6 +215,15 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.space.add(player.body, player.shape, player.hitbox_shape)
         self.players.append(player)
         return player
+
+    def broadcast(self, message: Message):
+        for player in self.players:
+            player.messages.put_nowait(message)
+
+    @cache
+    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
+        path = f"../data/attack_profiles/{attack_profile_name}.yml"
+        return AttackProfile.from_yaml_file(path)
 
 
 # Locally, this is the world directly. When deployed, this might be a handle to

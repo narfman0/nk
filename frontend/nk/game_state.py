@@ -7,7 +7,7 @@ from betterproto import serialized_on_wire
 from pymunk import Vec2d
 
 from nk_shared import builders
-from nk_shared.proto import CharacterType, Message, PlayerJoinRequest
+from nk_shared.proto import CharacterType, Direction, Message, PlayerJoinRequest
 
 from nk.world import World
 from nk.net.network import Network
@@ -38,7 +38,7 @@ class GameState:
                 self.handle_player_join_response(message)
             elif serialized_on_wire(message.character_updated):
                 self.handle_character_updated(message)
-            elif serialized_on_wire(serialized_on_wire(message)):
+            elif serialized_on_wire(message.character_attacked):
                 self.handle_character_attacked(message)
             elif serialized_on_wire(message.character_damaged):
                 self.handle_character_damaged(message)
@@ -85,12 +85,11 @@ class GameState:
         details = message.character_updated
         uuid = UUID(details.uuid)
         if self.world.player.uuid == uuid:
+            logger.warning("Received character_updated for self")
             return
         character = self.world.get_character_by_uuid(uuid)
         if character:
             character.body.position = Vec2d(details.x, details.y)
-            character.facing_direction = details.facing_direction
-            character.moving_direction = details.moving_direction
         else:
             if details.character_type == CharacterType.CHARACTER_TYPE_PIGSASSIN:
                 character = self.world.add_player(
@@ -104,11 +103,11 @@ class GameState:
                     start_x=details.x,
                     start_y=details.y,
                     character_type=CharacterType(details.character_type),
-                    facing_direction=details.facing_direction,
-                    moving_direction=details.moving_direction,
                 )
             if self.character_added_callback:
                 self.character_added_callback(character)  # pylint: disable=not-callable
+        character.facing_direction = Direction(details.facing_direction)
+        character.moving_direction = Direction(details.moving_direction)
 
     def handle_player_join_response(self, message: Message):
         if not message.player_join_response.success:

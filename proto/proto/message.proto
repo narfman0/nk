@@ -4,6 +4,7 @@ package proto;
 
 import "proto/character.proto";
 import "proto/player.proto";
+import "proto/projectile.proto";
 import "proto/text_message.proto";
 
 message Message {
@@ -16,6 +17,9 @@ message Message {
     proto.PlayerLeft player_left = 101;
     proto.PlayerJoinRequest player_join_request = 102;
     proto.PlayerJoinResponse player_join_response = 103;
+    
+    proto.ProjectileCreated projectile_created = 300;
+    proto.ProjectileDestroyed projectile_destroyed = 301;
 
     proto.TextMessage text_message = 1;
   }

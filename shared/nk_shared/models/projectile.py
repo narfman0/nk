@@ -2,18 +2,14 @@ from dataclasses import dataclass
 
 from pymunk import Body, Circle
 
-from nk_shared.models.attack_profile import AttackProfile
-from nk_shared.models.character import Character
+from nk_shared.models import AttackProfile, Character
+from nk_shared.proto import Projectile as ProjectileProto
 
 
 @dataclass
-class Projectile:
-    x: float
-    y: float
-    dx: float
-    dy: float
-    origin: Character
-    attack_profile: AttackProfile
+class Projectile(ProjectileProto):
+    origin: Character = None
+    attack_profile: AttackProfile = None
     body: Body = None
     shape: Circle = None
 

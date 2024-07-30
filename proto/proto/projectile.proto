@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+message Projectile {
+  string uuid = 1;
+  string origin_uuid = 2;
+  float x = 3;
+  float y = 4;
+  float dx = 5;
+  float dy = 6;
+  string attack_profile_name = 7;
+}
+
+message ProjectileCreated {
+  Projectile projectile = 1;
+}
+
+message ProjectileDestroyed {
+  string uuid = 1;
+}
