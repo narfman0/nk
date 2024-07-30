@@ -16,7 +16,7 @@ from nk_shared.proto import CharacterType, Direction
 logger = logging.getLogger(__name__)
 
 
-class World:
+class World:  # pylint: disable=too-many-instance-attributes
     def __init__(self, zone_name="1"):
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}

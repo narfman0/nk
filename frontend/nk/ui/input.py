@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 from enum import Enum
 
 import pygame
@@ -49,7 +50,7 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 actions.append(ActionEnum.DASH)
-            elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
+            elif event.key in (pygame.K_LCTRL, pygame.K_RCTRL):
                 actions.append(ActionEnum.ATTACK)
             elif event.key == pygame.K_F2:
                 actions.append(ActionEnum.PLAYER_HEAL)

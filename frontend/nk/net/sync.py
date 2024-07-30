@@ -25,5 +25,5 @@ def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]
                 received.put(Message().parse(data))
         except TimeoutError:
             pass  # expected
-        except:  # noqa
+        except:  # pylint: disable=bare-except
             os._exit(1)

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class LoadScreen(Screen):
     def __init__(self, screen_manager: ScreenManager):
+        super().__init__()
         self.screen_manager = screen_manager
         self.game_state = GameState()
         self.game_state.network_initialized_callback = self.handle_network_initialized

@@ -1,5 +1,5 @@
 from pygame.event import Event
-from pygame.surface import Surface
+from pygame.surface import Surface  # pylint: disable=no-name-in-module
 
 
 class Screen:

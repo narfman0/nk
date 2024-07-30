@@ -1,14 +1,15 @@
+# pylint: disable=no-member
 from pstats import SortKey
 import pygame
 
 from nk_shared.util.logging import initialize_logging
 
-from nk.settings import *
+from nk.settings import WIDTH, HEIGHT, ENABLE_PROFILING, FPS
 from nk.ui.screen import ScreenManager
 from nk.ui.load_screen import LoadScreen
 
 
-def main():
+def main():  # pylint: disable=too-many-locals
     initialize_logging()
     pygame.init()
     pygame.display.set_caption("nk")
@@ -20,7 +21,7 @@ def main():
     screen_manager.push(LoadScreen(screen_manager))
 
     if ENABLE_PROFILING:
-        import cProfile, pstats, io
+        import cProfile, pstats, io  # pylint: disable=import-outside-toplevel,multiple-imports
 
         pr = cProfile.Profile()
         pr.enable()
@@ -47,7 +48,7 @@ def main():
         sortby = SortKey.CUMULATIVE
         ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
         ps.print_stats()
-        with open("pstats.log", "w+") as f:
+        with open("pstats.log", "w+") as f:  # pylint: disable=unspecified-encoding
             f.write(s.getvalue())
     pygame.quit()
 

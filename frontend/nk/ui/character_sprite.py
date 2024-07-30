@@ -1,14 +1,17 @@
+# pylint: disable=unspecified-encoding
 import pygame
+from pygame.sprite import Sprite
 import yaml
 
 from nk_shared.proto import Direction
 
 
-class CharacterSprite(pygame.sprite.Sprite):
+class CharacterSprite(Sprite):  # pylint: disable=too-many-instance-attributes
     FRAME_DURATION = 0.1
 
+    # pylint: disable=too-many-locals,too-many-branches
     def __init__(self, sprite_name: str, scale: float = 1, offset=(0, 0)):
-        super(CharacterSprite, self).__init__()
+        super().__init__()
         self.index = 0
         self.moving = False
         self.loop = True
@@ -99,7 +102,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         self.active_animation_name = animation_name
         self.current_frame_time_remaining = self.FRAME_DURATION
 
-    def update(self, dt: float):
+    def update(self, dt: float):  # pylint: disable=arguments-differ
         self.current_frame_time_remaining -= dt
         while self.current_frame_time_remaining <= 0:
             self.current_frame_time_remaining += self.FRAME_DURATION

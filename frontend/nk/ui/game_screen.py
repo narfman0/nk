@@ -39,7 +39,7 @@ class CharacterStruct:
     last_moving_direction: Direction
 
 
-class GameScreen(Screen):
+class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
     """UI screen for game state"""
 
     def __init__(self, screen_manager: ScreenManager, game_state: GameState):
@@ -107,13 +107,13 @@ class GameScreen(Screen):
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to %r", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
-            # TODO self.screen_scale = max(3, self.screen_scale - 1)
+            # TODO self.screen_scale = max(3, self.screen_scale - 1) # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.ZOOM_IN in player_actions:
-            # TODO self.screen_scale = min(6, self.screen_scale + 1)
+            # TODO self.screen_scale = min(6, self.screen_scale + 1) # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
 
-    def draw(self, dest_surface: pygame.Surface):
+    def draw(self, dest_surface: pygame.Surface):  # pylint: disable=arguments-renamed
         renderables = create_renderable_list()
         for map_renderable in self.map_renderables:
             blit_x, blit_y = map_renderable.blit_coords
@@ -190,7 +190,8 @@ class GameScreen(Screen):
             character_struct.sprite_group.update(dt)
 
     def generate_map_renderables(self, ground: bool):
-        """We can statically generate the blit coords once in the beginning, avoiding a bunch of coordinate conversions."""
+        """We can statically generate the blit coords once in the beginning,
+        avoiding a bunch of coordinate conversions."""
         ground_ids = self.world.map.get_ground_layer_ids()
         for layer in range(self.world.map.get_tile_layer_count()):
             if ground and layer not in ground_ids or not ground and layer in ground_ids:

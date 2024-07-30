@@ -60,6 +60,7 @@ class GameState:
         if character:
             character.attack()
             if self.character_attacked_callback:
+                # pylint: disable-next=not-callable
                 self.character_attacked_callback(character)
         else:
             logger.warning(
@@ -107,7 +108,7 @@ class GameState:
                     moving_direction=details.moving_direction,
                 )
             if self.character_added_callback:
-                self.character_added_callback(character)
+                self.character_added_callback(character)  # pylint: disable=not-callable
 
     def handle_player_join_response(self, message: Message):
         if not message.player_join_response.success:

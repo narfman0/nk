@@ -21,7 +21,11 @@ v1:
 
 * Shooting!
 * Login + character persistence
+
+v2:
+* Zoom screen out
 * friend/foe system (all pigsassins are players)
+* Very epic helpers?!
 
 ## License
 
