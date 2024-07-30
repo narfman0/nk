@@ -1,6 +1,7 @@
 black
 pyinstaller
 pyinstaller-hooks-contrib
+pylint
 pytest
 pytest-cov
 wheel

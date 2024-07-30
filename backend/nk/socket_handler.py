@@ -1,3 +1,5 @@
+"""Server handler of socket. Translates websocket bytes to and from messages for backend."""
+
 import asyncio
 import logging
 from uuid import UUID
@@ -13,34 +15,38 @@ logger = logging.getLogger(__name__)
 
 
 async def broadcast(origin: Player | None, message: Message):
+    """Put the message on the msg queue for every player who is not origin"""
     for remote_player in world.get_players():
         if origin != remote_player:
             await remote_player.messages.put(message)
 
 
 async def send_messages(player: Player, websocket: WebSocket):
+    """Push all messages on player's queue through their socket"""
     message = await player.messages.get()
-    logger.debug(f"Sending message {message} to {player.uuid}")
+    logger.debug("Sending message %s to %s", message, player.uuid)
     await websocket.send_bytes(bytes(message))
 
 
 async def handle_messages(player: Player, msg: Message):
-    if msg.player_join_request._serialized_on_wire:
+    """Socket-level handler for messages, mostly passing through to world"""
+    if msg.player_join_request._serialized_on_wire:  # pylint: disable=protected-access
         await handle_player_join_request(player, msg)
-    elif msg.text_message._serialized_on_wire:
+    elif msg.text_message._serialized_on_wire:  # pylint: disable=protected-access
         await broadcast(player, msg)
-    elif msg.character_attacked._serialized_on_wire:
+    elif msg.character_attacked._serialized_on_wire:  # pylint: disable=protected-access
         world.handle_character_attacked(msg.character_attacked)
-    elif msg.character_updated._serialized_on_wire:
+    elif msg.character_updated._serialized_on_wire:  # pylint: disable=protected-access
         world.handle_character_updated(msg.character_updated)
         await broadcast(player, msg)
-    logger.debug(f"Handled message: {msg} from {player.uuid}")
+    logger.debug("Handled message: %s from %s", msg, player.uuid)
 
 
 async def handle_player_join_request(player: Player, msg: Message):
+    """A player has joined. Handle initialization."""
     player.uuid = UUID(msg.player_join_request.uuid)
     world.spawn_player(player)
-    logger.info(f"Join request success: {player.uuid}")
+    logger.info("Join request success: %s", player.uuid)
     response = PlayerJoinResponse(
         success=True, x=player.position.x, y=player.position.y
     )
@@ -49,18 +55,23 @@ async def handle_player_join_request(player: Player, msg: Message):
 
 
 async def handle_connected(websocket: WebSocket):
+    """Handle the lifecycle of the websocket"""
+
     async def consumer():
+        """Translate bytes on the wire to messages"""
         async for data in websocket.iter_bytes():
             await handle_messages(player, Message().parse(data))
 
     async def producer():
+        """Emit queued messages to player"""
         while True:
             await send_messages(player, websocket)
 
     async def handler():
+        """Socket lifecycle handler. Handles producing and consuming simultaneously."""
         consumer_task = asyncio.create_task(consumer())
         producer_task = asyncio.create_task(producer())
-        done, pending = await asyncio.wait(
+        _done, pending = await asyncio.wait(
             [consumer_task, producer_task],
             return_when=asyncio.FIRST_COMPLETED,
         )
@@ -71,6 +82,6 @@ async def handle_connected(websocket: WebSocket):
     try:
         await handler()
     except WebSocketDisconnect:
-        logger.info(f"Disconnected from {player}")
+        logger.info("Disconnected from %s", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=str(player.uuid))))
     world.get_players().remove(player)

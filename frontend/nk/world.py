@@ -102,7 +102,7 @@ class World:
 
     def get_character_by_uuid(self, uuid: UUID | None) -> Character | None:
         if not uuid:
-            logger.warn(f"get_character_by_uuid received null uuid")
+            logger.warning(f"get_character_by_uuid received null uuid")
             return
         for character in self.players + self.enemies + [self.player]:
             if character.uuid == uuid:

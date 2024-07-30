@@ -1,3 +1,5 @@
+"""Simulates the world's characters"""
+
 import logging
 import random
 from uuid import UUID
@@ -21,7 +23,8 @@ UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)
 
 
-class World:
+class World:  # pylint: disable=too-many-instance-attributes
+    """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):
         self.projectiles: list[Projectile] = []
@@ -43,9 +46,11 @@ class World:
         self.next_update_time = 0
 
     def get_players(self) -> list[Player]:
+        """gets players"""
         return self.players
 
     def update(self, dt: float):
+        """High level world update"""
         self.update_ai(dt)
         self.update_characters(dt, self.players, self.enemies)
         self.update_characters(dt, self.enemies, self.players)
@@ -57,6 +62,7 @@ class World:
         characters: list[Character],
         targets: list[Character],
     ):
+        """Update given characters (players and enemies)"""
         for character in characters:
             character.update(dt)
             if character.should_process_attack:
@@ -68,16 +74,18 @@ class World:
                 )
 
     def process_attack_damage(self, attacker: Character, targets: list[Character]):
+        """Attack trigger frame reached, let's find who was hit and apply dmg"""
         attacker.should_process_attack = False
         for target in targets:
             if attacker.hitbox_shape.shapes_collide(target.shape).points:
-                damage = 1  # TODO different dmg amounts
+                damage = 1
                 target.handle_damage_received(damage)
                 msg = builders.build_character_damaged(target, damage)
                 for player in self.players:
                     player.messages.put_nowait(msg)
 
     def update_ai(self, dt: float):
+        """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
         self.next_update_time -= dt
         if self.next_update_time <= 0:
             self.next_update_time = UPDATE_FREQUENCY
@@ -103,29 +111,37 @@ class World:
                     player.messages.put_nowait(msg)
 
     def handle_character_attacked(self, details: CharacterUpdated):
+        """Call character attack, does nothing if character does not exist"""
         character = self.get_character_by_uuid(UUID(details.uuid))
         if not character:
-            logger.warn(f"No character maching uuid: {details.uuid}")
+            logger.warning("No character maching uuid: %s", details.uuid)
         logger.info(details)
         character.attack()
 
     def handle_character_updated(self, details: CharacterUpdated):
+        """Apply message details to relevant character. If character
+        does not exist, do not do anything."""
         character = self.get_character_by_uuid(UUID(details.uuid))
         if not character:
-            logger.warn(f"No character maching uuid: {details.uuid}")
+            logger.warning("No character maching uuid: %s", details.uuid)
         character.body.position = (details.x, details.y)
         character.moving_direction = details.moving_direction
         character.facing_direction = details.facing_direction
 
     def get_character_by_uuid(self, uuid: UUID) -> Character | None:
+        """Retrieve closest player or enemy"""
         if isinstance(uuid, str):
-            logger.warn(f"Received uuid as a string: {uuid}, converting")
+            logger.warning("Received uuid as a string: %s, converting", uuid)
             uuid = UUID(uuid)
         for character in self.players + self.enemies:
             if character.uuid == uuid:
                 return character
+        return None
 
     def closest_player(self, x: float, y: float) -> Player | None:
+        """Retrieve the closest player to the given x,y pair.
+        Long term, should considering splitting world into zone/chunks, but
+        this is a scan currently."""
         closest, min_dst = None, float("inf")
         for player in self.players:
             if player.alive:
@@ -138,6 +154,7 @@ class World:
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
     ) -> Enemy:
+        """Create enemy in world"""
         character = Enemy(
             character_type=character_type,
             center_y=center_y,
@@ -150,7 +167,8 @@ class World:
         return character
 
     def spawn_player(self, player: Player) -> Player:
-        """Player 'is' a Character, which i don't love, but its already created. Update relevant attrs."""
+        """Player 'is' a Character, which i don't love, but its already
+        created. Update relevant attrs."""
         x, y = world.map.get_start_tile()
         player.body.position = (x, y)
         self.space.add(player.body, player.shape, player.hitbox_shape)

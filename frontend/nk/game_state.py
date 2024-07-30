@@ -53,7 +53,7 @@ class GameState:
         details = message.character_attacked
         logger.info(details)
         if not details.uuid:
-            logger.warn(f"character_attacked has no associated uuid!")
+            logger.warning(f"character_attacked has no associated uuid!")
             return
         character = self.world.get_character_by_uuid(UUID(details.uuid))
         if character:
@@ -61,7 +61,7 @@ class GameState:
             if self.character_attacked_callback:
                 self.character_attacked_callback(character)
         else:
-            logger.warn(
+            logger.warning(
                 f"character_attacked no character found with uuid {details.uuid}"
             )
 
@@ -69,13 +69,13 @@ class GameState:
         details = message.character_damaged
         logger.info(details)
         if not details.uuid:
-            logger.warn(f"character_damaged has no associated uuid!")
+            logger.warning(f"character_damaged has no associated uuid!")
             return
         character = self.world.get_character_by_uuid(UUID(details.uuid))
         if character:
             character.handle_damage_received(details.damage)
         else:
-            logger.warn(
+            logger.warning(
                 f"character_damaged no character found with uuid {details.uuid}"
             )
 
