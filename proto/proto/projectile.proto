@@ -4,12 +4,11 @@ package proto;
 
 message Projectile {
   string uuid = 1;
-  string origin_uuid = 2;
-  float x = 3;
-  float y = 4;
-  float dx = 5;
-  float dy = 6;
-  string attack_profile_name = 7;
+  float x = 2;
+  float y = 3;
+  float dx = 4;
+  float dy = 5;
+  string attack_profile_name = 6;
 }
 
 message ProjectileCreated {

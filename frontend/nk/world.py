@@ -1,4 +1,5 @@
 import logging
+from functools import cache
 from uuid import UUID
 
 from typing_extensions import Unpack
@@ -11,7 +12,7 @@ from nk_shared.models import (
     Zone,
     Projectile,
 )
-from nk_shared.proto import CharacterType, Direction
+from nk_shared.proto import CharacterType, Direction, Projectile as ProjectileProto
 
 logger = logging.getLogger(__name__)
 
@@ -60,19 +61,6 @@ class World:  # pylint: disable=too-many-instance-attributes
     def update_projectiles(self, dt: float):
         for projectile in self.projectiles:
             projectile.update(dt)
-            should_remove = False
-            for query_info in self.space.shape_query(projectile.shape):
-                if hasattr(query_info.shape.body, "character"):
-                    character = query_info.shape.body.character
-                    # let's avoid friendly fire. eventually it'd be cool to have factions.
-                    player_involved = self.player in (projectile.origin, character)
-                    if player_involved and projectile.origin != character:
-                        character.handle_damage_received(1)
-                        should_remove = True
-                else:
-                    should_remove = True
-            if should_remove:
-                self.projectiles.remove(projectile)
 
     def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
         character = self.add_character(**character_kwargs)
@@ -110,3 +98,28 @@ class World:  # pylint: disable=too-many-instance-attributes
                 return character
         logger.info("Could not find character with uuid %s", uuid)
         return None
+
+    def create_projectile(self, proto: ProjectileProto):
+        attack_profile = self.get_attack_profile_by_name(proto.attack_profile_name)
+        self.projectiles.append(
+            Projectile(
+                uuid=proto.uuid,
+                attack_profile=attack_profile,
+                x=proto.x,
+                y=proto.y,
+                dx=proto.dx,
+                dy=proto.dy,
+            )
+        )
+        logger.debug("Created projectile: %s", self.projectiles[-1])
+
+    def get_projectile_by_uuid(self, uuid: str) -> Projectile | None:
+        for projectile in self.projectiles:
+            if projectile.uuid == uuid:
+                return projectile
+        return None
+
+    @cache
+    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
+        path = f"../data/attack_profiles/{attack_profile_name}.yml"
+        return AttackProfile.from_yaml_file(path)

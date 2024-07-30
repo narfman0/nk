@@ -47,7 +47,6 @@ def build_projectile_destroyed(uuid: str) -> proto.Message:
 def build_projectile(projectile: Projectile) -> proto.Message:
     return proto.Projectile(
         uuid=projectile.uuid,
-        origin_uuid=projectile.origin_uuid,
         x=projectile.x,
         y=projectile.y,
         dx=projectile.dx,

@@ -42,6 +42,10 @@ class GameState:
                 self.handle_character_attacked(message)
             elif serialized_on_wire(message.character_damaged):
                 self.handle_character_damaged(message)
+            elif serialized_on_wire(message.projectile_created):
+                self.handle_projectile_created(message)
+            elif serialized_on_wire(message.projectile_destroyed):
+                self.handle_projectile_destroyed(message)
         self.handle_self_updated()
 
     def handle_self_updated(self):
@@ -118,3 +122,12 @@ class GameState:
         self.world.player.body.position = (x, y)
         if self.network_initialized_callback:
             self.network_initialized_callback()
+
+    def handle_projectile_created(self, message: Message):
+        self.world.create_projectile(message.projectile_created.projectile)
+
+    def handle_projectile_destroyed(self, message: Message):
+        details = message.projectile_destroyed
+        projectile = self.world.get_projectile_by_uuid(details.uuid)
+        if projectile:
+            self.world.projectiles.remove(projectile)

@@ -97,7 +97,7 @@ class World:  # pylint: disable=too-many-instance-attributes
             if should_remove:
                 self.projectiles.remove(projectile)
                 self.broadcast(builders.build_projectile_destroyed(projectile.uuid))
-                logger.info("Projectile destroyed: %s", projectile)
+                logger.debug("Projectile destroyed: %s", projectile.uuid)
 
     def process_ranged_attack(self, character: Character):
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
@@ -112,13 +112,12 @@ class World:  # pylint: disable=too-many-instance-attributes
             origin=character,
             attack_profile=attack_profile,
             attack_profile_name=attack_profile.name,
-            origin_uuid=str(character.uuid),
             uuid=str(uuid4()),
         )
         self.projectiles.append(projectile)
         self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
-        logger.info("Projectile created: %s", projectile)
+        logger.debug("Projectile created: %s", projectile.uuid)
 
     def process_attack_damage(self, attacker: Character, targets: list[Character]):
         """Attack trigger frame reached, let's find who was hit and apply dmg"""
