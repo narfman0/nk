@@ -14,5 +14,5 @@ message PlayerJoinResponse {
   float y = 3;
 }
 message PlayerLeft {
-    string uuid = 1;
+  string uuid = 1;
 }

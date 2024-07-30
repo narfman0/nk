@@ -41,7 +41,10 @@ def main():
             network.send(
                 Message(
                     character_updated=CharacterUpdated(
-                        uuid=str(uuid), x=x, y=y, character_type=CharacterType.PIGSASSIN
+                        uuid=str(uuid),
+                        x=x,
+                        y=y,
+                        character_type=CharacterType.CHARACTER_TYPE_PIGSASSIN,
                     )
                 )
             )

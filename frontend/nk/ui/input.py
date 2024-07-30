@@ -24,22 +24,22 @@ def read_input_player_move_direction():
     direction = None
     if down:
         if right:
-            direction = Direction.E
+            direction = Direction.DIRECTION_E
         elif left:
-            direction = Direction.S
+            direction = Direction.DIRECTION_S
         else:
-            direction = Direction.SE
+            direction = Direction.DIRECTION_SE
     elif up:
         if right:
-            direction = Direction.N
+            direction = Direction.DIRECTION_N
         elif left:
-            direction = Direction.W
+            direction = Direction.DIRECTION_W
         else:
-            direction = Direction.NW
+            direction = Direction.DIRECTION_NW
     elif left:
-        direction = Direction.SW
+        direction = Direction.DIRECTION_SW
     elif right:
-        direction = Direction.NE
+        direction = Direction.DIRECTION_NE
     return direction
 
 

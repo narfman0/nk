@@ -73,7 +73,7 @@ class GameScreen(Screen):
         )
         if (
             self.world.player.alive
-            and self.world.player.character_type.name.lower()
+            and self.world.player.character_type_short
             != self.player_struct.sprite.sprite_name
         ):
             # ideally we could pass a callback here but :shrugs:
@@ -214,7 +214,7 @@ class GameScreen(Screen):
         return (x, y)
 
     def update_player_sprite(self):
-        sprite = CharacterSprite(self.world.player.character_type.name.lower())
+        sprite = CharacterSprite(self.world.player.character_type_short)
         sprite.set_position(
             self.screen_width // 2 - sprite.image.get_width() // 2,
             self.screen_height // 2 - sprite.image.get_height() // 2,
@@ -230,7 +230,7 @@ class GameScreen(Screen):
         self.camera_offset_y = self.screen_height // 2
 
     def handle_character_added(self, character: Character):
-        sprite = CharacterSprite(character.character_type.name.lower())
+        sprite = CharacterSprite(character.character_type_short)
         self.character_structs.append(
             CharacterStruct(character, sprite, pygame.sprite.Group(sprite), None)
         )

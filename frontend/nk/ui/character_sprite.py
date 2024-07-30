@@ -15,7 +15,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         self.sprite_name = sprite_name
         self.offset = offset
         self.active_animation_name = "idle"
-        self.direction = Direction.S
+        self.direction = Direction.DIRECTION_S
         self.current_frame_time_remaining = self.FRAME_DURATION
 
         with open(f"../data/characters/{sprite_name}/animations.yml") as f:
@@ -27,7 +27,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         for animation_name, direction_list_path_map in animations_yml.items():
             self.images[animation_name] = {}
             for direction_str, animation_struct in direction_list_path_map.items():
-                direction = Direction[direction_str]
+                direction = Direction[f"DIRECTION_{direction_str}"]
                 animation_direction_images = []
                 for image_path in animation_struct["images"]:
                     path = f"../data/characters/{sprite_name}/images/{image_path}"
@@ -53,18 +53,27 @@ class CharacterSprite(pygame.sprite.Sprite):
                     animation_direction_images.append(image)
                 self.images[animation_name][direction] = animation_direction_images
             # let's make it easy to make animation yml, and allow ourselves just to define once for east.
-            for direction in [Direction.N, Direction.NE, Direction.SE]:
+            for direction in [
+                Direction.DIRECTION_N,
+                Direction.DIRECTION_NE,
+                Direction.DIRECTION_SE,
+            ]:
                 if direction not in self.images[animation_name]:
                     self.images[animation_name][direction] = self.images[
                         animation_name
-                    ][Direction.E]
-            if Direction.W not in self.images[animation_name]:
-                east_images = list(self.images[animation_name][Direction.E])
+                    ][Direction.DIRECTION_E]
+            if Direction.DIRECTION_W not in self.images[animation_name]:
+                east_images = list(self.images[animation_name][Direction.DIRECTION_E])
                 west_images = [
                     pygame.transform.flip(img, flip_x=True, flip_y=False)
                     for img in east_images
                 ]
-                for direction in [Direction.S, Direction.SW, Direction.W, Direction.NW]:
+                for direction in [
+                    Direction.DIRECTION_S,
+                    Direction.DIRECTION_SW,
+                    Direction.DIRECTION_W,
+                    Direction.DIRECTION_NW,
+                ]:
                     if direction not in self.images[animation_name]:
                         self.images[animation_name][direction] = west_images
 

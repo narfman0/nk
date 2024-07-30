@@ -1,10 +1,10 @@
 syntax = "proto3";
 
+package proto;
+
 import "proto/character.proto";
 import "proto/player.proto";
 import "proto/text_message.proto";
-
-package proto;
 
 message Message {
   oneof payload {

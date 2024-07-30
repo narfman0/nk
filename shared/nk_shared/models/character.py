@@ -10,9 +10,9 @@ from nk_shared.util import direction_util
 
 @dataclass
 class Character(CharacterProperties):
-    character_type: CharacterType = CharacterType.PIGSASSIN
+    character_type: CharacterType = CharacterType.CHARACTER_TYPE_PIGSASSIN
     uuid: UUID = field(default_factory=generate_uuid)
-    facing_direction: Direction = Direction.S
+    facing_direction: Direction = Direction.DIRECTION_S
     moving_direction: Direction = None
     shape: pymunk.Shape = None
     body: pymunk.Body = None
@@ -116,7 +116,7 @@ class Character(CharacterProperties):
             self.dash_time_remaining = self.dash_duration
 
     def apply_character_properties(self):
-        path = f"../data/characters/{self.character_type.name.lower()}/character.yml"
+        path = f"../data/characters/{self.character_type_short}/character.yml"
         character_properties = CharacterProperties.from_yaml_file(path)
         self.__dict__.update(character_properties.__dict__)
 
@@ -127,3 +127,7 @@ class Character(CharacterProperties):
     @property
     def alive(self) -> bool:
         return self.hp > 0
+
+    @property
+    def character_type_short(self):
+        return self.character_type.name.lower()[15:]

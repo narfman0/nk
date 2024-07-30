@@ -36,7 +36,7 @@ class World:
             r = 1 + enemy_group.count // 2  # randomize where group is centered
             for _ in range(enemy_group.count):
                 self.spawn_enemy(
-                    CharacterType[enemy_group.character_type.upper()],
+                    enemy_group.character_type,
                     enemy_group.center_x + random.randint(-r, r),
                     enemy_group.center_y + random.randint(-r, r),
                 )

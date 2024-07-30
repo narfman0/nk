@@ -91,7 +91,7 @@ class GameState:
             character.moving_direction = details.moving_direction
         else:
             # TODO develop better friend foe system
-            if details.character_type == CharacterType.PIGSASSIN:
+            if details.character_type == CharacterType.CHARACTER_TYPE_PIGSASSIN:
                 character = self.world.add_player(
                     uuid=uuid,
                     start_x=details.x,

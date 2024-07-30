@@ -9,27 +9,27 @@ from nk_shared.proto import Direction
 def to_vector(direction: Direction) -> Vec2d:
     # lrucacheable!
     return {
-        Direction.N: Vec2d(0, -1),
-        Direction.NE: Vec2d(1, -1),
-        Direction.E: Vec2d(1, 0),
-        Direction.SE: Vec2d(1, 1),
-        Direction.S: Vec2d(0, 1),
-        Direction.SW: Vec2d(-1, 1),
-        Direction.W: Vec2d(-1, 0),
-        Direction.NW: Vec2d(-1, -1),
+        Direction.DIRECTION_N: Vec2d(0, -1),
+        Direction.DIRECTION_NE: Vec2d(1, -1),
+        Direction.DIRECTION_E: Vec2d(1, 0),
+        Direction.DIRECTION_SE: Vec2d(1, 1),
+        Direction.DIRECTION_S: Vec2d(0, 1),
+        Direction.DIRECTION_SW: Vec2d(-1, 1),
+        Direction.DIRECTION_W: Vec2d(-1, 0),
+        Direction.DIRECTION_NW: Vec2d(-1, -1),
     }[direction].normalized()
 
 
 def to_isometric(direction: Direction):
     return {
-        Direction.N: Direction.NE,
-        Direction.NE: Direction.E,
-        Direction.E: Direction.SE,
-        Direction.SE: Direction.S,
-        Direction.S: Direction.SW,
-        Direction.SW: Direction.W,
-        Direction.W: Direction.NW,
-        Direction.NW: Direction.N,
+        Direction.DIRECTION_N: Direction.DIRECTION_NE,
+        Direction.DIRECTION_NE: Direction.DIRECTION_E,
+        Direction.DIRECTION_E: Direction.DIRECTION_SE,
+        Direction.DIRECTION_SE: Direction.DIRECTION_S,
+        Direction.DIRECTION_S: Direction.DIRECTION_SW,
+        Direction.DIRECTION_SW: Direction.DIRECTION_W,
+        Direction.DIRECTION_W: Direction.DIRECTION_NW,
+        Direction.DIRECTION_NW: Direction.DIRECTION_N,
     }[direction]
 
 
@@ -39,22 +39,22 @@ def direction_to(origin: Vec2d, target: Vec2d):
     angle += pi / 8  # this makes things a bit more concise
     if angle >= 0:
         if angle < pi / 4:
-            result = Direction.E
+            result = Direction.DIRECTION_E
         elif angle < pi / 2:
-            result = Direction.SE
+            result = Direction.DIRECTION_SE
         elif angle < 3 * pi / 4:
-            result = Direction.S
+            result = Direction.DIRECTION_S
         else:
-            result = Direction.SW
+            result = Direction.DIRECTION_SW
     else:
         if angle > -pi / 4:
-            result = Direction.NE
+            result = Direction.DIRECTION_NE
         elif angle > -pi / 2:
-            result = Direction.N
+            result = Direction.DIRECTION_N
         elif angle > -3 * pi / 4:
-            result = Direction.NW
+            result = Direction.DIRECTION_NW
         else:
-            result = Direction.W
+            result = Direction.DIRECTION_W
     return result
 
 

@@ -1,32 +1,32 @@
 syntax = "proto3";
 
-import "proto/direction.proto";
-
 package proto;
 
+import "proto/direction.proto";
+
 enum CharacterType {
-    INVALID_CHARACTER_TYPE = 0;
-    PIGSASSIN = 1;
-    ASSAULT_DROID = 2;
-    DROID_ASSASSIN = 3;
-    SAMURAI = 4;
-    SHADOW_GUARDIAN = 5;
+  CHARACTER_TYPE_UNSPECIFIED = 0;
+  CHARACTER_TYPE_PIGSASSIN = 1;
+  CHARACTER_TYPE_ASSAULT_DROID = 2;
+  CHARACTER_TYPE_DROID_ASSASSIN = 3;
+  CHARACTER_TYPE_SAMURAI = 4;
+  CHARACTER_TYPE_SHADOW_GUARDIAN = 5;
 }
 
 message CharacterAttacked {
-    string uuid = 1;
+  string uuid = 1;
 }
 
 message CharacterDamaged {
-    string uuid = 1;
-    float damage = 2;
+  string uuid = 1;
+  float damage = 2;
 }
 
 message CharacterUpdated {
-    string uuid = 1;
-    float x = 2;
-    float y = 3;
-    CharacterType character_type = 4;
-    Direction facing_direction = 5;
-    Direction moving_direction = 6;
+  string uuid = 1;
+  float x = 2;
+  float y = 3;
+  CharacterType character_type = 4;
+  Direction facing_direction = 5;
+  Direction moving_direction = 6;
 }

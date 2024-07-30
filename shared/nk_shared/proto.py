@@ -7,24 +7,24 @@ import betterproto
 
 
 class Direction(betterproto.Enum):
-    INVALID_DIRECTION = 0
-    N = 1
-    NE = 2
-    E = 3
-    SE = 4
-    S = 5
-    SW = 6
-    W = 7
-    NW = 8
+    DIRECTION_UNSPECIFIED = 0
+    DIRECTION_N = 1
+    DIRECTION_NE = 2
+    DIRECTION_E = 3
+    DIRECTION_SE = 4
+    DIRECTION_S = 5
+    DIRECTION_SW = 6
+    DIRECTION_W = 7
+    DIRECTION_NW = 8
 
 
 class CharacterType(betterproto.Enum):
-    INVALID_CHARACTER_TYPE = 0
-    PIGSASSIN = 1
-    ASSAULT_DROID = 2
-    DROID_ASSASSIN = 3
-    SAMURAI = 4
-    SHADOW_GUARDIAN = 5
+    CHARACTER_TYPE_UNSPECIFIED = 0
+    CHARACTER_TYPE_PIGSASSIN = 1
+    CHARACTER_TYPE_ASSAULT_DROID = 2
+    CHARACTER_TYPE_DROID_ASSASSIN = 3
+    CHARACTER_TYPE_SAMURAI = 4
+    CHARACTER_TYPE_SHADOW_GUARDIAN = 5
 
 
 @dataclass

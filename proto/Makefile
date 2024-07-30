@@ -1,7 +1,7 @@
 SRC_DIR := proto/
 BUILD_DIR := ../shared/nk_shared/
 
-build: build_dir
+build: build_dir lint
 	protoc --python_betterproto_out=$(BUILD_DIR) $(SRC_DIR)*.proto
 
 build_dir:
@@ -9,6 +9,9 @@ build_dir:
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+lint:
+	protolint lint -fix proto
 
 watch: build
 	python -m watcher

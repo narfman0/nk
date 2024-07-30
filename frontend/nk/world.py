@@ -27,7 +27,7 @@ class World:
         # initialize player
         tile_x, tile_y = self.map.get_start_tile()
         self.player = self.add_character(
-            character_type=CharacterType.PIGSASSIN,
+            character_type=CharacterType.CHARACTER_TYPE_PIGSASSIN,
             start_x=0.5 + tile_x,
             start_y=0.5 + tile_y,
         )
