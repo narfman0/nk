@@ -1,3 +1,4 @@
+import os
 from pygame import Event, Rect
 import pygame_gui
 
@@ -20,34 +21,37 @@ class LoginScreen(Screen):
     def init_ui(self):
         top, left = HEIGHT // 2 - 64, WIDTH // 2 - ELEMENT_WIDTH // 2
         width_height = (ELEMENT_WIDTH, 50)
-        pygame_gui.elements.UITextBox(
+        pygame_gui.elements.UILabel(
             relative_rect=Rect((left, top), width_height),
-            html_text="Email",
+            text="Email",
             manager=self.manager,
         )
         top += 64
-        self.email_field = pygame_gui.elements.UITextEntryBox(
+        self.email_field = pygame_gui.elements.UITextEntryLine(
             relative_rect=Rect((left, top), width_height),
+            manager=self.manager,
+            placeholder_text="email",
+        )
+        top += 64
+        pygame_gui.elements.UILabel(
+            relative_rect=Rect((left, top), width_height),
+            text="Password",
             manager=self.manager,
         )
         top += 64
-        pygame_gui.elements.UITextBox(
+        self.password_field = pygame_gui.elements.UITextEntryLine(
             relative_rect=Rect((left, top), width_height),
-            html_text="Password",
             manager=self.manager,
+            placeholder_text="password",
         )
-        top += 64
-        self.password_field = pygame_gui.elements.UITextEntryBox(
-            relative_rect=Rect((left, top), width_height),
-            initial_text="",
-            manager=self.manager,
-        )
+        self.password_field.set_text_hidden(True)
         top += 64
         self.login_button = pygame_gui.elements.UIButton(
             relative_rect=Rect((left, top), width_height),
             text="Login",
             manager=self.manager,
         )
+        self.load_login()
 
     def draw(self, surface):
         self.manager.draw_ui(surface)
@@ -58,6 +62,7 @@ class LoginScreen(Screen):
             self.manager.process_events(event)
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.login_button:
+                    self.save_login()
                     self.screen_manager.pop()
                     self.screen_manager.push(
                         LoadScreen(
@@ -68,3 +73,24 @@ class LoginScreen(Screen):
                         )
                     )
         self.manager.update(dt)
+
+    def load_login(self):
+        os.makedirs(self.save_root(), exist_ok=True)
+        path = os.path.expanduser(os.path.join(self.save_root(), "login.txt"))
+        try:
+            with open(path) as login_file:
+                email, passw = login_file.readlines()
+                self.email_field.set_text(email.strip())
+                self.password_field.set_text(passw.strip())
+        except OSError:
+            pass  # failed to open file, nothing saved, who cares
+
+    def save_login(self):
+        os.makedirs(self.save_root(), exist_ok=True)
+        path = os.path.expanduser(os.path.join(self.save_root(), "login.txt"))
+        lines = [self.email_field.get_text() + "\n", self.password_field.get_text()]
+        with open(path, "w+") as login_file:
+            login_file.writelines(lines)
+
+    def save_root(self) -> str:
+        return os.path.expanduser("~/.nk")
