@@ -9,9 +9,12 @@ from nk_shared.proto import Message
 logger = logging.getLogger(__name__)
 
 
-def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]):
+def handle_websocket(
+    url: str, received: Queue[Message], to_send: Queue[Message], access_token: str
+):
+    headers = [("Authorization", f"Bearer {access_token}")]
     try:
-        ws = connect(url)
+        ws = connect(url, additional_headers=headers)
     except TimeoutError:
         logger.error("Timed out connected to %s", url)
         os._exit(1)

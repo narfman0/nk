@@ -1,3 +1,4 @@
+httpx
 pygame
 pygame_gui
 pymunk

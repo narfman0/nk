@@ -78,7 +78,9 @@ async def authenticated_route(user: User = Depends(current_active_user)):
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(
+    websocket: WebSocket, user: User = Depends(current_active_user)
+):
     """Client entrypoint to game server"""
     await websocket.accept()
     await handle_connected(websocket)

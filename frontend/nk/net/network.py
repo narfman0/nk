@@ -3,6 +3,8 @@ from queue import Queue
 from os import environ
 from threading import Thread
 
+import httpx
+
 from nk_shared.proto import Message
 from nk.net.sync import handle_websocket
 
@@ -16,13 +18,16 @@ class Network:
     def __init__(self):
         self._received_messages: Queue[Message] = Queue()
         self._to_send: Queue[Message] = Queue()
-        self.network_thread = Thread(
+
+    def connect(self, email: str, password: str):
+        access_token = self.login(email, password)
+        network_thread = Thread(
             target=handle_websocket,
             name="network thread",
-            args=(url, self._received_messages, self._to_send),
+            args=(url, self._received_messages, self._to_send, access_token),
             daemon=True,
         )
-        self.network_thread.start()
+        network_thread.start()
 
     def send(self, message: Message):
         self._to_send.put(message)
@@ -34,3 +39,15 @@ class Network:
         if self.has_messages():
             return self._received_messages.get()
         return None
+
+    @classmethod
+    def login(cls, email: str, password: str) -> str:
+        response = httpx.post(
+            f"http://{host}:{port}/auth/jwt/login",  # Change to your actual host and port
+            data={"username": email, "password": password},
+        )
+        if response.status_code == 200:
+            tokens = response.json()
+            return tokens["access_token"]
+        else:
+            raise Exception("Login failed", response.text)
