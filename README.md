@@ -19,8 +19,7 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 v1:
 
-* Shooting!
-* Login + character persistence
+* Proper registration+login
 
 v2:
 * Zoom screen out

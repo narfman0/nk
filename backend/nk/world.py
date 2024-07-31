@@ -202,7 +202,10 @@ class World:  # pylint: disable=too-many-instance-attributes
     def spawn_player(self, player: Player) -> Player:
         """Player 'is' a Character, which i don't love, but its already
         created. Update relevant attrs."""
-        x, y = world.map.get_start_tile()
+        if player.user.x and player.user.y:
+            x, y = player.user.x, player.user.y
+        else:
+            x, y = world.map.get_start_tile()
         player.body.position = (x, y)
         self.space.add(player.body, player.shape, player.hitbox_shape)
         self.players.append(player)

@@ -17,7 +17,8 @@ db = client[DB_NAME]
 
 # pylint: disable-next=too-many-ancestors
 class User(BeanieBaseUser, Document):
-    pass
+    x: float | None = None
+    y: float | None = None
 
 
 async def get_user_db():

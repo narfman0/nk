@@ -83,7 +83,7 @@ async def handle_connected(websocket: WebSocket, user: User):
         for task in pending:
             task.cancel()
 
-    player = Player(user)
+    player = Player(user=user)
     player.uuid = str(user.id)
     logger.info("Player uuid set to %s", player.uuid)
     try:
@@ -91,4 +91,6 @@ async def handle_connected(websocket: WebSocket, user: User):
     except WebSocketDisconnect:
         logger.info("Disconnected from %s", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=str(player.uuid))))
+    await user.set({User.x: player.position.x, User.y: player.position.y})
+    logger.info("Successfully saved player post-logout")
     world.get_players().remove(player)
