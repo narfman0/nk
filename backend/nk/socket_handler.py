@@ -1,13 +1,24 @@
 """Server handler of socket. Translates websocket bytes to and from messages for backend."""
 
 import asyncio
+import contextlib
 import logging
 
 from betterproto import serialized_on_wire
-from fastapi import WebSocket
+from fastapi import Depends, WebSocket
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_users import BaseUserManager
 from starlette.websockets import WebSocketDisconnect
 
-from nk_shared.proto import Message, PlayerLeft, PlayerJoined, PlayerJoinResponse
+from nk_shared.proto import (
+    Message,
+    PlayerLeft,
+    PlayerJoined,
+    PlayerJoinResponse,
+    PlayerLoginResponse,
+)
+from nk.db import db, get_user_db
+from nk.users import UserManager, get_user_manager, fastapi_users
 from nk.models import Player
 from nk.world import world
 
@@ -32,6 +43,8 @@ async def handle_messages(player: Player, msg: Message):
     """Socket-level handler for messages, mostly passing through to world"""
     if serialized_on_wire(msg.player_join_request):
         await handle_player_join_request(player, msg)
+    elif serialized_on_wire(msg.player_login_request):
+        await handle_player_login_request(player, msg)
     elif serialized_on_wire(msg.text_message):
         await broadcast(player, msg)
     elif serialized_on_wire(msg.character_attacked):
@@ -40,6 +53,33 @@ async def handle_messages(player: Player, msg: Message):
         world.handle_character_updated(msg.character_updated)
         await broadcast(player, msg)
     logger.debug("Handled message: %s from %s", msg, player.uuid)
+
+
+async def handle_player_login_request(
+    player: Player,
+    msg: Message,
+):
+    details = msg.player_login_request
+    _credentials = OAuth2PasswordRequestForm(
+        username=details.email,
+        password=details.password,
+    )
+    # get_async_session_context = contextlib.asynccontextmanager(get_async_session)
+    # get_user_db_context = contextlib.asynccontextmanager(get_user_db)
+    # get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
+    # async with get_user_manager_context(db) as user_manager:
+    #     user = await user_manager.authenticate(credentials)
+    collection = db.get_collection("User")
+    user = await collection.find_one(filter={"email": details.email})
+    success = bool(user) and user["is_active"]
+    logger.info(
+        "User %s attempted login, success: %r",
+        details.email,
+        success,
+    )
+    await player.messages.put(
+        Message(player_login_response=PlayerLoginResponse(success=success))
+    )
 
 
 async def handle_player_join_request(player: Player, msg: Message):
