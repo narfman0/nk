@@ -49,6 +49,17 @@ class CharacterUpdated(betterproto.Message):
 
 
 @dataclass
+class PlayerLoginRequest(betterproto.Message):
+    username: str = betterproto.string_field(1)
+    password: str = betterproto.string_field(2)
+
+
+@dataclass
+class PlayerLoginResponse(betterproto.Message):
+    success: bool = betterproto.bool_field(1)
+
+
+@dataclass
 class PlayerJoined(betterproto.Message):
     uuid: str = betterproto.string_field(1)
 
@@ -106,8 +117,14 @@ class Message(betterproto.Message):
     character_damaged: "CharacterDamaged" = betterproto.message_field(
         202, group="payload"
     )
-    player_joined: "PlayerJoined" = betterproto.message_field(100, group="payload")
     player_left: "PlayerLeft" = betterproto.message_field(101, group="payload")
+    player_login_request: "PlayerLoginRequest" = betterproto.message_field(
+        104, group="payload"
+    )
+    player_login_response: "PlayerLoginResponse" = betterproto.message_field(
+        105, group="payload"
+    )
+    player_joined: "PlayerJoined" = betterproto.message_field(100, group="payload")
     player_join_request: "PlayerJoinRequest" = betterproto.message_field(
         102, group="payload"
     )
