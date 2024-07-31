@@ -119,7 +119,7 @@ class GameState:
         y = message.player_join_response.y
         self.world.player.body.position = (x, y)
         if self.network_initialized_callback:
-            self.network_initialized_callback()
+            self.network_initialized_callback()  # pylint: disable=not-callable
 
     def handle_projectile_created(self, message: Message):
         self.world.create_projectile(message.projectile_created.projectile)

@@ -6,7 +6,7 @@ from nk_shared.util.logging import initialize_logging
 
 from nk.settings import WIDTH, HEIGHT, ENABLE_PROFILING, FPS
 from nk.ui.screen import ScreenManager
-from nk.ui.load_screen import LoadScreen
+from nk.ui.login_screen import LoginScreen
 
 
 def main():  # pylint: disable=too-many-locals
@@ -18,7 +18,7 @@ def main():  # pylint: disable=too-many-locals
     clock = pygame.time.Clock()
 
     screen_manager = ScreenManager()
-    screen_manager.push(LoadScreen(screen_manager))
+    screen_manager.push(LoginScreen(screen_manager))
 
     if ENABLE_PROFILING:
         import cProfile, pstats, io  # pylint: disable=import-outside-toplevel,multiple-imports
