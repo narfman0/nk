@@ -6,7 +6,7 @@ from nk.settings import WIDTH, HEIGHT
 from nk.ui.load_screen import LoadScreen
 from nk.ui.screen import Screen, ScreenManager
 
-ELEMENT_WIDTH = 164
+ELEMENT_WIDTH = 256
 
 
 class LoginScreen(Screen):
@@ -22,11 +22,11 @@ class LoginScreen(Screen):
         width_height = (ELEMENT_WIDTH, 50)
         pygame_gui.elements.UITextBox(
             relative_rect=Rect((left, top), width_height),
-            html_text="Username",
+            html_text="Email",
             manager=self.manager,
         )
         top += 64
-        self.username_field = pygame_gui.elements.UITextEntryBox(
+        self.email_field = pygame_gui.elements.UITextEntryBox(
             relative_rect=Rect((left, top), width_height),
             manager=self.manager,
         )
@@ -63,7 +63,7 @@ class LoginScreen(Screen):
                         LoadScreen(
                             self.screen_manager,
                             self.game_state,
-                            self.username_field.get_text(),
+                            self.email_field.get_text(),
                             self.password_field.get_text(),
                         )
                     )

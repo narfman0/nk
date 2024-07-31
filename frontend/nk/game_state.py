@@ -51,9 +51,9 @@ class GameState:
                 self.handle_projectile_destroyed(message)
         self.handle_self_updated()
 
-    def login(self, username: str, password: str, callback: Callable):
+    def login(self, email: str, password: str, callback: Callable):
         self.login_callback = callback
-        details = PlayerLoginRequest(username=username, password=password)
+        details = PlayerLoginRequest(email=email, password=password)
         self.network.send(Message(player_login_request=details))
 
     def join_request(self, callback: Callable):
