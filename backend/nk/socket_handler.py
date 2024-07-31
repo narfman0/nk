@@ -3,6 +3,7 @@
 import asyncio
 import logging
 
+from betterproto import serialized_on_wire
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
@@ -29,13 +30,13 @@ async def send_messages(player: Player, websocket: WebSocket):
 
 async def handle_messages(player: Player, msg: Message):
     """Socket-level handler for messages, mostly passing through to world"""
-    if msg.player_join_request._serialized_on_wire:  # pylint: disable=protected-access
+    if serialized_on_wire(msg.player_join_request):
         await handle_player_join_request(player, msg)
-    elif msg.text_message._serialized_on_wire:  # pylint: disable=protected-access
+    elif serialized_on_wire(msg.text_message):
         await broadcast(player, msg)
-    elif msg.character_attacked._serialized_on_wire:  # pylint: disable=protected-access
+    elif serialized_on_wire(msg.character_attacked):
         world.handle_character_attacked(msg.character_attacked)
-    elif msg.character_updated._serialized_on_wire:  # pylint: disable=protected-access
+    elif serialized_on_wire(msg.character_updated):
         world.handle_character_updated(msg.character_updated)
         await broadcast(player, msg)
     logger.debug("Handled message: %s from %s", msg, player.uuid)
