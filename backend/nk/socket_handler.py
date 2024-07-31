@@ -14,7 +14,7 @@ from nk_shared.proto import (
     PlayerJoinResponse,
     PlayerLoginResponse,
 )
-from nk.db import User, db
+from nk.db import User
 from nk.models import Player
 from nk.world import world
 
@@ -40,7 +40,7 @@ async def handle_messages(player: Player, msg: Message):
     if serialized_on_wire(msg.player_join_request):
         await handle_player_join_request(player, msg)
     elif serialized_on_wire(msg.player_login_request):
-        await handle_player_login_request(player, msg)
+        await handle_player_login_request(player)
     elif serialized_on_wire(msg.text_message):
         await broadcast(player, msg)
     elif serialized_on_wire(msg.character_attacked):
@@ -51,10 +51,7 @@ async def handle_messages(player: Player, msg: Message):
     logger.debug("Handled message: %s from %s", msg, player.uuid)
 
 
-async def handle_player_login_request(
-    player: Player,
-    msg: Message,
-):
+async def handle_player_login_request(player: Player):
     await player.messages.put(
         Message(player_login_response=PlayerLoginResponse(success=True))
     )

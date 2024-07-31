@@ -13,6 +13,10 @@ port = environ.get("WEBSOCKET_PORT", "7666")
 url = f"ws://{host}:{port}/ws"
 
 
+class LoginException(Exception):
+    pass
+
+
 class Network:
 
     def __init__(self):
@@ -49,5 +53,4 @@ class Network:
         if response.status_code == 200:
             tokens = response.json()
             return tokens["access_token"]
-        else:
-            raise Exception("Login failed", response.text)
+        raise LoginException(f"Login failed: {response.text}")
