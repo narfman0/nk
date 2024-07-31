@@ -1,5 +1,3 @@
-"""Server specific models"""
-
 from asyncio import Queue
 from dataclasses import dataclass, field
 

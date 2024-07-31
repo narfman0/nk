@@ -1,3 +1,5 @@
 fastapi
+fastapi-users[beanie]
+uvicorn[standard]
 betterproto
 #-e ../shared

@@ -48,11 +48,9 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.next_update_time = 0
 
     def get_players(self) -> list[Player]:
-        """gets players"""
         return self.players
 
     def update(self, dt: float):
-        """High level world update"""
         self.update_ai(dt)
         self.update_characters(dt, self.players, self.enemies)
         self.update_characters(dt, self.enemies, self.players)
@@ -80,7 +78,6 @@ class World:  # pylint: disable=too-many-instance-attributes
                 )
 
     def update_projectiles(self, dt: float):
-        """Projectile movement and collision handling"""
         for projectile in self.projectiles:
             projectile.update(dt)
             should_remove = False
@@ -101,7 +98,6 @@ class World:  # pylint: disable=too-many-instance-attributes
                 logger.debug("Projectile destroyed: %s", projectile.uuid)
 
     def process_ranged_attack(self, character: Character):
-        """Perform a ranged attack"""
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
         speed = direction_util.to_vector(character.facing_direction).scale_to_length(
             attack_profile.speed
@@ -171,7 +167,6 @@ class World:  # pylint: disable=too-many-instance-attributes
         character.facing_direction = Direction(details.facing_direction)
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        """Retrieve closest player or enemy"""
         for character in self.players + self.enemies:
             if character.uuid == uuid:
                 return character
@@ -193,7 +188,6 @@ class World:  # pylint: disable=too-many-instance-attributes
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
     ) -> Enemy:
-        """Create enemy in world"""
         character = Enemy(
             character_type=character_type,
             center_y=center_y,
@@ -215,13 +209,11 @@ class World:  # pylint: disable=too-many-instance-attributes
         return player
 
     def broadcast(self, message: Message):
-        """Send message to all players"""
         for player in self.players:
             player.messages.put_nowait(message)
 
     @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
-        """Get model from attack profile name"""
         path = f"../data/attack_profiles/{attack_profile_name}.yml"
         return AttackProfile.from_yaml_file(path)
 
