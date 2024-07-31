@@ -10,11 +10,6 @@ space squad-y multiplayer RPG!
 
 Tweak your IDE/vs code run configurations to mirror that behavior :D
 
-## Development
-
-* Install protobuf compiler and ensure it is on PATH
-* From proto directory, make changes and use `make deploy` to cp to other projects
-
 ## TODO
 
 v1:
