@@ -1,5 +1,5 @@
 from queue import Queue
-
+import logging
 from os import environ
 from threading import Thread
 
@@ -11,6 +11,8 @@ from nk.net.sync import handle_websocket
 host = environ.get("WEBSOCKET_HOST", "localhost")
 port = environ.get("WEBSOCKET_PORT", "7666")
 url = f"ws://{host}:{port}/ws"
+
+logger = logging.getLogger(__name__)
 
 
 class LoginException(Exception):
@@ -25,6 +27,7 @@ class Network:
 
     def connect(self, email: str, password: str):
         access_token = self.login(email, password)
+        logger.info("Access token retrieved, connecting")
         network_thread = Thread(
             target=handle_websocket,
             name="network thread",

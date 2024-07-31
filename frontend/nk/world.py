@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class World:  # pylint: disable=too-many-instance-attributes
-    def __init__(self, zone_name="1"):
+    def __init__(self, uuid: str, x: float, y: float, zone_name="1"):
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
@@ -26,11 +26,11 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.map.add_map_geometry_to_space(self.space)
 
         # initialize player
-        tile_x, tile_y = self.map.get_start_tile()
         self.player = self.add_character(
+            uuid=uuid,
             character_type=CharacterType.CHARACTER_TYPE_PIGSASSIN,
-            start_x=0.5 + tile_x,
-            start_y=0.5 + tile_y,
+            start_x=x,
+            start_y=y,
         )
 
         self.enemies: list[Character] = []

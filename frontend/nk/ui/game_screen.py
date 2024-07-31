@@ -184,7 +184,9 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 if sprite.sprite_name != "death":
                     sprite.change_animation("death", loop=False)
             x, y = self.calculate_draw_coordinates(
-                character.position.x, character.position.y, sprite.image
+                character.position.x,  # pylint: disable=no-member
+                character.position.y,  # pylint: disable=no-member
+                sprite.image,
             )
             sprite.set_position(x - self.cam_x, y - self.cam_y)
 

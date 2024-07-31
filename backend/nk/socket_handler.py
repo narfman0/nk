@@ -12,7 +12,6 @@ from nk_shared.proto import (
     PlayerLeft,
     PlayerJoined,
     PlayerJoinResponse,
-    PlayerLoginResponse,
 )
 from nk.db import User
 from nk.models import Player
@@ -38,9 +37,7 @@ async def send_messages(player: Player, websocket: WebSocket):
 async def handle_messages(player: Player, msg: Message):
     """Socket-level handler for messages, mostly passing through to world"""
     if serialized_on_wire(msg.player_join_request):
-        await handle_player_join_request(player, msg)
-    elif serialized_on_wire(msg.player_login_request):
-        await handle_player_login_request(player)
+        await handle_player_join_request(player)
     elif serialized_on_wire(msg.text_message):
         await broadcast(player, msg)
     elif serialized_on_wire(msg.character_attacked):
@@ -51,22 +48,15 @@ async def handle_messages(player: Player, msg: Message):
     logger.debug("Handled message: %s from %s", msg, player.uuid)
 
 
-async def handle_player_login_request(player: Player):
-    await player.messages.put(
-        Message(player_login_response=PlayerLoginResponse(success=True))
-    )
-
-
-async def handle_player_join_request(player: Player, msg: Message):
+async def handle_player_join_request(player: Player):
     """A player has joined. Handle initialization."""
-    player.uuid = msg.player_join_request.uuid
     world.spawn_player(player)
     logger.info("Join request success: %s", player.uuid)
     response = PlayerJoinResponse(
-        success=True, x=player.position.x, y=player.position.y
+        uuid=player.uuid, x=player.position.x, y=player.position.y
     )
     await player.messages.put(Message(player_join_response=response))
-    await broadcast(player, Message(player_joined=PlayerJoined(uuid=str(player.uuid))))
+    await broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
 
 async def handle_connected(websocket: WebSocket, user: User):
@@ -94,6 +84,8 @@ async def handle_connected(websocket: WebSocket, user: User):
             task.cancel()
 
     player = Player(user)
+    player.uuid = str(user.id)
+    logger.info("Player uuid set to %s", player.uuid)
     try:
         await handler()
     except WebSocketDisconnect:

@@ -1,6 +1,5 @@
 import logging
 import time
-from uuid import uuid4
 from math import sin, cos
 
 from betterproto import serialized_on_wire
@@ -26,11 +25,10 @@ def get_start_pos(network: Network) -> tuple[float, float]:
 
 
 def main():
-    uuid = str(uuid4())
     character_type = CharacterType.CHARACTER_TYPE_PIGSASSIN
-    logger.info("Starting headless session with uuid: %s", uuid)
+    logger.info("Starting headless session")
     network = Network()
-    network.send(Message(player_join_request=PlayerJoinRequest(uuid=uuid)))
+    network.send(Message(player_join_request=PlayerJoinRequest()))
     i = 0
     center_x, center_y = get_start_pos(network)
     x, y = center_x, center_y
@@ -44,7 +42,7 @@ def main():
             network.send(
                 Message(
                     character_updated=CharacterUpdated(
-                        uuid=uuid,
+                        uuid="TODOretrieveuuid",
                         x=x,
                         y=y,
                         character_type=character_type,

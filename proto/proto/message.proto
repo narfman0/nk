@@ -14,8 +14,6 @@ message Message {
     proto.CharacterDamaged character_damaged = 202;
 
     proto.PlayerLeft player_left = 101;
-    proto.PlayerLoginRequest player_login_request = 104;
-    proto.PlayerLoginResponse player_login_response = 105;
     proto.PlayerJoined player_joined = 100;
     proto.PlayerJoinRequest player_join_request = 102;
     proto.PlayerJoinResponse player_join_response = 103;

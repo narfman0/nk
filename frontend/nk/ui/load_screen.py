@@ -19,18 +19,14 @@ class LoadScreen(Screen):
         super().__init__()
         self.screen_manager = screen_manager
         self.game_state = game_state
-        self.game_state.login(email, password, self.handle_login_success)
+        self.game_state.login(email, password, self.handle_player_joined)
         logger.info("Logging in to %s", email)
 
     def update(self, dt: float, events: list[Event]):
         super().update(dt, events)
         self.game_state.update()
 
-    def handle_login_success(self):
-        logger.info("Login success!")
-        self.game_state.join_request(self.handle_network_initialized)
-
-    def handle_network_initialized(self):
-        logger.info("Network initialized, loading...")
+    def handle_player_joined(self):
+        logger.info("Player joined, loading...")
         self.screen_manager.pop()
         self.screen_manager.push(GameScreen(self.screen_manager, self.game_state))

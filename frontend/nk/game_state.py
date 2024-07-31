@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import Callable
 
 from betterproto import serialized_on_wire
@@ -11,7 +10,6 @@ from nk_shared.proto import (
     Direction,
     Message,
     PlayerJoinRequest,
-    PlayerLoginRequest,
 )
 
 from nk.world import World
@@ -24,12 +22,11 @@ logger = logging.getLogger(__name__)
 class GameState:
 
     def __init__(self):
-        self.network_initialized_callback: Callable = None
-        self.login_callback: Callable = None
+        self.player_joined_callback: Callable = None
         self.character_added_callback: Callable = None
         self.character_attacked_callback: Callable = None
         self.network_ticks_til_update = TICKS_BEFORE_UPDATE
-        self.world = World()
+        self.world: World = None
         self.network = Network()
 
     def update(self):
@@ -37,8 +34,6 @@ class GameState:
             message = self.network.next()
             if serialized_on_wire(message.player_join_response):
                 self.handle_player_join_response(message)
-            elif serialized_on_wire(message.player_login_response):
-                self.handle_player_login_response(message)
             elif serialized_on_wire(message.character_updated):
                 self.handle_character_updated(message)
             elif serialized_on_wire(message.character_attacked):
@@ -49,21 +44,16 @@ class GameState:
                 self.handle_projectile_created(message)
             elif serialized_on_wire(message.projectile_destroyed):
                 self.handle_projectile_destroyed(message)
-        self.handle_self_updated()
+        if self.world:
+            self.handle_self_updated()
 
     def login(self, email: str, password: str, callback: Callable):
-        self.login_callback = callback
         self.network.connect(email, password)
-        details = PlayerLoginRequest()
-        self.network.send(Message(player_login_request=details))
-
-    def join_request(self, callback: Callable):
-        self.network_initialized_callback = callback
+        self.player_joined_callback = callback
         self.network.send(
-            Message(
-                player_join_request=PlayerJoinRequest(uuid=str(self.world.player.uuid))
-            )
+            Message(player_join_request=PlayerJoinRequest(requested=True))
         )
+        logger.info("Sent join request, waiting for response")
 
     def handle_self_updated(self):
         self.network_ticks_til_update -= 1
@@ -129,22 +119,11 @@ class GameState:
         character.facing_direction = Direction(details.facing_direction)
         character.moving_direction = Direction(details.moving_direction)
 
-    def handle_player_login_response(self, message: Message):
-        if not message.player_login_response.success:
-            logger.info("Player login request failed, aborting")
-            os._exit(1)
-        if self.login_callback:
-            self.login_callback()  # pylint: disable=not-callable
-
     def handle_player_join_response(self, message: Message):
-        if not message.player_join_response.success:
-            logger.info("Player join request failed, aborting")
-            os._exit(1)
-        x = message.player_join_response.x
-        y = message.player_join_response.y
-        self.world.player.body.position = (x, y)
-        if self.network_initialized_callback:
-            self.network_initialized_callback()  # pylint: disable=not-callable
+        details = message.player_join_response
+        self.world = World(details.uuid, details.x, details.y)
+        if self.player_joined_callback:
+            self.player_joined_callback()  # pylint: disable=not-callable
 
     def handle_projectile_created(self, message: Message):
         self.world.create_projectile(message.projectile_created.projectile)
