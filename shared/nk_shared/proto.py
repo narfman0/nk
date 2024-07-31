@@ -50,8 +50,7 @@ class CharacterUpdated(betterproto.Message):
 
 @dataclass
 class PlayerLoginRequest(betterproto.Message):
-    email: str = betterproto.string_field(1)
-    password: str = betterproto.string_field(2)
+    pass
 
 
 @dataclass

@@ -12,7 +12,13 @@ from nk.world import world
 
 from nk.db import User, db
 from nk.schemas import UserCreate, UserRead, UserUpdate
-from nk.users import auth_backend, current_active_user, fastapi_users
+from nk.users import (
+    UserManager,
+    auth_backend,
+    fastapi_users,
+    get_jwt_strategy,
+    get_user_manager,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,15 +78,15 @@ app.include_router(
 )
 
 
-@app.get("/authenticated-route")
-async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"message": f"Hello {user.email}!"}
-
-
 @app.websocket("/ws")
 async def websocket_endpoint(
-    websocket: WebSocket, user: User = Depends(current_active_user)
+    websocket: WebSocket, user_manager: UserManager = Depends(get_user_manager)
 ):
     """Client entrypoint to game server"""
     await websocket.accept()
-    await handle_connected(websocket)
+    token = websocket.headers["Authorization"].removeprefix("Bearer ")
+    user: User | None = await get_jwt_strategy().read_token(token, user_manager)
+    if not user:
+        raise Exception("Authorization failed")
+    logger.info("Client logged in as %s", user.email)
+    await handle_connected(websocket, user)

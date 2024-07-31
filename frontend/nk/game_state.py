@@ -54,7 +54,7 @@ class GameState:
     def login(self, email: str, password: str, callback: Callable):
         self.login_callback = callback
         self.network.connect(email, password)
-        details = PlayerLoginRequest(email=email, password=password)
+        details = PlayerLoginRequest()
         self.network.send(Message(player_login_request=details))
 
     def join_request(self, callback: Callable):

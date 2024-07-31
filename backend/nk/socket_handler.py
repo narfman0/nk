@@ -1,13 +1,10 @@
 """Server handler of socket. Translates websocket bytes to and from messages for backend."""
 
 import asyncio
-import contextlib
 import logging
 
 from betterproto import serialized_on_wire
-from fastapi import Depends, WebSocket
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_users import BaseUserManager
+from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
 from nk_shared.proto import (
@@ -17,8 +14,7 @@ from nk_shared.proto import (
     PlayerJoinResponse,
     PlayerLoginResponse,
 )
-from nk.db import db, get_user_db
-from nk.users import UserManager, get_user_manager, fastapi_users
+from nk.db import User, db
 from nk.models import Player
 from nk.world import world
 
@@ -59,26 +55,8 @@ async def handle_player_login_request(
     player: Player,
     msg: Message,
 ):
-    details = msg.player_login_request
-    _credentials = OAuth2PasswordRequestForm(
-        username=details.email,
-        password=details.password,
-    )
-    # get_async_session_context = contextlib.asynccontextmanager(get_async_session)
-    # get_user_db_context = contextlib.asynccontextmanager(get_user_db)
-    # get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
-    # async with get_user_manager_context(db) as user_manager:
-    #     user = await user_manager.authenticate(credentials)
-    collection = db.get_collection("User")
-    user = await collection.find_one(filter={"email": details.email})
-    success = bool(user) and user["is_active"]
-    logger.info(
-        "User %s attempted login, success: %r",
-        details.email,
-        success,
-    )
     await player.messages.put(
-        Message(player_login_response=PlayerLoginResponse(success=success))
+        Message(player_login_response=PlayerLoginResponse(success=True))
     )
 
 
@@ -94,7 +72,7 @@ async def handle_player_join_request(player: Player, msg: Message):
     await broadcast(player, Message(player_joined=PlayerJoined(uuid=str(player.uuid))))
 
 
-async def handle_connected(websocket: WebSocket):
+async def handle_connected(websocket: WebSocket, user: User):
     """Handle the lifecycle of the websocket"""
 
     async def consumer():
@@ -118,7 +96,7 @@ async def handle_connected(websocket: WebSocket):
         for task in pending:
             task.cancel()
 
-    player = Player()
+    player = Player(user)
     try:
         await handler()
     except WebSocketDisconnect:
