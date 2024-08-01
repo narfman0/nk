@@ -17,9 +17,21 @@ v1:
 * Deploy
 
 v2:
-* Zoom screen out
-* friend/foe system (all pigsassins are players)
-* Very epic helpers?!
+* Shoot in mouse direction
+* Enemy respawns+patrols
+* Town + player respawn
+* Zoom screen out?
+* Visuals+sound
+* Bigger map
+
+vx:
+* Objectives
+* Strategems
+* Leveling
+* Factions (all pigsassins are players)
+* AI (e.g. behavior trees)
+* AI goals/planning
+* Helpers (upgradeable bots to direct)
 
 ## License
 
