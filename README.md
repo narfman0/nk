@@ -14,7 +14,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 v1:
 
-* Docker container dev for backend
 * Proper registration+login
 * Deploy
 

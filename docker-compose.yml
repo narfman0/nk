@@ -35,20 +35,5 @@ services:
       - 7666:7666
     volumes:
       - ./backend:/app
-
-  nk-data-base:
-      container_name: data
-      image: nk-data-base
-      build:
-          context: data
-      deploy:
-        mode: replicated
-        replicas: 0
-  nk-shared-base:
-      container_name: shared
-      image: nk-shared-base
-      build:
-          context: shared
-      deploy:
-        mode: replicated
-        replicas: 0
+      - ./data:/data
+      - ./shared/nk_shared:/app/nk_shared
