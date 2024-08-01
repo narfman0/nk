@@ -6,16 +6,9 @@ from functools import lru_cache
 from uuid import uuid4
 
 import pymunk
-
 from nk_shared import builders
-from nk_shared.models import (
-    AttackProfile,
-    AttackType,
-    Character,
-    Zone,
-    Projectile,
-)
 from nk_shared.map import Map
+from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
 from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
 from nk_shared.util import direction_util
 

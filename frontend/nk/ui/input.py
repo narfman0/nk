@@ -2,9 +2,8 @@
 from enum import Enum
 
 import pygame
-from pygame.event import Event
-
 from nk_shared.proto import Direction
+from pygame.event import Event
 
 
 class ActionEnum(Enum):

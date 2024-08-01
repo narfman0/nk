@@ -1,15 +1,17 @@
 import logging
+
 from pygame.event import Event
 
 from nk.game_state import GameState
-from nk.ui.screen import Screen, ScreenManager
 from nk.ui.game_screen import GameScreen
+from nk.ui.screen import Screen, ScreenManager
 
 logger = logging.getLogger(__name__)
 
 
 class LoadScreen(Screen):
-    def __init__(
+
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         screen_manager: ScreenManager,
         game_state: GameState,

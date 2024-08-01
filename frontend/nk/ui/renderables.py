@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from pygame.surface import Surface  # pylint: disable=no-name-in-module
 from pygame.sprite import Group as SpriteGroup
+from pygame.surface import Surface  # pylint: disable=no-name-in-module
 from sortedcontainers import SortedKeyList
 
 

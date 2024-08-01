@@ -2,28 +2,27 @@ import logging
 from dataclasses import dataclass
 
 import pygame
-from pygame.event import Event
-
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.proto import Direction
-from nk_shared.util.math import cartesian_to_isometric
 from nk_shared.util import direction_util
+from nk_shared.util.math import cartesian_to_isometric
+from pygame.event import Event
 
 from nk.game_state import GameState
-from nk.settings import WIDTH, HEIGHT
+from nk.settings import HEIGHT, WIDTH
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.input import (
     ActionEnum,
-    read_input_player_move_direction,
     read_input_player_actions,
+    read_input_player_move_direction,
 )
 from nk.ui.renderables import (
-    create_renderable_list,
-    MapRenderable,
-    renderables_generate_key,
-    SpriteRenderable,
     BlittableRenderable,
+    MapRenderable,
+    SpriteRenderable,
+    create_renderable_list,
+    renderables_generate_key,
 )
 from nk.ui.screen import Screen, ScreenManager
 

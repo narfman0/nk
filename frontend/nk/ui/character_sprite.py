@@ -1,9 +1,8 @@
 # pylint: disable=unspecified-encoding
 import pygame
-from pygame.sprite import Sprite
 import yaml
-
 from nk_shared.proto import Direction
+from pygame.sprite import Sprite
 
 
 class CharacterSprite(Sprite):  # pylint: disable=too-many-instance-attributes

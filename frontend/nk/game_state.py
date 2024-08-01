@@ -2,18 +2,12 @@ import logging
 from typing import Callable
 
 from betterproto import serialized_on_wire
+from nk_shared import builders
+from nk_shared.proto import CharacterType, Direction, Message, PlayerJoinRequest
 from pymunk import Vec2d
 
-from nk_shared import builders
-from nk_shared.proto import (
-    CharacterType,
-    Direction,
-    Message,
-    PlayerJoinRequest,
-)
-
-from nk.world import World
 from nk.net.network import Network
+from nk.world import World
 
 TICKS_BEFORE_UPDATE = 6
 logger = logging.getLogger(__name__)

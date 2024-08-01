@@ -1,7 +1,7 @@
 """Users module"""
 
-from typing import Optional
 from os import environ
+from typing import Optional
 
 from beanie import PydanticObjectId
 from fastapi import Depends, Request

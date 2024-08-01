@@ -5,14 +5,9 @@ import logging
 
 from betterproto import serialized_on_wire
 from fastapi import WebSocket
+from nk_shared.proto import Message, PlayerJoined, PlayerJoinResponse, PlayerLeft
 from starlette.websockets import WebSocketDisconnect
 
-from nk_shared.proto import (
-    Message,
-    PlayerLeft,
-    PlayerJoined,
-    PlayerJoinResponse,
-)
 from nk.db import User
 from nk.models import Player
 from nk.world import world
@@ -91,6 +86,7 @@ async def handle_connected(websocket: WebSocket, user: User):
     except WebSocketDisconnect:
         logger.info("Disconnected from %s", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=str(player.uuid))))
-    await user.set({User.x: player.position.x, User.y: player.position.y})
+    x, y = player.position.x, player.position.y  # pylint: disable=no-member
+    await user.set({User.x: x, User.y: y})
     logger.info("Successfully saved player post-logout")
     world.get_players().remove(player)

@@ -1,17 +1,12 @@
 import logging
 from functools import lru_cache
 
-from typing_extensions import Unpack
 import pymunk
-
 from nk_shared.map import Map
-from nk_shared.models import (
-    AttackProfile,
-    Character,
-    Zone,
-    Projectile,
-)
-from nk_shared.proto import CharacterType, Direction, Projectile as ProjectileProto
+from nk_shared.models import AttackProfile, Character, Projectile, Zone
+from nk_shared.proto import CharacterType, Direction
+from nk_shared.proto import Projectile as ProjectileProto
+from typing_extensions import Unpack
 
 logger = logging.getLogger(__name__)
 

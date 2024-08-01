@@ -1,4 +1,5 @@
 black
+isort
 pyinstaller
 pyinstaller-hooks-contrib
 pylint

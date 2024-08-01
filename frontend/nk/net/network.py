@@ -1,11 +1,11 @@
-from queue import Queue
 import logging
 from os import environ
+from queue import Queue
 from threading import Thread
 
 import httpx
-
 from nk_shared.proto import Message
+
 from nk.net.sync import handle_websocket
 
 host = environ.get("WEBSOCKET_HOST", "localhost")

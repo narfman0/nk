@@ -26,7 +26,10 @@ init:
 init-dev:
 	pip install -r requirements_test.txt
 
-lint:
+isort:
+	isort --profile black nk
+
+lint: isort
 	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
 
 pyinstaller: clean

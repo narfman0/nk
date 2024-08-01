@@ -1,9 +1,9 @@
 from os import environ
 
-from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import Document
 from fastapi_users.db import BeanieBaseUser
 from fastapi_users_db_beanie import BeanieUserDatabase
+from motor.motor_asyncio import AsyncIOMotorClient
 
 DB_USER = environ.get("MONGODB_USER", "root")
 DB_PASS = environ.get("MONGODB_PASS", "rootpass")

@@ -1,10 +1,9 @@
 import logging
 import time
-from math import sin, cos
+from math import cos, sin
 
 from betterproto import serialized_on_wire
-
-from nk_shared.proto import Message, PlayerJoinRequest, CharacterUpdated, CharacterType
+from nk_shared.proto import CharacterType, CharacterUpdated, Message, PlayerJoinRequest
 from nk_shared.util.logging import initialize_logging
 
 from nk.net import Network

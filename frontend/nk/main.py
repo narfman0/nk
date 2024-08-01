@@ -1,12 +1,12 @@
 # pylint: disable=no-member
 from pstats import SortKey
-import pygame
 
+import pygame
 from nk_shared.util.logging import initialize_logging
 
-from nk.settings import WIDTH, HEIGHT, ENABLE_PROFILING, FPS
-from nk.ui.screen import ScreenManager
+from nk.settings import ENABLE_PROFILING, FPS, HEIGHT, WIDTH
 from nk.ui.login_screen import LoginScreen
+from nk.ui.screen import ScreenManager
 
 
 def main():  # pylint: disable=too-many-locals
@@ -21,7 +21,9 @@ def main():  # pylint: disable=too-many-locals
     screen_manager.push(LoginScreen(screen_manager))
 
     if ENABLE_PROFILING:
-        import cProfile, pstats, io  # pylint: disable=import-outside-toplevel,multiple-imports
+        import cProfile  # pylint: disable=import-outside-toplevel
+        import io  # pylint: disable=import-outside-toplevel
+        import pstats  # pylint: disable=import-outside-toplevel
 
         pr = cProfile.Profile()
         pr.enable()

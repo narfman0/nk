@@ -1,14 +1,11 @@
 import asyncio
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 
 from beanie import init_beanie
 from fastapi import Depends, FastAPI, WebSocket, WebSocketException
-from pygame.time import Clock
 from nk_shared.util.logging import initialize_logging
-
-from nk.socket_handler import handle_connected
-from nk.world import world
+from pygame.time import Clock
 
 from nk.db import User, db
 from nk.db.schemas import UserCreate, UserRead, UserUpdate
@@ -19,6 +16,8 @@ from nk.db.users import (
     get_jwt_strategy,
     get_user_manager,
 )
+from nk.socket_handler import handle_connected
+from nk.world import world
 
 logger = logging.getLogger(__name__)
 

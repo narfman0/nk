@@ -1,9 +1,10 @@
 import os
-from pygame import Event, Rect
+
 import pygame_gui
+from pygame import Event, Rect
 
 from nk.game_state import GameState
-from nk.settings import WIDTH, HEIGHT
+from nk.settings import HEIGHT, WIDTH
 from nk.ui.load_screen import LoadScreen
 from nk.ui.screen import Screen, ScreenManager
 
@@ -86,7 +87,7 @@ class LoginScreen(Screen):
         os.makedirs(self.save_root(), exist_ok=True)
         path = os.path.expanduser(os.path.join(self.save_root(), "login.txt"))
         try:
-            with open(path) as login_file:
+            with open(path, encoding="utf-8") as login_file:
                 email, passw = login_file.readlines()
                 self.email_field.set_text(email.strip())
                 self.password_field.set_text(passw.strip())
@@ -97,7 +98,7 @@ class LoginScreen(Screen):
         os.makedirs(self.save_root(), exist_ok=True)
         path = os.path.expanduser(os.path.join(self.save_root(), "login.txt"))
         lines = [self.email_field.get_text() + "\n", self.password_field.get_text()]
-        with open(path, "w+") as login_file:
+        with open(path, "w+", encoding="utf-8") as login_file:
             login_file.writelines(lines)
 
     def save_root(self) -> str:

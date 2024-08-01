@@ -2,9 +2,8 @@ import logging
 import os
 from queue import Queue
 
-from websockets.sync.client import connect
-
 from nk_shared.proto import Message
+from websockets.sync.client import connect
 
 logger = logging.getLogger(__name__)
 
