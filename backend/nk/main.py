@@ -11,8 +11,8 @@ from nk.socket_handler import handle_connected
 from nk.world import world
 
 from nk.db import User, db
-from nk.schemas import UserCreate, UserRead, UserUpdate
-from nk.users import (
+from nk.db.schemas import UserCreate, UserRead, UserUpdate
+from nk.db.users import (
     UserManager,
     auth_backend,
     fastapi_users,
