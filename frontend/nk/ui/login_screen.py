@@ -19,7 +19,7 @@ class LoginScreen(Screen):
         self.init_ui()
 
     def init_ui(self):
-        top, left = HEIGHT // 2 - 64, WIDTH // 2 - ELEMENT_WIDTH // 2
+        top, left = HEIGHT // 2 - 128, WIDTH // 2 - ELEMENT_WIDTH // 2
         width_height = (ELEMENT_WIDTH, 50)
         pygame_gui.elements.UILabel(
             relative_rect=Rect((left, top), width_height),
@@ -51,6 +51,12 @@ class LoginScreen(Screen):
             text="Login",
             manager=self.manager,
         )
+        top += 64
+        self.register_button = pygame_gui.elements.UIButton(
+            relative_rect=Rect((left, top), width_height),
+            text="Register",
+            manager=self.manager,
+        )
         self.load_login()
 
     def draw(self, surface):
@@ -61,7 +67,8 @@ class LoginScreen(Screen):
         for event in events:
             self.manager.process_events(event)
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.login_button:
+                register = event.ui_element == self.register_button
+                if event.ui_element == self.login_button or register:
                     self.save_login()
                     self.screen_manager.pop()
                     self.screen_manager.push(
@@ -70,6 +77,7 @@ class LoginScreen(Screen):
                             self.game_state,
                             self.email_field.get_text(),
                             self.password_field.get_text(),
+                            register,
                         )
                     )
         self.manager.update(dt)

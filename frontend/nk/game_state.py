@@ -48,12 +48,16 @@ class GameState:
             self.handle_self_updated()
 
     def login(self, email: str, password: str, callback: Callable):
-        self.network.connect(email, password)
+        access_token = self.network.login(email, password)
+        self.network.connect(access_token)
         self.player_joined_callback = callback
         self.network.send(
             Message(player_join_request=PlayerJoinRequest(requested=True))
         )
         logger.info("Sent join request, waiting for response")
+
+    def register(self, email: str, password: str):
+        self.network.register(email, password)
 
     def handle_self_updated(self):
         self.network_ticks_til_update -= 1

@@ -14,7 +14,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 v1:
 
-* Proper registration+login
 * Deploy
 
 v2:

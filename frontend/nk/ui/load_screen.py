@@ -15,10 +15,13 @@ class LoadScreen(Screen):
         game_state: GameState,
         email: str,
         password: str,
+        register: bool,
     ):
         super().__init__()
         self.screen_manager = screen_manager
         self.game_state = game_state
+        if register:
+            self.game_state.register(email, password)
         self.game_state.login(email, password, self.handle_player_joined)
         logger.info("Logging in to %s", email)
 

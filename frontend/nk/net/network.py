@@ -25,9 +25,7 @@ class Network:
         self._received_messages: Queue[Message] = Queue()
         self._to_send: Queue[Message] = Queue()
 
-    def connect(self, email: str, password: str):
-        access_token = self.login(email, password)
-        logger.info("Access token retrieved, connecting")
+    def connect(self, access_token: str):
         network_thread = Thread(
             target=handle_websocket,
             name="network thread",
@@ -48,12 +46,25 @@ class Network:
         return None
 
     @classmethod
-    def login(cls, email: str, password: str) -> str:
+    def register(cls, email: str, password: str):
+        """Login to return a JWT"""
         response = httpx.post(
-            f"http://{host}:{port}/auth/jwt/login",  # Change to your actual host and port
+            f"http://{host}:{port}/auth/register",
+            json={"email": email, "password": password},
+        )
+        if response.status_code == 201:
+            logger.info("Successfully registered user %s", email)
+        raise LoginException(f"Login failed: {response.text}")
+
+    @classmethod
+    def login(cls, email: str, password: str) -> str:
+        """Login to return a JWT"""
+        response = httpx.post(
+            f"http://{host}:{port}/auth/jwt/login",
             data={"username": email, "password": password},
         )
         if response.status_code == 200:
             tokens = response.json()
+            logger.info("Access token retrieved, connecting")
             return tokens["access_token"]
         raise LoginException(f"Login failed: {response.text}")
