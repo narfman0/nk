@@ -6,7 +6,7 @@ import logging
 from betterproto import serialized_on_wire
 from fastapi import WebSocket
 from nk_shared.proto import Message, PlayerJoined, PlayerJoinResponse, PlayerLeft
-from starlette.websockets import WebSocketDisconnect
+from starlette.websockets import WebSocketDisconnect, WebSocketState
 
 from nk.db import User
 from nk.models import Player
@@ -26,7 +26,20 @@ async def send_messages(player: Player, websocket: WebSocket):
     """Push all messages on player's queue through their socket"""
     message = await player.messages.get()
     logger.debug("Sending message %s to %s", message, player.uuid)
-    await websocket.send_bytes(bytes(message))
+    if websocket.state != WebSocketState.DISCONNECTED:
+        try:
+            await websocket.send_bytes(bytes(message))
+        except RuntimeError as runtime_error:
+            if "'websocket.send', after sending 'websocket.close'" in str(
+                runtime_error
+            ):
+                logger.warning("FIXME websocket.send after websocket.close")
+            else:
+                raise runtime_error
+        except WebSocketDisconnect:
+            # theres a race condition with the above check and sending.
+            # let's throw these away.
+            logger.debug("WebSocketDisconnect after all")
 
 
 async def handle_messages(player: Player, msg: Message):
