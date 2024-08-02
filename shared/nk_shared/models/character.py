@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from os import environ
 from uuid import uuid4 as generate_uuid
 
 import pymunk
@@ -7,9 +8,11 @@ from nk_shared.models.character_properties import CharacterProperties
 from nk_shared.proto import CharacterType, Direction
 from nk_shared.util import direction_util
 
+DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
+
 
 @dataclass
-class Character(CharacterProperties):
+class Character(CharacterProperties):  # pylint: disable=too-many-instance-attributes
     character_type: CharacterType = CharacterType.CHARACTER_TYPE_PIGSASSIN
     uuid: str = field(default_factory=lambda: str(generate_uuid()))
     facing_direction: Direction = Direction.DIRECTION_S
@@ -47,12 +50,12 @@ class Character(CharacterProperties):
         if not self.invincible:
             self.hp = max(0, self.hp - dmg)
             if not self.alive:
-                self.body._set_type(pymunk.Body.STATIC)
+                self.body.body_type = pymunk.Body.STATIC
 
     def handle_healing_received(self, amount: float):
         self.hp = min(self.hp_max, self.hp + amount)
         if self.alive:
-            self.body._set_type(pymunk.Body.DYNAMIC)
+            self.body.body_type = pymunk.Body.DYNAMIC
 
     def update(self, dt: float):
         if self.alive and self.moving_direction:
@@ -65,9 +68,9 @@ class Character(CharacterProperties):
                 * dash_scalar
                 * dt
             )
-            self.body.apply_force_at_world_point(
-                force=(dpos.x, dpos.y), point=(self.position.x, self.position.y)
-            )
+            force = (dpos.x, dpos.y)  # pylint: disable=no-member
+            point = (self.position.x, self.position.y)  # pylint: disable=no-member
+            self.body.apply_force_at_world_point(force=force, point=point)
             if self.body.velocity.length > self.max_velocity * dash_scalar:
                 self.body.velocity = self.body.velocity.scale_to_length(
                     self.max_velocity * dash_scalar
@@ -89,8 +92,7 @@ class Character(CharacterProperties):
                 self.dash_cooldown_remaining = self.dash_cooldown
         elif self.dash_cooldown_remaining > 0:
             self.dash_cooldown_remaining -= dt
-            if self.dash_cooldown_remaining <= 0:
-                self.dash_cooldown_remaining = 0
+            self.dash_cooldown_remaining = max(self.dash_cooldown_remaining, 0)
 
         if self.attacking:
             self.attack_time_remaining -= dt
@@ -116,7 +118,7 @@ class Character(CharacterProperties):
             self.dash_time_remaining = self.dash_duration
 
     def apply_character_properties(self):
-        path = f"../data/characters/{self.character_type_short}/character.yml"
+        path = f"{DATA_ROOT}/characters/{self.character_type_short}/character.yml"
         character_properties = CharacterProperties.from_yaml_file(path)
         self.__dict__.update(character_properties.__dict__)
 

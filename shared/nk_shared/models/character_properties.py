@@ -5,7 +5,7 @@ from nk_shared.models.attack_type import AttackType
 
 
 @dataclass
-class CharacterProperties(YAMLWizard):
+class CharacterProperties(YAMLWizard):  # pylint: disable=too-many-instance-attributes
     mass: float = 10
     dash_cooldown: float = None
     dash_duration: float = None

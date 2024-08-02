@@ -1,13 +1,16 @@
 from functools import lru_cache
+from os import environ
 
 import pymunk
 import pytmx
+
+DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 
 
 class Map:
     def __init__(self, area: str, pygame=True):
         self.area = area
-        path = f"../data/tiled/{area}.tmx"
+        path = f"{DATA_ROOT}/tiled/{area}.tmx"
         if pygame:
             self._tmxdata = pytmx.load_pygame(path)
         else:
@@ -16,7 +19,7 @@ class Map:
     def get_start_tile(self):
         return map(int, self._tmxdata.properties.get("StartXY").split(","))
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=2048)
     def get_tile_image(self, tile_x: int, tile_y: int, layer: int):
         return self._tmxdata.get_tile_image(tile_x, tile_y, layer)
 
