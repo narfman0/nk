@@ -6,3 +6,11 @@ isort:
 
 lint: isort
 	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
+
+deploy:
+	cp -r ../data .
+	find -type f -iname '*.png' -delete
+	cp -r ../shared/nk_shared .
+	docker build . -t narfman0/nk-backend-docker
+	docker push narfman0/nk-backend-docker
+	rm -rf data nk_shared

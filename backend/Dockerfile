@@ -4,4 +4,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 7666
-CMD ["uvicorn", "nk.main:app", "--host", "0.0.0.0", "--port", "7666", "--reload"]
+CMD ["uvicorn", "nk.main:app", "--host", "0.0.0.0", "--port", "7666"]

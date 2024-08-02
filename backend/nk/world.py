@@ -3,6 +3,7 @@
 import logging
 import random
 from functools import lru_cache
+from os import environ
 from uuid import uuid4
 
 import pymunk
@@ -14,6 +15,7 @@ from nk_shared.util import direction_util
 
 from nk.models import Enemy, Player
 
+DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 UPDATE_FREQUENCY = 0.1
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
-        self.zone = Zone.from_yaml_file(f"../data/zones/{zone_name}.yml")
+        self.zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
         self.map = Map(self.zone.tmx_path, pygame=False)
         self.map.add_map_geometry_to_space(self.space)
         self.players: list[Player] = []
@@ -210,7 +212,7 @@ class World:  # pylint: disable=too-many-instance-attributes
 
     @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
-        path = f"../data/attack_profiles/{attack_profile_name}.yml"
+        path = f"{DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
         return AttackProfile.from_yaml_file(path)
 
 
