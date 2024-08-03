@@ -3,5 +3,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
+RUN chmod a+x start.sh
+ENV PORT=7666
 EXPOSE 7666
-CMD ["uvicorn", "nk.main:app", "--host", "0.0.0.0", "--port", "7666"]
+CMD ["./start.sh"]
