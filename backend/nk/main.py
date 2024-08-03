@@ -77,6 +77,11 @@ app.include_router(
 )
 
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(
     websocket: WebSocket, user_manager: UserManager = Depends(get_user_manager)
