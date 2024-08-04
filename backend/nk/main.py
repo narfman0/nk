@@ -86,5 +86,10 @@ async def websocket_endpoint(
 ):
     """Client entrypoint to game server"""
     await websocket.accept()
+    auth_header = websocket.headers["Authorization"]
+    httpx.get()
+    # TODO use Authorization header to request auth service /users/me. if successful,
+    # that means this header represents a valid jwt for the returned user, so
+    # ensure active and use response `id` or `email`
     logger.info("Client logged in as %s", user.email)
     await handle_connected(websocket, user)
