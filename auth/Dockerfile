@@ -6,4 +6,4 @@ COPY . .
 RUN chmod a+x start.sh
 ENV PORT=8080
 EXPOSE 8080
-CMD ["./start.sh"]
+CMD ["sh", "start.sh"]
