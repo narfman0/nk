@@ -8,7 +8,6 @@ from fastapi import WebSocket
 from nk_shared.proto import Message, PlayerJoined, PlayerJoinResponse, PlayerLeft
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
-from nk.db import User
 from nk.models import Player
 from nk.world import world
 
@@ -93,7 +92,7 @@ async def handle_connected(websocket: WebSocket, user_id: str):
         for task in pending:
             task.cancel()
 
-    player = Player(user=user_id)
+    player = Player(user_id=user_id)
     player.uuid = user_id
     logger.info("Player uuid set to %s", player.uuid)
     try:
@@ -101,7 +100,8 @@ async def handle_connected(websocket: WebSocket, user_id: str):
     except WebSocketDisconnect:
         logger.info("Disconnected from %s", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
-    x, y = player.position.x, player.position.y  # pylint: disable=no-member
-    # TODO persist position await user.set({User.x: x, User.y: y})
+    # TODO persist position
+    # x, y = player.position.x, player.position.y  # pylint: disable=no-member
+    # await user.set({User.x: x, User.y: y})
     logger.info("Successfully saved player post-logout")
     world.get_players().remove(player)

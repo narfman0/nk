@@ -19,8 +19,8 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASS:-rootpass}
       ME_CONFIG_MONGODB_URL: mongodb://${MONGODB_USER:-root}:${MONGODB_PASS:-rootpass}@mongo:27017/
       ME_CONFIG_BASICAUTH: false
-  backend:
-    image: 'backend:latest'
+  auth:
+    image: 'narfman0/nk-auth-docker:latest'
     restart: always
     depends_on:
       - mongo
@@ -29,6 +29,21 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_HOST: ${MONGODB_HOST:-mongo}
+    build:
+      context: ./auth
+    ports:
+      - 8080:8080
+  backend:
+    image: 'narfman0/nk-backend-docker:latest'
+    restart: always
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_HOST: ${MONGODB_HOST:-mongo}
+      UVICORN_RELOAD: ${UVICORN_RELOAD:-true}
     build:
       context: ./backend
     ports:

@@ -4,8 +4,6 @@ from dataclasses import dataclass, field
 from nk_shared.models import Character
 from nk_shared.proto import Message
 
-from nk.db import User
-
 
 @dataclass
 class Player(Character):
@@ -13,6 +11,10 @@ class Player(Character):
 
     messages: Queue[Message] = field(default_factory=Queue)
     user_id: str = None
+
+    def __post_init(self):
+        self.uuid = self.user_id
+        print("Set uuid to %s", self.uuid)
 
 
 @dataclass

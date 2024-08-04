@@ -2,7 +2,7 @@ from os import environ
 
 from beanie import Document, PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 DATABASE_URL = environ.get("MONGODB_URL")
 DB_NAME = environ.get("MONGODB_NAME", "backend")
@@ -17,7 +17,7 @@ db = client[DB_NAME]
 
 
 # pylint: disable-next=too-many-ancestors
-class Character(BaseModel, Document):
+class Character(Document):
     user_id: PydanticObjectId = Field(default_factory=PydanticObjectId)
     x: float | None = None
     y: float | None = None

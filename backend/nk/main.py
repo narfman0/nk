@@ -14,7 +14,7 @@ from nk.socket_handler import handle_connected
 from nk.world import world
 
 logger = logging.getLogger(__name__)
-AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "https://auth")
+AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "http://auth:8080")
 
 
 @asynccontextmanager
@@ -63,6 +63,6 @@ async def websocket_endpoint(websocket: WebSocket):
     )
     if not response.is_success:
         logger.warning("Auth request failed %s", response)
-    user_id = response.json()["user"]
+    user_id = response.json()["id"]
     logger.info("Client logged in as %s", user_id)
     await handle_connected(websocket, user_id)
