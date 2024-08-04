@@ -3,18 +3,16 @@ import logging
 from contextlib import asynccontextmanager
 
 from beanie import init_beanie
-from fastapi import Depends, FastAPI, WebSocket, WebSocketException
+from fastapi import Depends, FastAPI, WebSocket
 from nk_shared.util.logging import initialize_logging
 from pygame.time import Clock
 
 from nk.db import User, db
 from nk.db.schemas import UserCreate, UserRead, UserUpdate
 from nk.db.users import (
-    UserManager,
     auth_backend,
+    current_active_user,
     fastapi_users,
-    get_jwt_strategy,
-    get_user_manager,
 )
 from nk.socket_handler import handle_connected
 from nk.world import world
@@ -84,13 +82,9 @@ async def root():
 
 @app.websocket("/ws")
 async def websocket_endpoint(
-    websocket: WebSocket, user_manager: UserManager = Depends(get_user_manager)
+    websocket: WebSocket, user: User = Depends(current_active_user)
 ):
     """Client entrypoint to game server"""
     await websocket.accept()
-    token = websocket.headers["Authorization"].removeprefix("Bearer ")
-    user: User | None = await get_jwt_strategy().read_token(token, user_manager)
-    if not user:
-        raise WebSocketException(401, "Authorization failed")
     logger.info("Client logged in as %s", user.email)
     await handle_connected(websocket, user)
