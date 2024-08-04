@@ -13,7 +13,7 @@ def handle_websocket(
     try:
         ws = connect(url, additional_headers=headers)
     except TimeoutError:
-        logger.error("Timed out connected to %s", url)
+        logger.error("Timed out connected to {}", url)
         os._exit(1)
     while True:
         while not to_send.empty():

@@ -53,7 +53,7 @@ class Network:
         )
         if response.is_error:
             raise LoginException(f"Login failed: {response.text}")
-        logger.info("Successfully registered user %s", email)
+        logger.info("Successfully registered user {}", email)
 
     @classmethod
     def login(cls, email: str, password: str) -> str:

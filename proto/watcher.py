@@ -14,28 +14,28 @@ class EventHandler(FileSystemEventHandler):
         super().on_moved(event)
 
         what = "directory" if event.is_directory else "file"
-        logger.info("Moved %s: from %s to %s", what, event.src_path, event.dest_path)
+        logger.info("Moved {}: from {} to {}", what, event.src_path, event.dest_path)
         self.handle_changes(event)
 
     def on_created(self, event: FileSystemEvent) -> None:
         super().on_created(event)
 
         what = "directory" if event.is_directory else "file"
-        logger.info("Created %s: %s", what, event.src_path)
+        logger.info("Created {}: {}", what, event.src_path)
         self.handle_changes(event)
 
     def on_deleted(self, event: FileSystemEvent) -> None:
         super().on_deleted(event)
 
         what = "directory" if event.is_directory else "file"
-        logger.info("Deleted %s: %s", what, event.src_path)
+        logger.info("Deleted {}: {}", what, event.src_path)
         self.handle_changes(event)
 
     def on_modified(self, event: FileSystemEvent) -> None:
         super().on_modified(event)
 
         what = "directory" if event.is_directory else "file"
-        logger.info("Modified %s: %s", what, event.src_path)
+        logger.info("Modified {}: {}", what, event.src_path)
         self.handle_changes(event)
 
     def handle_changes(self, event: FileSystemEvent) -> None:

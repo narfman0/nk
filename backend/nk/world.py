@@ -90,7 +90,7 @@ class World:  # pylint: disable=too-many-instance-attributes
             if should_remove:
                 self.projectiles.remove(projectile)
                 self.broadcast(builders.build_projectile_destroyed(projectile.uuid))
-                logger.debug("Projectile destroyed: %s", projectile.uuid)
+                logger.debug("Projectile destroyed: {}", projectile.uuid)
 
     def process_ranged_attack(self, character: Character):
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
@@ -110,7 +110,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.projectiles.append(projectile)
         self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
-        logger.debug("Projectile created: %s", projectile.uuid)
+        logger.debug("Projectile created: {}", projectile.uuid)
 
     def process_attack_damage(self, attacker: Character, targets: list[Character]):
         """Attack trigger frame reached, let's find who was hit and apply dmg"""
@@ -147,7 +147,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         """Call character attack, does nothing if character does not exist"""
         character = self.get_character_by_uuid(details.uuid)
         if not character:
-            logger.warning("No character maching uuid: %s", details.uuid)
+            logger.warning("No character maching uuid: {}", details.uuid)
         logger.info(details)
         character.attack()
 
@@ -156,7 +156,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         does not exist, do not do anything."""
         character = self.get_character_by_uuid(details.uuid)
         if not character:
-            logger.warning("No character maching uuid: %s", details.uuid)
+            logger.warning("No character maching uuid: {}", details.uuid)
         character.body.position = (details.x, details.y)
         character.moving_direction = Direction(details.moving_direction)
         character.facing_direction = Direction(details.facing_direction)

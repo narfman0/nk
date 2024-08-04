@@ -23,7 +23,7 @@ async def broadcast(origin: Player | None, message: Message):
 async def send_messages(player: Player, websocket: WebSocket):
     """Push all messages on player's queue through their socket"""
     message = await player.messages.get()
-    logger.debug("Sending message %s to %s", message, player.uuid)
+    logger.debug("Sending message {} to {}", message, player.uuid)
     if websocket.state != WebSocketState.DISCONNECTED:
         try:
             await websocket.send_bytes(bytes(message))
@@ -53,13 +53,13 @@ async def handle_messages(player: Player, msg: Message):
     elif serialized_on_wire(msg.character_updated):
         world.handle_character_updated(msg.character_updated)
         await broadcast(player, msg)
-    logger.debug("Handled message: %s from %s", msg, player.uuid)
+    logger.debug("Handled message: {} from {}", msg, player.uuid)
 
 
 async def handle_player_join_request(player: Player):
     """A player has joined. Handle initialization."""
     await world.spawn_player(player)
-    logger.info("Join request success: %s", player.uuid)
+    logger.info("Join request success: {}", player.uuid)
     response = PlayerJoinResponse(
         uuid=player.uuid, x=player.position.x, y=player.position.y
     )
@@ -92,11 +92,11 @@ async def handle_connected(websocket: WebSocket, user_id: str):
             task.cancel()
 
     player = Player(user_id=user_id)
-    logger.info("Player uuid set to %s", player.uuid)
+    logger.info("Player uuid set to {}", player.uuid)
     try:
         await handler()
     except WebSocketDisconnect:
-        logger.info("Disconnected from %s", player)
+        logger.info("Disconnected from {}", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
     x, y = player.position.x, player.position.y  # pylint: disable=no-member
     character = await Character.find_one(Character.user_id == player.uuid)

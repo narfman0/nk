@@ -67,7 +67,7 @@ def main():
         while network.has_messages():
             msg = network.next()
             if serialized_on_wire(msg.character_attacked):
-                logger.info("Received: %s", msg.character_attacked)
+                logger.info("Received: {}", msg.character_attacked)
         time.sleep(0.1)
 
 

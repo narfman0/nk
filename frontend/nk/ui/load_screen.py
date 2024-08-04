@@ -22,7 +22,7 @@ class LoadScreen(Screen):
         if register:
             self.game_state.register(email, password)
         self.game_state.login(email, password, self.handle_player_joined)
-        logger.info("Logging in to %s", email)
+        logger.info("Logging in to {}", email)
 
     def update(self, dt: float, events: list[Event]):
         super().update(dt, events)

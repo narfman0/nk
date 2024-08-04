@@ -59,7 +59,7 @@ async def websocket_endpoint(websocket: WebSocket):
         headers={"Authorization": websocket.headers["Authorization"]},
     )
     if not response.is_success:
-        logger.warning("Auth request failed %s", response)
+        logger.warning("Auth request failed {}", response)
     user_id = response.json()["id"]
-    logger.info("Client logged in as %s", user_id)
+    logger.info("Client logged in as {}", user_id)
     await handle_connected(websocket, user_id)

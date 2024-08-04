@@ -72,7 +72,7 @@ class GameState:
                 self.character_attacked_callback(character)
         else:
             logger.warning(
-                "character_attacked no character found with uuid %s", details.uuid
+                "character_attacked no character found with uuid {}", details.uuid
             )
 
     def handle_character_damaged(self, message: Message):
@@ -86,7 +86,7 @@ class GameState:
             character.handle_damage_received(details.damage)
         else:
             logger.warning(
-                "character_damaged no character found with uuid %s", details.uuid
+                "character_damaged no character found with uuid {}", details.uuid
             )
 
     def handle_character_updated(self, message: Message):
