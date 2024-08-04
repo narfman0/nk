@@ -32,6 +32,8 @@ async def send_messages(player: Player, websocket: WebSocket):
         except RuntimeError as runtime_error:
             if "'websocket.send', after sending 'websocket.close'" in str(
                 runtime_error
+            ) or 'Cannot call "send" once a close message has been sent.' in str(
+                runtime_error
             ):
                 logger.warning("FIXME websocket.send after websocket.close")
             else:
