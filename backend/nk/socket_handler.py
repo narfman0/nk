@@ -32,6 +32,8 @@ async def send_messages(player: Player, websocket: WebSocket):
         except RuntimeError as runtime_error:
             if "'websocket.send', after sending 'websocket.close'" in str(
                 runtime_error
+            ) or 'Cannot call "send" once a close message has been sent.' in str(
+                runtime_error
             ):
                 logger.warning("FIXME websocket.send after websocket.close")
             else:
@@ -67,7 +69,7 @@ async def handle_player_join_request(player: Player):
     await broadcast(player, Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
 
-async def handle_connected(websocket: WebSocket, user: User):
+async def handle_connected(websocket: WebSocket, user_id: str):
     """Handle the lifecycle of the websocket"""
 
     async def consumer():
@@ -91,15 +93,15 @@ async def handle_connected(websocket: WebSocket, user: User):
         for task in pending:
             task.cancel()
 
-    player = Player(user=user)
-    player.uuid = str(user.id)
+    player = Player(user=user_id)
+    player.uuid = user_id
     logger.info("Player uuid set to %s", player.uuid)
     try:
         await handler()
     except WebSocketDisconnect:
         logger.info("Disconnected from %s", player)
-    await broadcast(player, Message(player_left=PlayerLeft(uuid=str(player.uuid))))
+    await broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
     x, y = player.position.x, player.position.y  # pylint: disable=no-member
-    await user.set({User.x: x, User.y: y})
+    # TODO persist position await user.set({User.x: x, User.y: y})
     logger.info("Successfully saved player post-logout")
     world.get_players().remove(player)

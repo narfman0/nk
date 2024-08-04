@@ -1,12 +1,11 @@
 from os import environ
 
-from beanie import Document
-from fastapi_users.db import BeanieBaseUser
-from fastapi_users_db_beanie import BeanieUserDatabase
+from beanie import Document, PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel, Field
 
 DATABASE_URL = environ.get("MONGODB_URL")
-DB_NAME = environ.get("MONGODB_NAME", "nk")
+DB_NAME = environ.get("MONGODB_NAME", "backend")
 if not DATABASE_URL:
     DB_USER = environ.get("MONGODB_USER", "root")
     DB_PASS = environ.get("MONGODB_PASS", "rootpass")
@@ -18,10 +17,7 @@ db = client[DB_NAME]
 
 
 # pylint: disable-next=too-many-ancestors
-class User(BeanieBaseUser, Document):
+class Character(BaseModel, Document):
+    user_id: PydanticObjectId = Field(default_factory=PydanticObjectId)
     x: float | None = None
     y: float | None = None
-
-
-async def get_user_db():
-    yield BeanieUserDatabase(User)

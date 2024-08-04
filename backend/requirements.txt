@@ -1,7 +1,8 @@
+beanie
 betterproto
 dataclass-wizard
 fastapi
-fastapi-users[beanie]
+httpx
 pygame
 pymunk
 pytmx

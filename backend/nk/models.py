@@ -12,7 +12,7 @@ class Player(Character):
     """A remote player. Their websocket thread will tick and publish any messages to them."""
 
     messages: Queue[Message] = field(default_factory=Queue)
-    user: User = None
+    user_id: str = None
 
 
 @dataclass
