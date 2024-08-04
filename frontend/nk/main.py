@@ -2,7 +2,6 @@
 from pstats import SortKey
 
 import pygame
-from nk_shared.util.logging import initialize_logging
 
 from nk.settings import ENABLE_PROFILING, FPS, HEIGHT, WIDTH
 from nk.ui.login_screen import LoginScreen
@@ -10,7 +9,6 @@ from nk.ui.screen import ScreenManager
 
 
 def main():  # pylint: disable=too-many-locals
-    initialize_logging()
     pygame.init()
     pygame.display.set_caption("nk")
     surface = pygame.display.set_mode((WIDTH, HEIGHT))

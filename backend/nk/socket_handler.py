@@ -1,18 +1,16 @@
 """Server handler of socket. Translates websocket bytes to and from messages for backend."""
 
 import asyncio
-import logging
 
 from betterproto import serialized_on_wire
 from fastapi import WebSocket
+from loguru import logger
 from nk_shared.proto import Message, PlayerJoined, PlayerJoinResponse, PlayerLeft
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
 from nk.db import Character
 from nk.models import Player
 from nk.world import world
-
-logger = logging.getLogger(__name__)
 
 
 async def broadcast(origin: Player | None, message: Message):

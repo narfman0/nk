@@ -1,13 +1,12 @@
 """Simulates the world's characters"""
 
-import logging
 import random
 from functools import lru_cache
 from os import environ
 from uuid import uuid4
 
 import pymunk
-from nk_shared import builders
+from loguru import logger
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
 from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
@@ -15,10 +14,10 @@ from nk_shared.util import direction_util
 
 from nk.db import Character as DBCharacter
 from nk.models import Enemy, Player
+from nk_shared import builders
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 UPDATE_FREQUENCY = 0.1
-logger = logging.getLogger(__name__)
 
 
 class World:  # pylint: disable=too-many-instance-attributes

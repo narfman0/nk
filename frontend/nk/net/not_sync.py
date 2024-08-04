@@ -1,12 +1,10 @@
 import asyncio
-import logging
 from queue import Queue
 
+from loguru import logger
 from nk_shared.proto import Message
 from websockets import ConnectionClosed, WebSocketClientProtocol
 from websockets.client import connect
-
-logger = logging.getLogger(__name__)
 
 
 async def network_async_runner(

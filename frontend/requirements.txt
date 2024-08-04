@@ -1,11 +1,12 @@
+betterproto
+dataclass-wizard
 httpx
+loguru
 pygame
 pygame_gui
 pymunk
 pytmx
 pyyaml
-dataclass-wizard
 sortedcontainers
-betterproto
 websockets
 #-e ../shared

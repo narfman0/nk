@@ -1,7 +1,7 @@
-import logging
 from dataclasses import dataclass
 
 import pygame
+from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.proto import Direction
@@ -26,7 +26,6 @@ from nk.ui.renderables import (
 )
 from nk.ui.screen import Screen, ScreenManager
 
-logger = logging.getLogger(__name__)
 DEFAULT_SCREEN_SCALE = 5
 
 

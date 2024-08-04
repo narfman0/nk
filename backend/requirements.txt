@@ -3,6 +3,7 @@ betterproto
 dataclass-wizard
 fastapi
 httpx
+loguru
 pygame
 pymunk
 pytmx

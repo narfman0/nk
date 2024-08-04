@@ -1,19 +1,17 @@
 import asyncio
-import logging
 from contextlib import asynccontextmanager
 from os import environ
 
+import httpx
 from beanie import init_beanie
 from fastapi import FastAPI, WebSocket
-import httpx
-from nk_shared.util.logging import initialize_logging
+from loguru import logger
 from pygame.time import Clock
 
 from nk.db import Character, db
 from nk.socket_handler import handle_connected
 from nk.world import world
 
-logger = logging.getLogger(__name__)
 AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "http://auth:8080")
 
 
@@ -44,7 +42,6 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-initialize_logging()
 app = FastAPI(lifespan=lifespan)
 
 

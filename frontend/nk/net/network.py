@@ -1,9 +1,9 @@
-import logging
 from os import environ
 from queue import Queue
 from threading import Thread
 
 import httpx
+from loguru import logger
 from nk_shared.proto import Message
 
 from nk.net.sync import handle_websocket
@@ -12,8 +12,6 @@ AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "http://localhost:8080")
 HOST = environ.get("WEBSOCKET_HOST", "localhost")
 PORT = environ.get("WEBSOCKET_PORT", "7666")
 URL = f"ws://{HOST}:{PORT}/ws"
-
-logger = logging.getLogger(__name__)
 
 
 class LoginException(Exception):

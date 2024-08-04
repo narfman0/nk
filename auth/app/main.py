@@ -1,4 +1,3 @@
-import logging
 from contextlib import asynccontextmanager
 
 from beanie import init_beanie
@@ -7,8 +6,6 @@ from fastapi import FastAPI
 from app.db import User, db
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, fastapi_users
-
-logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager

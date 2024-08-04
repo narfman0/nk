@@ -1,10 +1,9 @@
-import logging
 import random
 import time
 from math import cos, sin
 
 from betterproto import serialized_on_wire
-from nk.net.network import LoginException
+from loguru import logger
 from nk_shared.proto import (
     CharacterType,
     CharacterUpdated,
@@ -12,12 +11,11 @@ from nk_shared.proto import (
     PlayerJoinRequest,
     PlayerJoinResponse,
 )
-from nk_shared.util.logging import initialize_logging
 
 from nk.net import Network
+from nk.net.network import LoginException
 
 UPDATE_FREQUENCY = 0.1
-logger = logging.getLogger(__name__)
 
 
 def get_start_pos(network: Network) -> PlayerJoinResponse:
@@ -74,5 +72,4 @@ def main():
 
 
 if __name__ == "__main__":
-    initialize_logging()
     main()
