@@ -12,9 +12,9 @@ class Player(Character):
     messages: Queue[Message] = field(default_factory=Queue)
     user_id: str = None
 
-    def __post_init(self):
+    def __post_init__(self):
+        super().__post_init__()
         self.uuid = self.user_id
-        print("Set uuid to %s", self.uuid)
 
 
 @dataclass

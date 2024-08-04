@@ -13,6 +13,7 @@ from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Z
 from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
 from nk_shared.util import direction_util
 
+from nk.db import Character as DBCharacter
 from nk.models import Enemy, Player
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
@@ -194,14 +195,14 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.enemies.append(character)
         return character
 
-    def spawn_player(self, player: Player) -> Player:
+    async def spawn_player(self, player: Player) -> Player:
         """Player 'is' a Character, which i don't love, but its already
         created. Update relevant attrs."""
-        # TODO persistence
-        # if player.user.x and player.user.y:
-        #     x, y = player.user.x, player.user.y
-        # else:
-        x, y = world.map.get_start_tile()
+        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
+        if character:
+            x, y = character.x, character.y
+        else:
+            x, y = world.map.get_start_tile()
         player.body.position = (x, y)
         self.space.add(player.body, player.shape, player.hitbox_shape)
         self.players.append(player)

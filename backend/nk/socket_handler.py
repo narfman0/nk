@@ -8,6 +8,7 @@ from fastapi import WebSocket
 from nk_shared.proto import Message, PlayerJoined, PlayerJoinResponse, PlayerLeft
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
+from nk.db import Character
 from nk.models import Player
 from nk.world import world
 
@@ -59,7 +60,7 @@ async def handle_messages(player: Player, msg: Message):
 
 async def handle_player_join_request(player: Player):
     """A player has joined. Handle initialization."""
-    world.spawn_player(player)
+    await world.spawn_player(player)
     logger.info("Join request success: %s", player.uuid)
     response = PlayerJoinResponse(
         uuid=player.uuid, x=player.position.x, y=player.position.y
@@ -93,15 +94,17 @@ async def handle_connected(websocket: WebSocket, user_id: str):
             task.cancel()
 
     player = Player(user_id=user_id)
-    player.uuid = user_id
     logger.info("Player uuid set to %s", player.uuid)
     try:
         await handler()
     except WebSocketDisconnect:
         logger.info("Disconnected from %s", player)
     await broadcast(player, Message(player_left=PlayerLeft(uuid=player.uuid)))
-    # TODO persist position
-    # x, y = player.position.x, player.position.y  # pylint: disable=no-member
-    # await user.set({User.x: x, User.y: y})
+    x, y = player.position.x, player.position.y  # pylint: disable=no-member
+    character = await Character.find_one(Character.user_id == player.uuid)
+    if character:
+        await character.set({Character.x: x, Character.y: y})
+    else:
+        await Character(user_id=user_id, x=x, y=y).insert()
     logger.info("Successfully saved player post-logout")
     world.get_players().remove(player)
