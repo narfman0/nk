@@ -12,17 +12,21 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-v2:
 * Enemy respawns+patrols
-* Town + player respawn
-* Zoom screen out?
-* Visuals+sound
 * Bigger map
+* Town + player respawn
+* Update sprites
+* Sound effects
+* UI (health, ammo, death)
+* Zoom screen out?
 
-vx:
+### deferred
+
 * Objectives
 * Strategems
 * Leveling
+* Active reload
+* Grenades
 * Factions (all pigsassins are players)
 * AI (e.g. behavior trees)
 * AI goals/planning
