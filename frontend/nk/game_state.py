@@ -97,6 +97,7 @@ class GameState:
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.body.position = Vec2d(details.x, details.y)
+            character.body.velocity = Vec2d(details.dx, details.dy)
         else:
             if details.character_type == CharacterType.CHARACTER_TYPE_PIGSASSIN:
                 character = self.world.add_player(

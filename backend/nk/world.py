@@ -160,6 +160,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         character.body.position = (details.x, details.y)
         character.moving_direction = Direction(details.moving_direction)
         character.facing_direction = Direction(details.facing_direction)
+        character.body.velocity = (details.dx, details.dy)
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         for character in self.players + self.enemies:

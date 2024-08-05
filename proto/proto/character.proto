@@ -26,6 +26,8 @@ message CharacterUpdated {
   string uuid = 1;
   float x = 2;
   float y = 3;
+  float dx = 7;
+  float dy = 8;
   CharacterType character_type = 4;
   Direction facing_direction = 5;
   Direction moving_direction = 6;
