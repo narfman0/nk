@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from math import atan2, pi
 
 import pygame
 from loguru import logger
@@ -97,8 +98,12 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 self.world.player.dash()
         if ActionEnum.ATTACK in player_actions:
             if self.world.player.alive and not self.world.player.attacking:
-                self.world.player.attack()
-                self.network.send(builders.build_character_attacked(self.world.player))
+                x, y = pygame.mouse.get_pos()
+                direction = atan2(y - HEIGHT // 2, x - WIDTH // 2) - pi / 4
+                self.world.player.attack(direction)
+                self.network.send(
+                    builders.build_character_attacked(self.world.player, direction)
+                )
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)

@@ -66,7 +66,7 @@ class GameState:
             return
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
-            character.attack()
+            character.attack(details.direction)
             if self.character_attacked_callback:
                 # pylint: disable-next=not-callable
                 self.character_attacked_callback(character)

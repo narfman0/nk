@@ -2,6 +2,7 @@
 
 import random
 from functools import lru_cache
+from math import atan2, cos, sin
 from os import environ
 from uuid import uuid4
 
@@ -10,7 +11,13 @@ from loguru import logger
 from nk_shared import builders
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
-from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
+from nk_shared.proto import (
+    CharacterAttacked,
+    CharacterType,
+    CharacterUpdated,
+    Direction,
+    Message,
+)
 from nk_shared.util import direction_util
 
 from nk.db import Character as DBCharacter
@@ -94,9 +101,12 @@ class World:  # pylint: disable=too-many-instance-attributes
 
     def process_ranged_attack(self, character: Character):
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
-        speed = direction_util.to_vector(character.facing_direction).scale_to_length(
-            attack_profile.speed
-        )
+        # speed = direction_util.to_vector(character.facing_direction).scale_to_length(
+        #     attack_profile.speed
+        # )
+        speed = pymunk.Vec2d(
+            cos(character.attack_direction), sin(character.attack_direction)
+        ).scale_to_length(attack_profile.speed)
         projectile = Projectile(
             x=character.position.x + attack_profile.emitter_offset_x,
             y=character.position.y + attack_profile.emitter_offset_y,
@@ -139,17 +149,21 @@ class World:  # pylint: disable=too-many-instance-attributes
                         enemy.position, player.position
                     )
                 if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
-                    enemy.attack()
-                    self.broadcast(builders.build_character_attacked(enemy))
+                    direction = atan2(
+                        player.position.y - enemy.position.y,
+                        player.position.x - enemy.position.x,
+                    )
+                    enemy.attack(direction)
+                    self.broadcast(builders.build_character_attacked(enemy, direction))
                 self.broadcast(builders.build_character_updated(enemy))
 
-    def handle_character_attacked(self, details: CharacterUpdated):
+    def handle_character_attacked(self, details: CharacterAttacked):
         """Call character attack, does nothing if character does not exist"""
         character = self.get_character_by_uuid(details.uuid)
         if not character:
             logger.warning("No character maching uuid: {}", details.uuid)
         logger.info(details)
-        character.attack()
+        character.attack(details.direction)
 
     def handle_character_updated(self, details: CharacterUpdated):
         """Apply message details to relevant character. If character

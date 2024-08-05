@@ -2,10 +2,11 @@ from nk_shared.models import Character, Projectile
 from nk_shared import proto
 
 
-def build_character_attacked(character: Character) -> proto.Message:
+def build_character_attacked(character: Character, direction: float) -> proto.Message:
     return proto.Message(
         character_attacked=proto.CharacterAttacked(
-            uuid=str(character.uuid),
+            uuid=character.uuid,
+            direction=direction,
         )
     )
 
@@ -13,7 +14,7 @@ def build_character_attacked(character: Character) -> proto.Message:
 def build_character_damaged(character: Character, damage: float) -> proto.Message:
     return proto.Message(
         character_damaged=proto.CharacterDamaged(
-            uuid=str(character.uuid),
+            uuid=character.uuid,
             damage=damage,
         )
     )

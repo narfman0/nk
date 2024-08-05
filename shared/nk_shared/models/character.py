@@ -26,6 +26,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     attacking: bool = False
     attack_time_remaining: float = 0
     attack_damage_time_remaining: float = 0
+    attack_direction: float = 0
     should_process_attack: bool = False
     hp: float = 0
     invincible: bool = False
@@ -104,11 +105,12 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             if self.attack_time_remaining <= 0:
                 self.attacking = False
 
-    def attack(self):
+    def attack(self, direction: float | None):
         if not self.attacking:
             self.attacking = True
             self.attack_time_remaining = self.attack_duration
             self.attack_damage_time_remaining = self.attack_time_until_damage
+            self.attack_direction = direction
             if self.moving_direction:  # maybe standing still
                 self.facing_direction = self.moving_direction
 
