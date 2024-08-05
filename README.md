@@ -12,10 +12,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-v1:
-
-* Deploy
-
 v2:
 * Shoot in mouse direction
 * Enemy respawns+patrols
