@@ -18,6 +18,7 @@ clean-installer:
 
 clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -rf {} +
+	find . -name '.pytest_cache' -exec rm -rf {} +
 	find . -name '*~' -exec rm -f {} +
 
 init:
