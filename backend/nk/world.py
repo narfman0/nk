@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import pymunk
 from loguru import logger
+from nk_shared import builders
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
 from nk_shared.proto import CharacterType, CharacterUpdated, Direction, Message
@@ -14,7 +15,6 @@ from nk_shared.util import direction_util
 
 from nk.db import Character as DBCharacter
 from nk.models import Enemy, Player
-from nk_shared import builders
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 UPDATE_FREQUENCY = 0.1

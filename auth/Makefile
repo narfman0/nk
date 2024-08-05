@@ -12,3 +12,6 @@ docker-build:
 
 docker-deploy: docker-build
 	docker push narfman0/nk-auth-docker
+
+test:
+	SECRET=testing123 pytest --cov=app tests/

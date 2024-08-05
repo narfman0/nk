@@ -1,0 +1,2 @@
+-r auth/requirements_test.txt
+-r frontend/requirements_test.txt
