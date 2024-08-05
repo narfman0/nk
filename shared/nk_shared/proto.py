@@ -30,6 +30,7 @@ class CharacterType(betterproto.Enum):
 @dataclass
 class CharacterAttacked(betterproto.Message):
     uuid: str = betterproto.string_field(1)
+    direction: float = betterproto.float_field(2)
 
 
 @dataclass

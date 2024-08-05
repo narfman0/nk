@@ -15,6 +15,7 @@ enum CharacterType {
 
 message CharacterAttacked {
   string uuid = 1;
+  float direction = 2;
 }
 
 message CharacterDamaged {
