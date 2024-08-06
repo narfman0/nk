@@ -6,9 +6,11 @@ from math import atan2, cos, sin
 from os import environ
 from uuid import uuid4
 
+from betterproto import serialized_on_wire
 import pymunk
 from loguru import logger
 from nk_shared import builders
+from nk.db import Character as DBCharacter
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
 from nk_shared.proto import (
@@ -17,6 +19,9 @@ from nk_shared.proto import (
     CharacterUpdated,
     Direction,
     Message,
+    PlayerJoinResponse,
+    PlayerJoined,
+    PlayerLeft,
 )
 from nk_shared.util import direction_util
 
@@ -48,9 +53,6 @@ class World:  # pylint: disable=too-many-instance-attributes
                     enemy_group.center_y + random.randint(-r, r),
                 )
         self.next_update_time = 0
-
-    def get_players(self) -> list[Player]:
-        return self.players
 
     def update(self, dt: float):
         self.update_ai(dt)
@@ -222,9 +224,42 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.players.append(player)
         return player
 
-    def broadcast(self, message: Message):
+    async def handle_player_disconnected(self, player: Player):
+        self.broadcast(Message(player_left=PlayerLeft(uuid=player.uuid)), player)
+        x, y = player.position.x, player.position.y  # pylint: disable=no-member
+        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
+        if character:
+            await character.set({DBCharacter.x: x, DBCharacter.y: y})
+        else:
+            await DBCharacter(user_id=player.uuid, x=x, y=y).insert()
+        logger.info("Successfully saved player post-logout")
+        self.players.remove(player)
+
+    async def handle_player_join_request(self, player: Player):
+        """A player has joined. Handle initialization."""
+        await self.spawn_player(player)
+        logger.info("Join request success: {}", player.uuid)
+        x, y = player.position.x, player.position.y
+        response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
+        await player.messages.put(Message(player_join_response=response))
+        self.broadcast(Message(player_joined=PlayerJoined(uuid=player.uuid)), player)
+
+    async def handle_message(self, player: Player, msg: Message):
+        """Socket-level handler for messages, mostly passing through to world"""
+        if serialized_on_wire(msg.player_join_request):
+            await self.handle_player_join_request(player)
+        elif serialized_on_wire(msg.text_message):
+            self.broadcast(msg, player)
+        elif serialized_on_wire(msg.character_attacked):
+            self.handle_character_attacked(msg.character_attacked)
+        elif serialized_on_wire(msg.character_updated):
+            self.handle_character_updated(msg.character_updated)
+            self.broadcast(msg, player)
+
+    def broadcast(self, message: Message, origin: Player | None = None):
         for player in self.players:
-            player.messages.put_nowait(message)
+            if player != origin:
+                player.messages.put_nowait(message)
 
     @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
