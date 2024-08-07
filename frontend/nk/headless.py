@@ -63,7 +63,7 @@ def main():
                     )
                 )
             )
-            logger.info("Sent: (%r,%r)}", x, y)
+            logger.debug("Sent: ({},{})", x, y)
         while network.has_messages():
             msg = network.next()
             if serialized_on_wire(msg.character_attacked):
