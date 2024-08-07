@@ -4,7 +4,7 @@ import pymunk
 from loguru import logger
 from nk_shared import builders
 from nk_shared.map import Map
-from nk_shared.models import AttackProfile, AttackType, Character, Zone
+from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 
 from nk.ai_component import AiComponent
