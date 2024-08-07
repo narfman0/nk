@@ -16,8 +16,9 @@ class Map:
         else:
             self._tmxdata = pytmx.TiledMap(path)
 
-    def get_start_tile(self):
-        return map(int, self._tmxdata.properties.get("StartXY").split(","))
+    def get_start_tile(self) -> tuple[int, int]:
+        x, y = map(int, self._tmxdata.properties.get("StartXY").split(","))
+        return (x, y)
 
     @lru_cache(maxsize=2048)
     def get_tile_image(self, tile_x: int, tile_y: int, layer: int):

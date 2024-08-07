@@ -63,4 +63,4 @@ async def handle_connected(websocket: WebSocket, user_id: str):
         await handler()
     except WebSocketDisconnect:
         logger.info("Disconnected from {}", player)
-    await world.handle_player_disconnected(player)
+    await world.message_component.handle_player_disconnected(player)

@@ -1,14 +1,15 @@
 from functools import lru_cache
 from math import cos, sin
 from uuid import uuid4
-from loguru import logger
+
 import pymunk
-from nk.models import WorldComponentProvider
+from loguru import logger
 from nk_shared import builders
 from nk_shared.models.attack_profile import AttackProfile
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
 
+from nk.models import WorldComponentProvider
 from nk.settings import DATA_ROOT
 
 
