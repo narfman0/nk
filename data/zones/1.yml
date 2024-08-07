@@ -8,3 +8,7 @@ enemy_groups:
     count: 5
     center_x: 16
     center_y: 12
+environment_features:
+  - environment_type_str: factory_sm
+    center_x: 40
+    center_y: 20

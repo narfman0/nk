@@ -69,6 +69,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
 
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
+        self.map_renderables.extend(list(self.generate_environment_renderables()))
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -195,6 +196,20 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
 
         for character_struct in self.character_structs:
             character_struct.sprite_group.update(dt)
+
+    def generate_environment_renderables(self):
+        for environment in self.world.zone.environment_features:
+            path = f"../data/environment/{environment.environment_type_str}.png"
+            blit_image = pygame.image.load(path).convert_alpha()
+            if blit_image:
+                blit_x, blit_y = self.calculate_draw_coordinates(
+                    environment.center_x, environment.center_y, blit_image
+                )
+                yield MapRenderable(
+                    layer=self.world.map.get_1f_layer_id(),
+                    blit_image=blit_image,
+                    blit_coords=(blit_x, blit_y),
+                )
 
     def generate_map_renderables(self, ground: bool):
         """We can statically generate the blit coords once in the beginning,
