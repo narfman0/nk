@@ -1,8 +1,15 @@
+from functools import lru_cache
+from math import cos, sin
+from uuid import uuid4
 from loguru import logger
+import pymunk
 from nk.models import WorldComponentProvider
 from nk_shared import builders
+from nk_shared.models.attack_profile import AttackProfile
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
+
+from nk.settings import DATA_ROOT
 
 
 class ProjectileComponent:
@@ -32,3 +39,26 @@ class ProjectileComponent:
                 msg = builders.build_projectile_destroyed(projectile.uuid)
                 self.world.broadcast(msg)
                 logger.debug("Projectile destroyed: {}", projectile.uuid)
+
+    def create_projectile(self, character: Character):
+        attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
+        speed = pymunk.Vec2d(
+            cos(character.attack_direction), sin(character.attack_direction)
+        ).scale_to_length(attack_profile.speed)
+        projectile = Projectile(
+            x=character.position.x + attack_profile.emitter_offset_x,
+            y=character.position.y + attack_profile.emitter_offset_y,
+            dx=speed.x,
+            dy=speed.y,
+            origin=character,
+            attack_profile=attack_profile,
+            attack_profile_name=attack_profile.name,
+            uuid=str(uuid4()),
+        )
+        self.projectiles.append(projectile)
+        return projectile
+
+    @lru_cache
+    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
+        path = f"{DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
+        return AttackProfile.from_yaml_file(path)

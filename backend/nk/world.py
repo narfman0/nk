@@ -1,17 +1,12 @@
 """Simulates the world's characters"""
 
-from functools import lru_cache
-from math import cos, sin
-from os import environ
-from uuid import uuid4
-
 import pymunk
 from betterproto import serialized_on_wire
 from loguru import logger
 from nk.projectile_component import ProjectileComponent
 from nk_shared import builders
 from nk_shared.map import Map
-from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
+from nk_shared.models import AttackProfile, AttackType, Character, Zone
 from nk_shared.proto import (
     CharacterAttacked,
     CharacterUpdated,
@@ -24,9 +19,8 @@ from nk_shared.proto import (
 
 from nk.ai_component import AiComponent
 from nk.db import Character as DBCharacter
-from nk.models import Enemy, Player, WorldComponentProvider
-
-DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
+from nk.models import Player, WorldComponentProvider
+from nk.settings import DATA_ROOT
 
 
 class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attributes
@@ -70,24 +64,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 )
 
     def process_ranged_attack(self, character: Character):
-        attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
-        # speed = direction_util.to_vector(character.facing_direction).scale_to_length(
-        #     attack_profile.speed
-        # )
-        speed = pymunk.Vec2d(
-            cos(character.attack_direction), sin(character.attack_direction)
-        ).scale_to_length(attack_profile.speed)
-        projectile = Projectile(
-            x=character.position.x + attack_profile.emitter_offset_x,
-            y=character.position.y + attack_profile.emitter_offset_y,
-            dx=speed.x,
-            dy=speed.y,
-            origin=character,
-            attack_profile=attack_profile,
-            attack_profile_name=attack_profile.name,
-            uuid=str(uuid4()),
-        )
-        self.projectile_component.projectiles.append(projectile)
+        projectile = self.projectile_component.create_projectile(character)
         self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
@@ -192,11 +169,6 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     @property
     def space(self) -> pymunk.Space:
         return self._space
-
-    @lru_cache
-    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
-        path = f"{DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
-        return AttackProfile.from_yaml_file(path)
 
 
 # Locally, this is the world directly. When deployed, this might be a handle to
