@@ -1,38 +1,34 @@
 """Simulates the world's characters"""
 
-import random
 from functools import lru_cache
-from math import atan2, cos, sin
+from math import cos, sin
 from os import environ
 from uuid import uuid4
 
-from betterproto import serialized_on_wire
 import pymunk
+from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared import builders
-from nk.db import Character as DBCharacter
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
 from nk_shared.proto import (
     CharacterAttacked,
-    CharacterType,
     CharacterUpdated,
     Direction,
     Message,
-    PlayerJoinResponse,
     PlayerJoined,
+    PlayerJoinResponse,
     PlayerLeft,
 )
-from nk_shared.util import direction_util
 
+from nk.ai_component import AiComponent
 from nk.db import Character as DBCharacter
-from nk.models import Enemy, Player
+from nk.models import Enemy, Player, WorldComponentProvider
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
-UPDATE_FREQUENCY = 0.1
 
 
-class World:  # pylint: disable=too-many-instance-attributes
+class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attributes
     """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):
@@ -44,18 +40,10 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.map.add_map_geometry_to_space(self.space)
         self.players: list[Player] = []
         self.enemies: list[Enemy] = []
-        for enemy_group in self.zone.enemy_groups:
-            r = 1 + enemy_group.count // 2  # randomize where group is centered
-            for _ in range(enemy_group.count):
-                self.spawn_enemy(
-                    enemy_group.character_type,
-                    enemy_group.center_x + random.randint(-r, r),
-                    enemy_group.center_y + random.randint(-r, r),
-                )
-        self.next_update_time = 0
+        self.ai_component = AiComponent(self, self.zone)
 
     def update(self, dt: float):
-        self.update_ai(dt)
+        self.ai_component.update(dt)
         self.update_characters(dt, self.players, self.enemies)
         self.update_characters(dt, self.enemies, self.players)
         self.update_projectiles(dt)
@@ -133,32 +121,6 @@ class World:  # pylint: disable=too-many-instance-attributes
                 target.handle_damage_received(damage)
                 self.broadcast(builders.build_character_damaged(target, damage))
 
-    def update_ai(self, dt: float):
-        """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
-        self.next_update_time -= dt
-        if self.next_update_time <= 0:
-            self.next_update_time = UPDATE_FREQUENCY
-            for enemy in self.enemies:
-                if not enemy.alive:
-                    continue
-                enemy.moving_direction = None
-                player = self.closest_player(enemy.position.x, enemy.position.y)
-                if not player:
-                    continue
-                player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
-                if player_dst_sqrd < enemy.chase_distance**2:
-                    enemy.moving_direction = direction_util.direction_to(
-                        enemy.position, player.position
-                    )
-                if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
-                    direction = atan2(
-                        player.position.y - enemy.position.y,
-                        player.position.x - enemy.position.x,
-                    )
-                    enemy.attack(direction)
-                    self.broadcast(builders.build_character_attacked(enemy, direction))
-                self.broadcast(builders.build_character_updated(enemy))
-
     def handle_character_attacked(self, details: CharacterAttacked):
         """Call character attack, does nothing if character does not exist"""
         character = self.get_character_by_uuid(details.uuid)
@@ -178,6 +140,11 @@ class World:  # pylint: disable=too-many-instance-attributes
         character.facing_direction = Direction(details.facing_direction)
         character.body.velocity = (details.dx, details.dy)
 
+    def handle_character_created(self, character: Character):
+        """Called from ai component to create characters"""
+        self.space.add(character.body, character.shape, character.hitbox_shape)
+        self.enemies.append(character)
+
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         for character in self.players + self.enemies:
             if character.uuid == uuid:
@@ -196,20 +163,6 @@ class World:  # pylint: disable=too-many-instance-attributes
                     closest = player
                     min_dst = dst
         return closest
-
-    def spawn_enemy(
-        self, character_type: CharacterType, center_x: int, center_y: int
-    ) -> Enemy:
-        character = Enemy(
-            character_type=character_type,
-            center_y=center_y,
-            center_x=center_x,
-            start_x=center_x,
-            start_y=center_y,
-        )
-        self.space.add(character.body, character.shape, character.hitbox_shape)
-        self.enemies.append(character)
-        return character
 
     async def spawn_player(self, player: Player) -> Player:
         """Player 'is' a Character, which i don't love, but its already
@@ -256,7 +209,7 @@ class World:  # pylint: disable=too-many-instance-attributes
             self.handle_character_updated(msg.character_updated)
             self.broadcast(msg, player)
 
-    def broadcast(self, message: Message, origin: Player | None = None):
+    def broadcast(self, message: Message, origin: Player | None = None) -> None:
         for player in self.players:
             if player != origin:
                 player.messages.put_nowait(message)

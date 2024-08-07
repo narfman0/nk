@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from asyncio import Queue
 from dataclasses import dataclass, field
 
@@ -23,3 +24,17 @@ class Enemy(Character):
 
     center_x: int = None
     center_y: int = None
+
+
+class WorldComponentProvider(ABC):
+    @abstractmethod
+    def handle_character_created(self, character: Character):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def closest_player(self, x: float, y: float) -> Player | None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def broadcast(self, message: Message, origin: Player | None = None) -> None:
+        raise NotImplementedError()
