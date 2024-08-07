@@ -58,7 +58,7 @@ class MessageComponent:
         else:
             await DBCharacter(user_id=player.uuid, x=x, y=y).insert()
         logger.info("Successfully saved player post-logout")
-        self.world.get_players().remove(player)
+        self.world.players.remove(player)
 
     async def handle_player_join_request(self, player: Player):
         """A player has joined. Handle initialization."""
@@ -78,8 +78,8 @@ class MessageComponent:
         if character:
             x, y = character.x, character.y
         else:
-            x, y = self.world.get_start_tile()
+            x, y = self.world.map.get_start_tile()
         player.body.position = (x, y)
         self.world.space.add(player.body, player.shape, player.hitbox_shape)
-        self.world.get_players().append(player)
+        self.world.players.append(player)
         return player

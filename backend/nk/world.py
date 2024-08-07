@@ -21,17 +21,17 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self.attack_profiles: dict[str, AttackProfile] = {}
         self._space = pymunk.Space()
         self.zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
-        self.map = Map(self.zone.tmx_path, pygame=False)
-        self.map.add_map_geometry_to_space(self._space)
-        self.players: list[Player] = []
+        self._map = Map(self.zone.tmx_path, pygame=False)
+        self._map.add_map_geometry_to_space(self._space)
+        self._players: list[Player] = []
         self.ai_component = AiComponent(self, self.zone)
         self.projectile_component = ProjectileComponent(self)
         self.message_component = MessageComponent(self)
 
     def update(self, dt: float):
         self.ai_component.update(dt)
-        self.update_characters(dt, self.players, self.ai_component.enemies)
-        self.update_characters(dt, self.ai_component.enemies, self.players)
+        self.update_characters(dt, self._players, self.ai_component.enemies)
+        self.update_characters(dt, self.ai_component.enemies, self._players)
         self.projectile_component.update(dt)
         self._space.step(dt)
 
@@ -71,7 +71,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 self.broadcast(builders.build_character_damaged(target, damage))
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        for character in self.players + self.ai_component.enemies:
+        for character in self._players + self.ai_component.enemies:
             if character.uuid == uuid:
                 return character
         return None
@@ -79,16 +79,18 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     async def handle_message(self, player: Player, msg: Message):
         await self.message_component.handle_message(player, msg)
 
-    def get_start_tile(self) -> tuple[int, int]:
-        return self.map.get_start_tile()
-
-    def get_players(self) -> list[Player]:
-        return self.players
-
     def broadcast(self, message: Message, origin: Player | None = None) -> None:
-        for player in self.players:
+        for player in self._players:
             if player != origin:
                 player.messages.put_nowait(message)
+
+    @property
+    def map(self) -> Map:
+        return self._map
+
+    @property
+    def players(self) -> list[Player]:
+        return self._players
 
     @property
     def space(self) -> pymunk.Space:

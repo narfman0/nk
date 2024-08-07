@@ -3,6 +3,7 @@ from asyncio import Queue
 from dataclasses import dataclass, field
 
 import pymunk
+from nk_shared.map import Map
 from nk_shared.models import Character
 from nk_shared.proto import Message
 
@@ -36,12 +37,14 @@ class WorldComponentProvider(ABC):
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         raise NotImplementedError()
 
+    @property
     @abstractmethod
-    def get_start_tile(self) -> tuple[int, int]:
+    def players(self) -> list[Player]:
         raise NotImplementedError()
 
+    @property
     @abstractmethod
-    def get_players(self) -> list[Player]:
+    def map(self) -> Map:
         raise NotImplementedError()
 
     @property

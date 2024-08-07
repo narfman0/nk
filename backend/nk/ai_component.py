@@ -60,7 +60,7 @@ class AiComponent:
         Long term, should considering splitting world into zone/chunks, but
         this is a scan currently."""
         closest, min_dst = None, float("inf")
-        for player in self.world.get_players():
+        for player in self.world.players:
             if player.alive:
                 dst = player.position.get_dist_sqrd((x, y))
                 if dst < min_dst:
