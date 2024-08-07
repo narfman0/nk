@@ -29,10 +29,6 @@ class Enemy(Character):
 
 class WorldComponentProvider(ABC):
     @abstractmethod
-    def closest_player(self, x: float, y: float) -> Player | None:
-        raise NotImplementedError()
-
-    @abstractmethod
     def broadcast(self, message: Message, origin: Player | None = None) -> None:
         raise NotImplementedError()
 

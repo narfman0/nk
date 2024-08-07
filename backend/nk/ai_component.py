@@ -6,7 +6,7 @@ from nk_shared.models.zone import Zone
 from nk_shared.proto import CharacterType
 from nk_shared.util import direction_util
 
-from nk.models import Enemy, WorldComponentProvider
+from nk.models import Enemy, Player, WorldComponentProvider
 
 UPDATE_FREQUENCY = 0.1
 
@@ -36,7 +36,7 @@ class AiComponent:
                 if not enemy.alive:
                     continue
                 enemy.moving_direction = None
-                player = self.world.closest_player(enemy.position.x, enemy.position.y)
+                player = self.closest_player(enemy.position.x, enemy.position.y)
                 if not player:
                     continue
                 player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
@@ -54,6 +54,19 @@ class AiComponent:
                         builders.build_character_attacked(enemy, direction)
                     )
                 self.world.broadcast(builders.build_character_updated(enemy))
+
+    def closest_player(self, x: float, y: float) -> Player | None:
+        """Retrieve the closest player to the given x,y pair.
+        Long term, should considering splitting world into zone/chunks, but
+        this is a scan currently."""
+        closest, min_dst = None, float("inf")
+        for player in self.world.get_players():
+            if player.alive:
+                dst = player.position.get_dist_sqrd((x, y))
+                if dst < min_dst:
+                    closest = player
+                    min_dst = dst
+        return closest
 
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int

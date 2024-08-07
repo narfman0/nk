@@ -76,19 +76,6 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 return character
         return None
 
-    def closest_player(self, x: float, y: float) -> Player | None:
-        """Retrieve the closest player to the given x,y pair.
-        Long term, should considering splitting world into zone/chunks, but
-        this is a scan currently."""
-        closest, min_dst = None, float("inf")
-        for player in self.players:
-            if player.alive:
-                dst = player.position.get_dist_sqrd((x, y))
-                if dst < min_dst:
-                    closest = player
-                    min_dst = dst
-        return closest
-
     async def handle_message(self, player: Player, msg: Message):
         await self.message_component.handle_message(player, msg)
 
