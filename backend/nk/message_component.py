@@ -49,19 +49,6 @@ class MessageComponent:
         character.facing_direction = Direction(details.facing_direction)
         character.body.velocity = (details.dx, details.dy)
 
-    async def spawn_player(self, player: Player) -> Player:
-        """Player 'is' a Character, which i don't love, but its already
-        created. Update relevant attrs."""
-        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
-        if character:
-            x, y = character.x, character.y
-        else:
-            x, y = self.world.get_start_tile()
-        player.body.position = (x, y)
-        self.world.space.add(player.body, player.shape, player.hitbox_shape)
-        self.world.get_players().append(player)
-        return player
-
     async def handle_player_disconnected(self, player: Player):
         self.world.broadcast(Message(player_left=PlayerLeft(uuid=player.uuid)), player)
         x, y = player.position.x, player.position.y  # pylint: disable=no-member
@@ -83,3 +70,16 @@ class MessageComponent:
         self.world.broadcast(
             Message(player_joined=PlayerJoined(uuid=player.uuid)), player
         )
+
+    async def spawn_player(self, player: Player) -> Player:
+        """Player 'is' a Character, which i don't love, but its already
+        created. Update relevant attrs."""
+        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
+        if character:
+            x, y = character.x, character.y
+        else:
+            x, y = self.world.get_start_tile()
+        player.body.position = (x, y)
+        self.world.space.add(player.body, player.shape, player.hitbox_shape)
+        self.world.get_players().append(player)
+        return player
