@@ -18,21 +18,20 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):
-        self.attack_profiles: dict[str, AttackProfile] = {}
         self._space = pymunk.Space()
-        self.zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
-        self._map = Map(self.zone.tmx_path, pygame=False)
+        self._zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
+        self._map = Map(self._zone.tmx_path, pygame=False)
         self._map.add_map_geometry_to_space(self._space)
         self._players: list[Player] = []
-        self.ai_component = AiComponent(self, self.zone)
-        self.projectile_component = ProjectileComponent(self)
-        self.message_component = MessageComponent(self)
+        self._ai_component = AiComponent(self, self._zone)
+        self._projectile_component = ProjectileComponent(self)
+        self._message_component = MessageComponent(self)
 
     def update(self, dt: float):
-        self.ai_component.update(dt)
-        self.update_characters(dt, self._players, self.ai_component.enemies)
-        self.update_characters(dt, self.ai_component.enemies, self._players)
-        self.projectile_component.update(dt)
+        self._ai_component.update(dt)
+        self.update_characters(dt, self._players, self._ai_component.enemies)
+        self.update_characters(dt, self._ai_component.enemies, self._players)
+        self._projectile_component.update(dt)
         self._space.step(dt)
 
     def update_characters(
@@ -56,7 +55,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 )
 
     def process_ranged_attack(self, character: Character):
-        projectile = self.projectile_component.create_projectile(character)
+        projectile = self._projectile_component.create_projectile(character)
         self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
@@ -71,18 +70,21 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 self.broadcast(builders.build_character_damaged(target, damage))
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        for character in self._players + self.ai_component.enemies:
+        for character in self._players + self._ai_component.enemies:
             if character.uuid == uuid:
                 return character
         return None
 
     async def handle_message(self, player: Player, msg: Message):
-        await self.message_component.handle_message(player, msg)
+        await self._message_component.handle_message(player, msg)
 
     def broadcast(self, message: Message, origin: Player | None = None) -> None:
         for player in self._players:
             if player != origin:
                 player.messages.put_nowait(message)
+
+    def handle_player_disconnected(self, player: Player):
+        self._message_component.handle_player_disconnected(player)
 
     @property
     def map(self) -> Map:
