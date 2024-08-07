@@ -83,8 +83,8 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
             if player != origin:
                 player.messages.put_nowait(message)
 
-    def handle_player_disconnected(self, player: Player):
-        self._message_component.handle_player_disconnected(player)
+    async def handle_player_disconnected(self, player: Player):
+        await self._message_component.handle_player_disconnected(player)
 
     @property
     def map(self) -> Map:
