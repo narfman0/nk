@@ -66,5 +66,5 @@ class AiComponent:
             start_y=center_y,
         )
         self.enemies.append(character)
-        self.world.handle_character_created(character)
+        self.world.space.add(character.body, character.shape, character.hitbox_shape)
         return character

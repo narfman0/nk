@@ -8,6 +8,7 @@ from uuid import uuid4
 import pymunk
 from betterproto import serialized_on_wire
 from loguru import logger
+from nk.projectile_component import ProjectileComponent
 from nk_shared import builders
 from nk_shared.map import Map
 from nk_shared.models import AttackProfile, AttackType, Character, Projectile, Zone
@@ -32,22 +33,21 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):
-        self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
-        self.space = pymunk.Space()
+        self._space = pymunk.Space()
         self.zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
         self.map = Map(self.zone.tmx_path, pygame=False)
-        self.map.add_map_geometry_to_space(self.space)
+        self.map.add_map_geometry_to_space(self._space)
         self.players: list[Player] = []
-        self.enemies: list[Enemy] = []
         self.ai_component = AiComponent(self, self.zone)
+        self.projectile_component = ProjectileComponent(self)
 
     def update(self, dt: float):
         self.ai_component.update(dt)
-        self.update_characters(dt, self.players, self.enemies)
-        self.update_characters(dt, self.enemies, self.players)
-        self.update_projectiles(dt)
-        self.space.step(dt)
+        self.update_characters(dt, self.players, self.ai_component.enemies)
+        self.update_characters(dt, self.ai_component.enemies, self.players)
+        self.projectile_component.update(dt)
+        self._space.step(dt)
 
     def update_characters(
         self,
@@ -65,29 +65,9 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                     self.process_ranged_attack(character)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
-                self.space.remove(
+                self._space.remove(
                     character.body, character.shape, character.hitbox_shape
                 )
-
-    def update_projectiles(self, dt: float):
-        for projectile in self.projectiles:
-            projectile.update(dt)
-            should_remove = False
-            for query_info in self.space.shape_query(projectile.shape):
-                if hasattr(query_info.shape.body, "character"):
-                    character: Character = query_info.shape.body.character
-                    # i guess there's friendly fire for now :D
-                    if projectile.origin != character:
-                        dmg = 1
-                        character.handle_damage_received(dmg)
-                        self.broadcast(builders.build_character_damaged(character, dmg))
-                        should_remove = True
-                else:
-                    should_remove = True
-            if should_remove:
-                self.projectiles.remove(projectile)
-                self.broadcast(builders.build_projectile_destroyed(projectile.uuid))
-                logger.debug("Projectile destroyed: {}", projectile.uuid)
 
     def process_ranged_attack(self, character: Character):
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
@@ -107,7 +87,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
             attack_profile_name=attack_profile.name,
             uuid=str(uuid4()),
         )
-        self.projectiles.append(projectile)
+        self.projectile_component.projectiles.append(projectile)
         self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
@@ -140,13 +120,8 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         character.facing_direction = Direction(details.facing_direction)
         character.body.velocity = (details.dx, details.dy)
 
-    def handle_character_created(self, character: Character):
-        """Called from ai component to create characters"""
-        self.space.add(character.body, character.shape, character.hitbox_shape)
-        self.enemies.append(character)
-
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        for character in self.players + self.enemies:
+        for character in self.players + self.ai_component.enemies:
             if character.uuid == uuid:
                 return character
         return None
@@ -173,7 +148,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         else:
             x, y = world.map.get_start_tile()
         player.body.position = (x, y)
-        self.space.add(player.body, player.shape, player.hitbox_shape)
+        self._space.add(player.body, player.shape, player.hitbox_shape)
         self.players.append(player)
         return player
 
@@ -213,6 +188,10 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         for player in self.players:
             if player != origin:
                 player.messages.put_nowait(message)
+
+    @property
+    def space(self) -> pymunk.Space:
+        return self._space
 
     @lru_cache
     def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:

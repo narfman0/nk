@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from asyncio import Queue
 from dataclasses import dataclass, field
 
+import pymunk
+
 from nk_shared.models import Character
 from nk_shared.proto import Message
 
@@ -28,13 +30,14 @@ class Enemy(Character):
 
 class WorldComponentProvider(ABC):
     @abstractmethod
-    def handle_character_created(self, character: Character):
-        raise NotImplementedError()
-
-    @abstractmethod
     def closest_player(self, x: float, y: float) -> Player | None:
         raise NotImplementedError()
 
     @abstractmethod
     def broadcast(self, message: Message, origin: Player | None = None) -> None:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def space(self) -> pymunk.Space:
         raise NotImplementedError()
