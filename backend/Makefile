@@ -17,3 +17,6 @@ docker-build:
 
 docker-deploy: docker-build
 	docker push narfman0/nk-backend-docker
+
+test:
+	pytest --cov=nk --cov-report term-missing tests/
