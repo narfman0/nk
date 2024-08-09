@@ -20,26 +20,28 @@ class ProjectileComponent:
         self.projectiles: list[Projectile] = []
 
     def update(self, dt: float):
-        for projectile in self.projectiles:
+        for projectile in self.projectiles[:]:
             projectile.update(dt)
-            should_remove = False
-            for query_info in self.world.space.shape_query(projectile.shape):
-                if hasattr(query_info.shape.body, "character"):
-                    character: Character = query_info.shape.body.character
-                    # i guess there's friendly fire for now :D
-                    if projectile.origin != character:
-                        dmg = 1
-                        character.handle_damage_received(dmg)
-                        msg = builders.build_character_damaged(character, dmg)
-                        self.world.broadcast(msg)
-                        should_remove = True
-                else:
-                    should_remove = True
-            if should_remove:
+            if self.handle_projectile_collisions(projectile):
                 self.projectiles.remove(projectile)
                 msg = builders.build_projectile_destroyed(projectile.uuid)
                 self.world.broadcast(msg)
                 logger.debug("Projectile destroyed: {}", projectile.uuid)
+
+    def handle_projectile_collisions(self, projectile: Projectile) -> bool:
+        """Handle collisions for a single projectile."""
+        for query_info in self.world.space.shape_query(projectile.shape):
+            if hasattr(query_info.shape.body, "character"):
+                character: Character = query_info.shape.body.character
+                if projectile.origin != character:
+                    dmg = 1
+                    character.handle_damage_received(dmg)
+                    msg = builders.build_character_damaged(character, dmg)
+                    self.world.broadcast(msg)
+                    return True
+            else:
+                return True
+        return False
 
     def create_projectile(self, character: Character):
         attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
