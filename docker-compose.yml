@@ -45,10 +45,20 @@ services:
       MONGODB_HOST: ${MONGODB_HOST:-mongo}
       UVICORN_RELOAD: ${UVICORN_RELOAD:-true}
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend.Dockerfile
     ports:
       - 7666:7666
-    volumes:
-      - ./backend:/app
-      - ./data:/data
-      - ./shared/nk_shared:/app/nk_shared
+    develop:
+      watch:
+        - path: ./backend/requirements.txt
+          action: rebuild
+        - path: ./shared/nk_shared
+          action: sync
+          target: /app/nk_shared
+        - path: ./backend/nk
+          action: sync
+          target: /app/nk
+        - path: ./data
+          action: sync
+          target: /data
