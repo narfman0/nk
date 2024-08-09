@@ -36,6 +36,7 @@ class Ai:
         for enemy in self.enemies:
             if enemy.alive:
                 self.update_enemy_behavior(enemy)
+                self.world.broadcast(builders.build_character_updated(enemy))
 
     def update_enemy_behavior(self, enemy: Enemy):
         """Update behavior for a single enemy."""
