@@ -12,3 +12,7 @@ environment_features:
   - environment_type_str: factory_sm
     center_x: 40
     center_y: 20
+    spawners:
+      - character_type_str: droid_assassin
+        offset_x: 0
+        offset_y: -1

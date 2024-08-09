@@ -1,7 +1,6 @@
 default: test
 
 clean: clean-build clean-pyc clean-installer
-c: clean
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -43,22 +42,13 @@ pyinstaller: clean
 	7z a nk.zip dist/*
 	7z rn nk.zip dist nk
 
-run-black:
-	black nk
+test:
+	pytest --cov=nk --cov-report term-missing -W ignore::DeprecationWarning tests/
 
-run-test:
-	pytest --cov=nk --cov-report term-missing tests/
-
-run-main:
+main:
 	python -m nk.main
 
-release: run-test release-test release-prod clean
+release: test clean pyinstaller
 
 headless:
 	python -m nk.headless
-
-b: run-black
-m: run-main
-main: init m
-t: run-test
-test: init-dev t
