@@ -1,8 +1,11 @@
+import heapq
 import random
+from dataclasses import dataclass
 from math import atan2
+from time import time
 
 from nk_shared import builders
-from nk_shared.models.zone import Zone
+from nk_shared.models.zone import Environment, Spawner, Zone
 from nk_shared.proto import CharacterType
 from nk_shared.util import direction_util
 
@@ -11,13 +14,33 @@ from nk.models import Enemy, Player, WorldComponentProvider
 UPDATE_FREQUENCY = 0.1
 
 
+@dataclass
+class SpawnerStruct:
+    spawner: Spawner
+    next_spawn_time_s: float
+    parent_feature: Environment
+
+    @property
+    def spawn_x(self) -> int:
+        return self.parent_feature.center_x + self.spawner.offset_x
+
+    @property
+    def spawn_y(self) -> int:
+        return self.parent_feature.center_y + self.spawner.offset_y
+
+
 class Ai:
 
     def __init__(self, world: WorldComponentProvider, zone: Zone):
         self.world = world
         self.zone = zone
         self.next_update_time = 0
+        self.current_time = 0
         self.enemies: list[Enemy] = []
+        self.init_spawners()
+        self.init_enemy_groups()
+
+    def init_enemy_groups(self):
         for enemy_group in self.zone.enemy_groups:
             r = 1 + enemy_group.count // 2  # randomize where group is centered
             for _ in range(enemy_group.count):
@@ -27,8 +50,25 @@ class Ai:
                     enemy_group.center_y + random.randint(-r, r),
                 )
 
+    def init_spawners(self):
+        """Initialize the spawners for the zone"""
+        self.spawners: list[SpawnerStruct] = []
+        for feature in self.zone.environment_features:
+            for spawner in feature.spawners:
+                next_spawn = spawner.spawn_frequency_s
+                self.spawners.append(
+                    SpawnerStruct(
+                        spawner=spawner,
+                        next_spawn_time_s=next_spawn,
+                        parent_feature=feature,
+                    )
+                )
+        heapq.heapify(self.spawners)
+
     def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
+        self.update_spawners(dt)
+
         self.next_update_time -= dt
         if self.next_update_time > 0:
             return
@@ -37,6 +77,18 @@ class Ai:
             if enemy.alive:
                 self.update_enemy_behavior(enemy)
                 self.world.broadcast(builders.build_character_updated(enemy))
+
+    def update_spawners(self, dt: float):
+        """Update the spawners to spawn enemies based on their next spawn time."""
+        self.current_time += dt
+        while self.spawners and self.spawners[0].next_spawn_time_s <= self.current_time:
+            spawn_str = heapq.heappop(self.spawners)
+            self.spawn_enemy(
+                spawn_str.spawner.character_type, spawn_str.spawn_x, spawn_str.spawn_y
+            )
+            next_spawn = self.current_time + spawn_str.spawner.spawn_frequency_s
+            spawn_str.next_spawn_time_s = next_spawn
+            heapq.heappush(self.spawners, spawn_str)
 
     def update_enemy_behavior(self, enemy: Enemy):
         """Update behavior for a single enemy."""
