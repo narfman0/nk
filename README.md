@@ -12,7 +12,7 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-* Enemy respawns+patrols
+* Enemy factories
 * Bigger map
 * Town + player respawn
 * Update sprites
