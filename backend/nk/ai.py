@@ -11,7 +11,7 @@ from nk.models import Enemy, Player, WorldComponentProvider
 UPDATE_FREQUENCY = 0.1
 
 
-class AiComponent:
+class Ai:
 
     def __init__(self, world: WorldComponentProvider, zone: Zone):
         self.world = world

@@ -13,7 +13,7 @@ from nk.models import WorldComponentProvider
 from nk.settings import DATA_ROOT
 
 
-class ProjectileComponent:
+class ProjectileManager:
 
     def __init__(self, world: WorldComponentProvider):
         self.world = world

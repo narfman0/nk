@@ -14,7 +14,7 @@ from nk.db import Character as DBCharacter
 from nk.models import Player, WorldComponentProvider
 
 
-class MessageComponent:
+class MessageBus:
     def __init__(self, world: WorldComponentProvider):
         self.world = world
 

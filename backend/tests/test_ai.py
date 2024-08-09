@@ -1,11 +1,11 @@
 from unittest.mock import Mock
 
 import pytest
-
-from nk.models import Player
-from nk.ai_component import AiComponent
-from nk.world import World
 from nk_shared.models.zone import EnemyGroup
+
+from nk.ai import Ai
+from nk.models import Player
+from nk.world import World
 
 
 @pytest.fixture
@@ -28,18 +28,18 @@ def world(player) -> World:
 
 
 @pytest.fixture
-def zone(single_enemy_enemy_group) -> AiComponent:
+def zone(single_enemy_enemy_group) -> Ai:
     return Mock(enemy_groups=[single_enemy_enemy_group], environment_features=[])
 
 
 @pytest.fixture
-def ai(world, zone) -> AiComponent:
-    return AiComponent(world, zone)
+def ai(world, zone) -> Ai:
+    return Ai(world, zone)
 
 
-class TestAiComponent:
-    def test_trivial_update(self, ai: AiComponent):
+class TestAi:
+    def test_trivial_update(self, ai: Ai):
         ai.update(0.016)
 
-    def test_closest_player(self, ai: AiComponent, player: Player):
+    def test_closest_player(self, ai: Ai, player: Player):
         assert ai.closest_player(0, 0) == player

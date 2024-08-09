@@ -7,10 +7,10 @@ from nk_shared.map import Map
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 
-from nk.ai_component import AiComponent
-from nk.message_component import MessageComponent
+from nk.ai import Ai
+from nk.message_bus import MessageBus
 from nk.models import Player, WorldComponentProvider
-from nk.projectile_component import ProjectileComponent
+from nk.projectile_manager import ProjectileManager
 from nk.settings import DATA_ROOT
 
 
@@ -23,9 +23,9 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._map = Map(self._zone.tmx_path, pygame=False)
         self._map.add_map_geometry_to_space(self._space)
         self._players: list[Player] = []
-        self._ai_component = AiComponent(self, self._zone)
-        self._projectile_component = ProjectileComponent(self)
-        self._message_component = MessageComponent(self)
+        self._ai_component = Ai(self, self._zone)
+        self._projectile_component = ProjectileManager(self)
+        self._message_component = MessageBus(self)
 
     def update(self, dt: float):
         self._ai_component.update(dt)
