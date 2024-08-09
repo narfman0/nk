@@ -15,4 +15,4 @@ environment_features:
     spawners:
       - character_type_str: droid_assassin
         offset_x: 0
-        offset_y: -1
+        offset_y: -5

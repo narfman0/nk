@@ -2,7 +2,7 @@ betterproto
 dataclass-wizard
 httpx
 loguru
-pygame
+pygame-ce
 pygame_gui
 pymunk
 pytmx
