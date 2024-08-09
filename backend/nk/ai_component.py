@@ -30,30 +30,37 @@ class AiComponent:
     def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
         self.next_update_time -= dt
-        if self.next_update_time <= 0:
-            self.next_update_time = UPDATE_FREQUENCY
-            for enemy in self.enemies:
-                if not enemy.alive:
-                    continue
-                enemy.moving_direction = None
-                player = self.closest_player(enemy.position.x, enemy.position.y)
-                if not player:
-                    continue
-                player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
-                if player_dst_sqrd < enemy.chase_distance**2:
-                    enemy.moving_direction = direction_util.direction_to(
-                        enemy.position, player.position
-                    )
-                if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
-                    direction = atan2(
-                        player.position.y - enemy.position.y,
-                        player.position.x - enemy.position.x,
-                    )
-                    enemy.attack(direction)
-                    self.world.broadcast(
-                        builders.build_character_attacked(enemy, direction)
-                    )
-                self.world.broadcast(builders.build_character_updated(enemy))
+        if self.next_update_time > 0:
+            return
+        self.next_update_time = UPDATE_FREQUENCY
+        for enemy in self.enemies:
+            if enemy.alive:
+                self.update_enemy_behavior(enemy)
+
+    def update_enemy_behavior(self, enemy: Enemy):
+        """Update behavior for a single enemy."""
+        enemy.moving_direction = None
+        player = self.closest_player(enemy.position.x, enemy.position.y)
+        if not player:
+            return
+
+        player_dst_sqrd = enemy.position.get_dist_sqrd(player.position)
+        if player_dst_sqrd < enemy.chase_distance**2:
+            enemy.moving_direction = direction_util.direction_to(
+                enemy.position, player.position
+            )
+
+        if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
+            self.enemy_attack(enemy, player)
+
+    def enemy_attack(self, enemy: Enemy, player: Player):
+        """Handle enemy attack behavior."""
+        direction = atan2(
+            player.position.y - enemy.position.y,
+            player.position.x - enemy.position.x,
+        )
+        enemy.attack(direction)
+        self.world.broadcast(builders.build_character_attacked(enemy, direction))
 
     def closest_player(self, x: float, y: float) -> Player | None:
         """Retrieve the closest player to the given x,y pair.
