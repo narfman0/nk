@@ -113,10 +113,10 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to %r", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
-            # TODO self.screen_scale = max(3, self.screen_scale - 1) # pylint: disable=fixme
+            self.screen_scale = max(3, self.screen_scale - 1)  # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.ZOOM_IN in player_actions:
-            # TODO self.screen_scale = min(6, self.screen_scale + 1) # pylint: disable=fixme
+            self.screen_scale = min(6, self.screen_scale + 1)  # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
 
     def draw(self, dest_surface: pygame.Surface):  # pylint: disable=arguments-renamed
@@ -260,6 +260,9 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.screen_height = HEIGHT // self.screen_scale
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
+        self.ground_renderables = list(self.generate_map_renderables(ground=True))
+        self.map_renderables = list(self.generate_map_renderables(ground=False))
+        self.map_renderables.extend(list(self.generate_environment_renderables()))
 
     def handle_character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)

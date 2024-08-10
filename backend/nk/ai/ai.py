@@ -33,7 +33,8 @@ class Ai(SpawnerProvider):
 
     def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
-        self.spawn_manager.update(dt)
+        if self.world.players:
+            self.spawn_manager.update(dt)
 
         self.next_update_time -= dt
         if self.next_update_time > 0:
