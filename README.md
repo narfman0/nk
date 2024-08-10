@@ -17,8 +17,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 * Town + player respawn
 * Update sprites
 * Sound effects
-* UI (health, ammo, death)
-* Zoom screen out?
 
 ### deferred
 
