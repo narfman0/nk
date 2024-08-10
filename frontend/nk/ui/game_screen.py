@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from math import atan2, pi
+from math import atan2
 
-import pygame_gui
 import pygame
 from loguru import logger
 from nk_shared import builders
@@ -14,6 +13,7 @@ from pygame.event import Event
 from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.character_sprite import CharacterSprite
+from nk.ui.game_gui import GameGui
 from nk.ui.input import (
     ActionEnum,
     read_input_player_actions,
@@ -71,7 +71,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
         self.map_renderables.extend(list(self.generate_environment_renderables()))
-        self.init_ui()
+        self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -94,7 +94,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         assert self.world.player.facing_direction is not None
         self.update_character_structs(dt)
         self.game_state.update()
-        self.manager.update(dt)
+        self.game_gui.update(dt)
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -151,28 +151,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         pygame.transform.scale_by(
             surface, dest_surface=dest_surface, factor=self.screen_scale
         )
-        self.draw_ui(dest_surface)
-
-    def init_ui(self):
-        self.manager = pygame_gui.UIManager((WIDTH, HEIGHT))
-        width_height = (256, 50)
-        left = 100
-        self._hp_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((left, 64), width_height),
-            text="",
-            manager=self.manager,
-        )
-        self._debug_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((left, 96), width_height),
-            text="",
-            manager=self.manager,
-        )
-
-    def draw_ui(self, surface: pygame.Surface):
-        self._hp_label.set_text(f"HP: {self.world.player.hp}")
-        x, y = self.world.player.position
-        self._debug_label.set_text(f"x,y: {int(x)},{int(y)}")
-        self.manager.draw_ui(surface)
+        self.game_gui.draw(self.world.player, dest_surface)
 
     def generate_projectile_renderables(self):
         for projectile in self.world.projectiles:
