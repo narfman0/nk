@@ -4,9 +4,9 @@ space squad-y multiplayer RPG!
 
 ## Getting Started
 
+* Start backend servers with `docker compose up -d`
 * Activate a venv and `pip install -r requirements.txt`
-* Start server by navigating to backend and run with `make`
-* Start frontend by navigating to frontend and running wth `make m`
+* Start frontend by navigating to `frontend/` and run wth `make m`
 
 Tweak your IDE/vs code run configurations to mirror that behavior :D
 
