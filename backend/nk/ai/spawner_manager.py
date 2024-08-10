@@ -1,14 +1,14 @@
-from abc import ABC, abstractmethod
 import heapq
+from abc import ABC, abstractmethod
 
-from nk.models import Enemy
+from nk_shared.models.zone import Environment
 from nk_shared.proto import CharacterType
 
 from nk.ai.models import SpawnerStruct
-from nk_shared.models.zone import Environment
+from nk.models import Enemy
 
 
-class SpawnerProvider(ABC):
+class SpawnerProvider(ABC):  # pylint: disable=too-few-public-methods
     @abstractmethod
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
@@ -16,7 +16,7 @@ class SpawnerProvider(ABC):
         raise NotImplementedError()
 
 
-class SpawnerManager:
+class SpawnerManager:  # pylint: disable=too-few-public-methods
     def __init__(
         self, provider: SpawnerProvider, environment_features: list[Environment]
     ):

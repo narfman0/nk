@@ -1,4 +1,3 @@
-import heapq
 import random
 from math import atan2
 
