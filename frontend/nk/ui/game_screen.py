@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from math import atan2, pi
 
+import pygame_gui
 import pygame
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.proto import Direction
 from nk_shared.util import direction_util
-from nk_shared.util.math import cartesian_to_isometric
+from nk_shared.util.math import cartesian_to_isometric, isometric_to_cartesian
 from pygame.event import Event
 
 from nk.game_state import GameState
@@ -70,6 +71,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.ground_renderables = list(self.generate_map_renderables(ground=True))
         self.map_renderables = list(self.generate_map_renderables(ground=False))
         self.map_renderables.extend(list(self.generate_environment_renderables()))
+        self.init_ui()
 
     def update(self, dt: float, events: list[Event]):
         player_actions = read_input_player_actions(events)
@@ -92,6 +94,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         assert self.world.player.facing_direction is not None
         self.update_character_structs(dt)
         self.game_state.update()
+        self.manager.update(dt)
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -99,8 +102,8 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 self.world.player.dash()
         if ActionEnum.ATTACK in player_actions:
             if self.world.player.alive and not self.world.player.attacking:
-                x, y = pygame.mouse.get_pos()
-                direction = atan2(y - HEIGHT // 2, x - WIDTH // 2) - pi / 4
+                wx, wy = self.calculate_world_coordinates(*pygame.mouse.get_pos())
+                direction = atan2(wy, wx)
                 self.world.player.attack(direction)
                 self.network.send(
                     builders.build_character_attacked(self.world.player, direction)
@@ -108,10 +111,10 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 self.player_struct.sprite.change_animation("attack")
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)
-            logger.info("Player now has %r hp", self.world.player.hp)
+            logger.info("Player now has {} hp", self.world.player.hp)
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible
-            logger.info("Player invincibility set to %r", self.world.player.invincible)
+            logger.info("Player invincibility set to {}", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
             self.screen_scale = max(3, self.screen_scale - 1)  # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
@@ -148,6 +151,28 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         pygame.transform.scale_by(
             surface, dest_surface=dest_surface, factor=self.screen_scale
         )
+        self.draw_ui(dest_surface)
+
+    def init_ui(self):
+        self.manager = pygame_gui.UIManager((WIDTH, HEIGHT))
+        width_height = (256, 50)
+        left = 100
+        self._hp_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((left, 64), width_height),
+            text="",
+            manager=self.manager,
+        )
+        self._debug_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((left, 96), width_height),
+            text="",
+            manager=self.manager,
+        )
+
+    def draw_ui(self, surface: pygame.Surface):
+        self._hp_label.set_text(f"HP: {self.world.player.hp}")
+        x, y = self.world.player.position
+        self._debug_label.set_text(f"x,y: {int(x)},{int(y)}")
+        self.manager.draw_ui(surface)
 
     def generate_projectile_renderables(self):
         for projectile in self.world.projectiles:
@@ -237,13 +262,24 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         x: float,
         y: float,
         image: pygame.Surface,
-    ):
+    ) -> tuple[float, float]:
         cartesian_x = x * self.world.map.tile_width // 2
         cartesian_y = y * self.world.map.tile_width // 2
         iso_x, iso_y = cartesian_to_isometric(cartesian_x, cartesian_y)
         x = iso_x + self.camera_offset_x - image.get_width() // 2
         y = iso_y + self.camera_offset_y - image.get_height() // 2
         return (x, y)
+
+    def calculate_world_coordinates(
+        self,
+        x: float,
+        y: float,
+    ) -> tuple[float, float]:
+        cam_x = x - self.camera_offset_x * self.screen_scale
+        cam_y = y - self.camera_offset_y * self.screen_scale
+        tx = cam_x / self.world.map.tile_width // 2
+        ty = cam_y / self.world.map.tile_width // 2
+        return isometric_to_cartesian(tx, ty)
 
     def update_player_sprite(self):
         sprite = CharacterSprite(self.world.player.character_type_short)

@@ -11,5 +11,4 @@ def cartesian_to_isometric(
 def isometric_to_cartesian(
     isometric_x: float, isometric_y: float
 ) -> tuple[float, float]:
-    cartesian_x = (isometric_x + isometric_y * 2) // 2
-    return cartesian_x, cartesian_x + isometric_x
+    return (2 * isometric_y + isometric_x) / 2, (2 * isometric_y - isometric_x) / 2
