@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import lru_cache
 from math import atan2
 
 import pygame
@@ -11,7 +12,7 @@ from nk_shared.util.math import cartesian_to_isometric, isometric_to_cartesian
 from pygame.event import Event
 
 from nk.game_state import GameState
-from nk.settings import HEIGHT, WIDTH
+from nk.settings import HEIGHT, NK_DATA_ROOT, WIDTH
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.game_gui import GameGui
 from nk.ui.input import (
@@ -48,7 +49,6 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
-        self.projectile_image_dict = {}
         self.cam_x, self.cam_y = 0, 0
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
@@ -153,23 +153,6 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         )
         self.game_gui.draw(self.world.player, dest_surface)
 
-    def generate_projectile_renderables(self):
-        for projectile in self.world.projectiles:
-            image = self.projectile_image_dict.get(projectile.attack_profile.image_path)
-            if image is None:
-                path = f"../data/projectiles/{projectile.attack_profile.image_path}.png"
-                image = pygame.image.load(path).convert_alpha()
-                self.projectile_image_dict[projectile.attack_profile.image_path] = image
-            blit_x, blit_y = self.calculate_draw_coordinates(
-                projectile.x, projectile.y, image
-            )
-            bottom_y = blit_y - self.cam_y + image.get_height()
-            yield BlittableRenderable(
-                renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y),
-                image,
-                (blit_x - self.cam_x, blit_y - self.cam_y),
-            )
-
     def update_character_structs(self, dt: float):
         for character_struct in self.character_structs:
             character = character_struct.character
@@ -201,9 +184,22 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         for character_struct in self.character_structs:
             character_struct.sprite_group.update(dt)
 
+    def generate_projectile_renderables(self):
+        for projectile in self.world.projectiles:
+            image = load_projectile_image(projectile.attack_profile.image_path)
+            blit_x, blit_y = self.calculate_draw_coordinates(
+                projectile.x, projectile.y, image
+            )
+            bottom_y = blit_y - self.cam_y + image.get_height()
+            yield BlittableRenderable(
+                renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y),
+                image,
+                (blit_x - self.cam_x, blit_y - self.cam_y),
+            )
+
     def generate_environment_renderables(self):
         for environment in self.world.zone.environment_features:
-            path = f"../data/environment/{environment.environment_type_str}.png"
+            path = f"{NK_DATA_ROOT}/environment/{environment.environment_type_str}.png"
             blit_image = pygame.image.load(path).convert_alpha()
             if blit_image:
                 blit_x, blit_y = self.calculate_draw_coordinates(
@@ -290,3 +286,9 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
             if cstruct.character == character:
                 cstruct.sprite.change_animation("attack")
                 return
+
+
+@lru_cache
+def load_projectile_image(image_path: str):
+    path = f"{NK_DATA_ROOT}/projectiles/{image_path}.png"
+    return pygame.image.load(path).convert_alpha()

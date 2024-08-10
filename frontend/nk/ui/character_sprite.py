@@ -4,6 +4,8 @@ import yaml
 from nk_shared.proto import Direction
 from pygame.sprite import Sprite
 
+from nk.settings import NK_DATA_ROOT
+
 
 class CharacterSprite(Sprite):  # pylint: disable=too-many-instance-attributes
     FRAME_DURATION = 0.1
@@ -20,7 +22,7 @@ class CharacterSprite(Sprite):  # pylint: disable=too-many-instance-attributes
         self.direction = Direction.DIRECTION_S
         self.current_frame_time_remaining = self.FRAME_DURATION
 
-        with open(f"../data/characters/{sprite_name}/animations.yml") as f:
+        with open(f"{NK_DATA_ROOT}/characters/{sprite_name}/animations.yml") as f:
             animations_yml = yaml.safe_load(f)
 
         path_to_nonflipped_image: dict[str, pygame.Surface] = {}
@@ -32,7 +34,9 @@ class CharacterSprite(Sprite):  # pylint: disable=too-many-instance-attributes
                 direction = Direction[f"DIRECTION_{direction_str}"]
                 animation_direction_images = []
                 for image_path in animation_struct["images"]:
-                    path = f"../data/characters/{sprite_name}/images/{image_path}"
+                    path = (
+                        f"{NK_DATA_ROOT}/characters/{sprite_name}/images/{image_path}"
+                    )
                     flipped = animation_struct.get("flipped")
                     if flipped:
                         path_image_map = path_to_flipped_image

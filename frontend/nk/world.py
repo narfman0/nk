@@ -8,13 +8,15 @@ from nk_shared.proto import CharacterType, Direction
 from nk_shared.proto import Projectile as ProjectileProto
 from typing_extensions import Unpack
 
+from nk.settings import NK_DATA_ROOT
+
 
 class World:  # pylint: disable=too-many-instance-attributes
     def __init__(self, uuid: str, x: float, y: float, zone_name="1"):
         self.projectiles: list[Projectile] = []
         self.attack_profiles: dict[str, AttackProfile] = {}
         self.space = pymunk.Space()
-        self.zone = Zone.from_yaml_file(f"../data/zones/{zone_name}.yml")
+        self.zone = Zone.from_yaml_file(f"{NK_DATA_ROOT}/zones/{zone_name}.yml")
         self.map = Map(self.zone.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
 
@@ -89,7 +91,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         return None
 
     def create_projectile(self, proto: ProjectileProto):
-        attack_profile = self.get_attack_profile_by_name(proto.attack_profile_name)
+        attack_profile = load_attack_profile_by_name(proto.attack_profile_name)
         self.projectiles.append(
             Projectile(
                 uuid=proto.uuid,
@@ -108,7 +110,8 @@ class World:  # pylint: disable=too-many-instance-attributes
                 return projectile
         return None
 
-    @lru_cache
-    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
-        path = f"../data/attack_profiles/{attack_profile_name}.yml"
-        return AttackProfile.from_yaml_file(path)
+
+@lru_cache
+def load_attack_profile_by_name(attack_profile_name: str) -> AttackProfile:
+    path = f"{NK_DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
+    return AttackProfile.from_yaml_file(path)
