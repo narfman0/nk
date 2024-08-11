@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 from nk_shared.models.character import Character
 
-from nk.settings import HEIGHT, WIDTH, NK_DATA_ROOT
+from nk.settings import HEIGHT, NK_DATA_ROOT, WIDTH
 
 
 class GameGui:

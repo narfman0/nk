@@ -199,7 +199,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
 
     def generate_environment_renderables(self):
         for environment in self.world.zone.environment_features:
-            path = f"{NK_DATA_ROOT}/environment/{environment.environment_type_str}.png"
+            path = f"{NK_DATA_ROOT}/environment/{environment.image_path}.png"
             blit_image = pygame.image.load(path).convert_alpha()
             if blit_image:
                 blit_x, blit_y = self.calculate_draw_coordinates(

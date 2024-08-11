@@ -1,7 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from dataclass_wizard import YAMLWizard
 
-from nk_shared.proto import CharacterType, EnvironmentType
+from nk_shared.proto import CharacterType
 
 
 @dataclass
@@ -30,14 +30,10 @@ class EnemyGroup:
 
 @dataclass
 class Environment:
-    environment_type_str: str
+    image_path: str
     center_x: int
     center_y: int
-    spawners: list[Spawner]
-
-    @property
-    def environment_type(self) -> EnvironmentType:
-        return EnvironmentType[f"ENVIRONMENT_TYPE_{self.environment_type_str.upper()}"]
+    spawners: list[Spawner] = field(default_factory=list)
 
 
 @dataclass
