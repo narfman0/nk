@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from math import atan2
 
+from nk_shared.map import Map
 import pygame
 from loguru import logger
 from nk_shared import builders
@@ -68,9 +69,6 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 CharacterStruct(enemy, sprite, pygame.sprite.Group(sprite), None)
             )
 
-        self.ground_renderables = list(self.generate_map_renderables(ground=True))
-        self.map_renderables = list(self.generate_map_renderables(ground=False))
-        self.map_renderables.extend(list(self.generate_environment_renderables()))
         self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
@@ -199,32 +197,30 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
 
     def generate_environment_renderables(self):
         for environment in self.world.zone.environment_features:
-            path = f"{NK_DATA_ROOT}/environment/{environment.image_path}.png"
-            blit_image = pygame.image.load(path).convert_alpha()
-            if blit_image:
-                blit_x, blit_y = self.calculate_draw_coordinates(
-                    environment.center_x, environment.center_y, blit_image
-                )
-                yield MapRenderable(
-                    layer=self.world.map.get_1f_layer_id(),
-                    blit_image=blit_image,
-                    blit_coords=(blit_x, blit_y),
-                )
+            tilemap = Map(environment.tmx_name)
+            yield from self.generate_map_renderables(
+                ground=False,
+                tilemap=tilemap,
+                tile_offset_y=environment.center_y - tilemap.height // 2,
+                tile_offset_x=environment.center_x - tilemap.width // 2,
+            )
 
-    def generate_map_renderables(self, ground: bool):
+    def generate_map_renderables(
+        self, ground: bool, tilemap: Map, tile_offset_x: int = 0, tile_offset_y: int = 0
+    ):
         """We can statically generate the blit coords once in the beginning,
         avoiding a bunch of coordinate conversions."""
-        ground_ids = self.world.map.get_ground_layer_ids()
-        for layer in range(self.world.map.get_tile_layer_count()):
-            if ground and layer not in ground_ids or not ground and layer in ground_ids:
+        ground_ids = tilemap.get_ground_layer_ids()
+        for layer in range(tilemap.get_tile_layer_count()):
+            if layer not in ground_ids if ground else layer in ground_ids:
                 continue
-            x_offset, y_offset = self.world.map.get_layer_offsets(layer)
-            for x in range(0, self.world.map.width):
-                for y in range(0, self.world.map.height):
-                    blit_image = self.world.map.get_tile_image(x, y, layer)
+            x_offset, y_offset = tilemap.get_layer_offsets(layer)
+            for x in range(0, tilemap.width):
+                for y in range(0, tilemap.height):
+                    blit_image = tilemap.get_tile_image(x, y, layer)
                     if blit_image:
                         blit_x, blit_y = self.calculate_draw_coordinates(
-                            x, y, blit_image
+                            x + tile_offset_x, y + tile_offset_y, blit_image
                         )
                         yield MapRenderable(
                             layer=layer,
@@ -271,8 +267,12 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.screen_height = HEIGHT // self.screen_scale
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
-        self.ground_renderables = list(self.generate_map_renderables(ground=True))
-        self.map_renderables = list(self.generate_map_renderables(ground=False))
+        self.ground_renderables = list(
+            self.generate_map_renderables(ground=True, tilemap=self.world.map)
+        )
+        self.map_renderables = list(
+            self.generate_map_renderables(ground=False, tilemap=self.world.map)
+        )
         self.map_renderables.extend(list(self.generate_environment_renderables()))
 
     def handle_character_added(self, character: Character):

@@ -9,10 +9,10 @@ enemy_groups:
     center_x: 16
     center_y: 12
 environment_features:
-  - image_path: factory
+  - tmx_name: factory_sm
     center_x: 41
     center_y: 14
     spawners:
       - character_type_str: droid_assassin
         offset_x: 0
-        offset_y: 0
+        offset_y: 5

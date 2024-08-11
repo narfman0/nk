@@ -46,7 +46,7 @@ def spawner() -> Spawner:
 @pytest.fixture
 def environment_feature(spawner: Spawner) -> Environment:
     return Environment(
-        image_path="factory_emitter1", center_x=20, center_y=0, spawners=[spawner]
+        tmx_name="factory_sm", center_x=20, center_y=0, spawners=[spawner]
     )
 
 

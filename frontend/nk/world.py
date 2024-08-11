@@ -19,6 +19,13 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.zone = Zone.from_yaml_file(f"{NK_DATA_ROOT}/zones/{zone_name}.yml")
         self.map = Map(self.zone.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
+        for feature in self.zone.environment_features:
+            tilemap = Map(feature.tmx_name)
+            tilemap.add_map_geometry_to_space(
+                self.space,
+                feature.center_x - tilemap.width // 2,
+                feature.center_y - tilemap.height // 2,
+            )
 
         # initialize player
         self.player = self.add_character(

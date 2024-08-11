@@ -30,7 +30,7 @@ class EnemyGroup:
 
 @dataclass
 class Environment:
-    image_path: str
+    tmx_name: str
     center_x: int
     center_y: int
     spawners: list[Spawner] = field(default_factory=list)
