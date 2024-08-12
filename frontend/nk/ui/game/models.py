@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from nk.ui.camera import Camera
+from nk.ui.game.camera import Camera
 
 
 class GameUICalculator(ABC):

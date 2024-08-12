@@ -5,8 +5,8 @@ from nk_shared.map import Map
 from nk_shared.models.zone import Environment
 
 from nk.settings import NK_DATA_ROOT
-from nk.ui.models import GameUICalculator
-from nk.ui.renderables import (
+from nk.ui.game.models import GameUICalculator
+from nk.ui.game.renderables import (
     BlittableRenderable,
     MapRenderable,
     renderables_generate_key,

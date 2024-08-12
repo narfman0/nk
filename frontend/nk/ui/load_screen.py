@@ -2,7 +2,7 @@ from loguru import logger
 from pygame.event import Event
 
 from nk.game_state import GameState
-from nk.ui.game_screen import GameScreen
+from nk.ui.game import GameScreen
 from nk.ui.screen import Screen, ScreenManager
 
 

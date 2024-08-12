@@ -1,32 +1,32 @@
 from math import atan2
 
 import pygame
-from pygame import Surface
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.util.math import cartesian_to_isometric, isometric_to_cartesian
+from pygame import Surface
 from pygame.event import Event
 
 from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
-from nk.ui.camera import Camera
-from nk.ui.character_sprite import CharacterSprite
-from nk.ui.character_struct import CharacterStruct, update_character_structs
-from nk.ui.game_gui import GameGui
-from nk.ui.input import (
+from nk.ui.game.camera import Camera
+from nk.ui.game.character_sprite import CharacterSprite
+from nk.ui.game.character_struct import CharacterStruct, update_character_structs
+from nk.ui.game.gui import GameGui
+from nk.ui.game.input import (
     ActionEnum,
     read_input_player_actions,
     read_input_player_move_direction,
 )
-from nk.ui.models import GameUICalculator
-from nk.ui.renderables import (
+from nk.ui.game.models import GameUICalculator
+from nk.ui.game.renderables import (
     BlittableRenderable,
     SpriteRenderable,
     create_renderable_list,
     renderables_generate_key,
 )
-from nk.ui.renderables_generator import (
+from nk.ui.game.renderables_generator import (
     generate_environment_renderables,
     generate_map_renderables,
     generate_projectile_renderables,

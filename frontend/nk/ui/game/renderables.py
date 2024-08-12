@@ -1,3 +1,4 @@
+from abc import ABC
 from dataclasses import dataclass
 
 from pygame.sprite import Group as SpriteGroup
@@ -6,11 +7,11 @@ from sortedcontainers import SortedKeyList
 
 
 @dataclass
-class Renderable:
+class Renderable(ABC):
     key: float
 
     def draw(self, surface: Surface):
-        pass
+        raise NotImplementedError
 
 
 @dataclass
