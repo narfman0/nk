@@ -16,3 +16,24 @@ environment_features:
       - character_type_str: droid_assassin
         offset_x: 0
         offset_y: 5
+  - tmx_name: factory_sm
+    center_x: 10
+    center_y: 50
+    spawners:
+      - character_type_str: droid_assassin
+        offset_x: 0
+        offset_y: 5
+  - tmx_name: factory_sm
+    center_x: 30
+    center_y: 50
+    spawners:
+      - character_type_str: droid_assassin
+        offset_x: 0
+        offset_y: 5
+  - tmx_name: factory_sm
+    center_x: 50
+    center_y: 50
+    spawners:
+      - character_type_str: droid_assassin
+        offset_x: 0
+        offset_y: 5

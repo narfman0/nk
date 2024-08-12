@@ -16,3 +16,6 @@ class SpawnerStruct:
     @property
     def spawn_y(self) -> int:
         return self.parent_feature.center_y + self.spawner.offset_y
+
+    def __lt__(self, other) -> bool:
+        return self.next_spawn_time_s < other.next_spawn_time_s
