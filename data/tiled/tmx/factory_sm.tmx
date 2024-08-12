@@ -3,7 +3,7 @@
  <properties>
   <property name="GroundLayerNames" value="street,ground"/>
  </properties>
- <tileset firstgid="1" source="factory.tsx"/>
+ <tileset firstgid="1" source="../tsx/factory.tsx"/>
  <layer id="4" name="street" width="11" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,

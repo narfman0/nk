@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.10.2" name="factory" tilewidth="32" tileheight="32" tilecount="66" columns="11">
- <image source="../environment/factory.png" width="358" height="217"/>
+ <image source="../images/factory.png" width="358" height="217"/>
  <tile id="12">
   <objectgroup draworder="index" id="2">
    <object id="1" x="17.0909" y="21.2727"/>

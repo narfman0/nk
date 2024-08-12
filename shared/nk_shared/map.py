@@ -10,7 +10,7 @@ DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 class Map:
     def __init__(self, area: str, pygame=True):
         self.area = area
-        path = f"{DATA_ROOT}/tiled/{area}.tmx"
+        path = f"{DATA_ROOT}/tiled/tmx/{area}.tmx"
         if pygame:
             self._tmxdata = pytmx.load_pygame(path)
         else:
