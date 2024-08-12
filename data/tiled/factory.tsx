@@ -66,9 +66,14 @@
    <object id="1" x="16.3636" y="16.7273"/>
   </objectgroup>
  </tile>
+ <tile id="49">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="21" y="10"/>
+  </objectgroup>
+ </tile>
  <tile id="50">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="16.1818" y="10.9091"/>
+   <object id="1" x="11" y="12"/>
   </objectgroup>
  </tile>
 </tileset>

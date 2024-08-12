@@ -1,19 +1,21 @@
-from dataclasses import dataclass
-from functools import lru_cache
 from math import atan2
 
+from nk.ui.projectile_manager import generate_projectile_renderables
+from nk.ui.models import GameUICalculator
+from nk.ui.character_struct import (
+    CharacterStruct,
+    update_character_structs,
+)
 from nk_shared.map import Map
 import pygame
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
-from nk_shared.proto import Direction
-from nk_shared.util import direction_util
 from nk_shared.util.math import cartesian_to_isometric, isometric_to_cartesian
 from pygame.event import Event
 
 from nk.game_state import GameState
-from nk.settings import HEIGHT, NK_DATA_ROOT, WIDTH
+from nk.settings import HEIGHT, WIDTH
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.game_gui import GameGui
 from nk.ui.input import (
@@ -33,15 +35,8 @@ from nk.ui.screen import Screen, ScreenManager
 DEFAULT_SCREEN_SCALE = 5
 
 
-@dataclass
-class CharacterStruct:
-    character: Character
-    sprite: CharacterSprite
-    sprite_group: pygame.sprite.Group
-    last_moving_direction: Direction
-
-
-class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
+# pylint: disable-next=too-many-instance-attributes
+class GameScreen(Screen, GameUICalculator):
     """UI screen for game state"""
 
     def __init__(self, screen_manager: ScreenManager, game_state: GameState):
@@ -50,25 +45,23 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
-        self.cam_x, self.cam_y = 0, 0
+        self._cam_x, self._cam_y = 0, 0
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.character_added_callback = self.handle_character_added
         self.game_state.character_attacked_callback = self.handle_character_attacked
-        self.player_struct = CharacterStruct(
-            self.world.player,
-            None,
-            pygame.sprite.Group(),
-            None,
+        player_sprite = CharacterSprite(self.world.player.character_type_short)
+        self.player_struct = CharacterStruct(self.world.player, player_sprite)
+        sprite = CharacterSprite(self.world.player.character_type_short)
+        sprite.set_position(
+            self.screen_width // 2 - sprite.image.get_width() // 2,
+            self.screen_height // 2 - sprite.image.get_height() // 2,
         )
-        self.update_player_sprite()
+
         self.character_structs = [self.player_struct]
         for enemy in self.world.enemies:
             sprite = CharacterSprite(enemy.character_type.name.lower())
-            self.character_structs.append(
-                CharacterStruct(enemy, sprite, pygame.sprite.Group(sprite), None)
-            )
-
+            self.character_structs.append(CharacterStruct(enemy, sprite))
         self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
@@ -76,21 +69,14 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         self.handle_player_actions(player_actions)
         player_move_direction = read_input_player_move_direction()
         self.world.update(dt, player_move_direction)
-        self.cam_x, self.cam_y = cartesian_to_isometric(
+        self._cam_x, self._cam_y = cartesian_to_isometric(
             self.world.player.position.x * self.world.map.tile_width // 2,
             self.world.player.position.y * self.world.map.tile_width // 2,
         )
-        if (
-            self.world.player.alive
-            and self.world.player.character_type_short
-            != self.player_struct.sprite.sprite_name
-        ):
-            # ideally we could pass a callback here but :shrugs:
-            self.update_player_sprite()
         if player_move_direction:
             self.world.player.facing_direction = player_move_direction
         assert self.world.player.facing_direction is not None
-        self.update_character_structs(dt)
+        update_character_structs(dt, self.character_structs, self)
         self.game_state.update()
         self.game_gui.update(dt)
 
@@ -124,14 +110,14 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         renderables = create_renderable_list()
         for map_renderable in self.map_renderables:
             blit_x, blit_y = map_renderable.blit_coords
-            bottom_y = blit_y - self.cam_y + map_renderable.blit_image.get_height() - 8
+            bottom_y = blit_y - self._cam_y + map_renderable.blit_image.get_height() - 8
             renderable = BlittableRenderable(
                 renderables_generate_key(map_renderable.layer, bottom_y),
                 map_renderable.blit_image,
-                (blit_x - self.cam_x, blit_y - self.cam_y),
+                (blit_x - self._cam_x, blit_y - self._cam_y),
             )
             renderables.add(renderable)
-        for renderable in self.generate_projectile_renderables():
+        for renderable in generate_projectile_renderables(self.world, self):
             renderables.add(renderable)
         for character_struct in self.character_structs:
             img_height = character_struct.sprite.image.get_height()
@@ -142,7 +128,7 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         surface = pygame.Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
-            blit_coords = (blit_x - self.cam_x, blit_y - self.cam_y)
+            blit_coords = (blit_x - self._cam_x, blit_y - self._cam_y)
             surface.blit(ground_renderable.blit_image, blit_coords)
         for renderable in renderables:
             renderable.draw(surface)
@@ -150,50 +136,6 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
             surface, dest_surface=dest_surface, factor=self.screen_scale
         )
         self.game_gui.draw(self.world.player, dest_surface)
-
-    def update_character_structs(self, dt: float):
-        for character_struct in self.character_structs:
-            character = character_struct.character
-            sprite = character_struct.sprite
-            if character.alive:
-                if not character.attacking:
-                    if character.moving_direction:
-                        if (
-                            character.moving_direction
-                            != character_struct.last_moving_direction
-                        ):
-                            sprite.move(
-                                direction_util.to_isometric(character.moving_direction)
-                            )
-                        sprite.change_animation("run")
-                    else:
-                        sprite.change_animation("idle")
-                character_struct.last_moving_direction = character.facing_direction
-            else:
-                if sprite.sprite_name != "death":
-                    sprite.change_animation("death", loop=False)
-            x, y = self.calculate_draw_coordinates(
-                character.position.x,  # pylint: disable=no-member
-                character.position.y,  # pylint: disable=no-member
-                sprite.image,
-            )
-            sprite.set_position(x - self.cam_x, y - self.cam_y)
-
-        for character_struct in self.character_structs:
-            character_struct.sprite_group.update(dt)
-
-    def generate_projectile_renderables(self):
-        for projectile in self.world.projectiles:
-            image = load_projectile_image(projectile.attack_profile.image_path)
-            blit_x, blit_y = self.calculate_draw_coordinates(
-                projectile.x, projectile.y, image
-            )
-            bottom_y = blit_y - self.cam_y + image.get_height()
-            yield BlittableRenderable(
-                renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y),
-                image,
-                (blit_x - self.cam_x, blit_y - self.cam_y),
-            )
 
     def generate_environment_renderables(self):
         for environment in self.world.zone.environment_features:
@@ -252,16 +194,6 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
         ty = cam_y / self.world.map.tile_width // 2
         return isometric_to_cartesian(tx, ty)
 
-    def update_player_sprite(self):
-        sprite = CharacterSprite(self.world.player.character_type_short)
-        sprite.set_position(
-            self.screen_width // 2 - sprite.image.get_width() // 2,
-            self.screen_height // 2 - sprite.image.get_height() // 2,
-        )
-        self.player_struct.sprite = sprite
-        self.player_struct.sprite_group.empty()
-        self.player_struct.sprite_group.add(sprite)
-
     def recalculate_screen_scale_derivatives(self):
         self.screen_width = WIDTH // self.screen_scale
         self.screen_height = HEIGHT // self.screen_scale
@@ -287,8 +219,10 @@ class GameScreen(Screen):  # pylint: disable=too-many-instance-attributes
                 cstruct.sprite.change_animation("attack")
                 return
 
+    @property
+    def cam_x(self):
+        return self._cam_x
 
-@lru_cache
-def load_projectile_image(image_path: str):
-    path = f"{NK_DATA_ROOT}/projectiles/{image_path}.png"
-    return pygame.image.load(path).convert_alpha()
+    @property
+    def cam_y(self):
+        return self._cam_y
