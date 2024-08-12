@@ -37,7 +37,14 @@ class Environment:
 
 
 @dataclass
+class Medic:
+    x: int
+    y: int
+
+
+@dataclass
 class Zone(YAMLWizard):
     tmx_path: str
     enemy_groups: list[EnemyGroup]
     environment_features: list[Environment]
+    medics: list[Medic]

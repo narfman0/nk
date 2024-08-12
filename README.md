@@ -12,7 +12,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-* Bigger map
 * Town + player respawn
 * Update sprites
 * Sound effects

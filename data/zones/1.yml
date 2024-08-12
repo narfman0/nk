@@ -8,6 +8,9 @@ enemy_groups:
     count: 5
     center_x: 16
     center_y: 12
+medics:
+  - x: 14
+    y: 23
 environment_features:
   - tmx_name: factory_sm
     center_x: 41

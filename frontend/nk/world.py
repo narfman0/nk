@@ -10,6 +10,9 @@ from typing_extensions import Unpack
 
 from nk.settings import NK_DATA_ROOT
 
+HEAL_DST_SQ = 5  # this should be on the backend but whatevs
+HEAL_AMT = 10.0
+
 
 class World:  # pylint: disable=too-many-instance-attributes
     def __init__(self, uuid: str, x: float, y: float, zone_name="1"):
@@ -48,7 +51,15 @@ class World:  # pylint: disable=too-many-instance-attributes
         self.update_characters(dt, self.enemies)
         self.update_characters(dt, self.players)
         self.update_projectiles(dt)
+        self.update_medic(dt)
         self.space.step(dt)
+
+    def update_medic(self, dt: float):
+        for medic in self.zone.medics:
+            dst_sq = self.player.position.get_dist_sqrd((medic.x, medic.y))
+            if dst_sq < HEAL_DST_SQ:
+                self.player.handle_healing_received(HEAL_AMT * dt)
+                return
 
     def update_characters(self, dt: float, characters: list[Character]):
         for character in characters:
