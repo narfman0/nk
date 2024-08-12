@@ -20,11 +20,11 @@ def generate_projectile_renderables(world: World, calculator: GameUICalculator):
         blit_x, blit_y = calculator.calculate_draw_coordinates(
             projectile.x, projectile.y, image
         )
-        bottom_y = blit_y - calculator.cam_y + image.get_height()
+        bottom_y = blit_y - calculator.camera.y + image.get_height()
         yield BlittableRenderable(
             renderables_generate_key(world.map.get_1f_layer_id(), bottom_y),
             image,
-            (blit_x - calculator.cam_x, blit_y - calculator.cam_y),
+            (blit_x - calculator.camera.x, blit_y - calculator.camera.y),
         )
 
 

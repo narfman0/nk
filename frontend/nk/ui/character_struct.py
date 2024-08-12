@@ -51,5 +51,5 @@ def update_character_structs(
             character.position.y,  # pylint: disable=no-member
             sprite.image,
         )
-        sprite.set_position(x - calculator.cam_x, y - calculator.cam_y)
+        sprite.set_position(x - calculator.camera.x, y - calculator.camera.y)
         character_struct.sprite_group.update(dt)

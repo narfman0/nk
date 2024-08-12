@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 import pygame
 
+from nk.ui.camera import Camera
+
 
 class GameUICalculator(ABC):
     @abstractmethod
@@ -15,10 +17,5 @@ class GameUICalculator(ABC):
 
     @property
     @abstractmethod
-    def cam_x(self) -> float:
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def cam_y(self) -> float:
+    def camera(self) -> Camera:
         raise NotImplementedError

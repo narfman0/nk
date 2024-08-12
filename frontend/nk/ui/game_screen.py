@@ -9,6 +9,7 @@ from pygame.event import Event
 
 from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
+from nk.ui.camera import Camera
 from nk.ui.character_sprite import CharacterSprite
 from nk.ui.character_struct import CharacterStruct, update_character_structs
 from nk.ui.game_gui import GameGui
@@ -18,16 +19,16 @@ from nk.ui.input import (
     read_input_player_move_direction,
 )
 from nk.ui.models import GameUICalculator
-from nk.ui.renderables_generator import (
-    generate_environment_renderables,
-    generate_map_renderables,
-    generate_projectile_renderables,
-)
 from nk.ui.renderables import (
     BlittableRenderable,
     SpriteRenderable,
     create_renderable_list,
     renderables_generate_key,
+)
+from nk.ui.renderables_generator import (
+    generate_environment_renderables,
+    generate_map_renderables,
+    generate_projectile_renderables,
 )
 from nk.ui.screen import Screen, ScreenManager
 
@@ -44,7 +45,7 @@ class GameScreen(Screen, GameUICalculator):
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
-        self._cam_x, self._cam_y = 0, 0
+        self._camera = Camera(game_state.world)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.character_added_callback = self.handle_character_added
@@ -68,10 +69,7 @@ class GameScreen(Screen, GameUICalculator):
         self.handle_player_actions(player_actions)
         player_move_direction = read_input_player_move_direction()
         self.world.update(dt, player_move_direction)
-        self._cam_x, self._cam_y = cartesian_to_isometric(
-            self.world.player.position.x * self.world.map.tile_width // 2,
-            self.world.player.position.y * self.world.map.tile_width // 2,
-        )
+        self._camera.update()
         if player_move_direction:
             self.world.player.facing_direction = player_move_direction
         assert self.world.player.facing_direction is not None
@@ -109,11 +107,13 @@ class GameScreen(Screen, GameUICalculator):
         renderables = create_renderable_list()
         for map_renderable in self.map_renderables:
             blit_x, blit_y = map_renderable.blit_coords
-            bottom_y = blit_y - self._cam_y + map_renderable.blit_image.get_height() - 8
+            bottom_y = (
+                blit_y - self._camera.y + map_renderable.blit_image.get_height() - 8
+            )
             renderable = BlittableRenderable(
                 renderables_generate_key(map_renderable.layer, bottom_y),
                 map_renderable.blit_image,
-                (blit_x - self._cam_x, blit_y - self._cam_y),
+                (blit_x - self._camera.x, blit_y - self._camera.y),
             )
             renderables.add(renderable)
         for renderable in generate_projectile_renderables(self.world, self):
@@ -127,7 +127,7 @@ class GameScreen(Screen, GameUICalculator):
         surface = pygame.Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
-            blit_coords = (blit_x - self._cam_x, blit_y - self._cam_y)
+            blit_coords = (blit_x - self._camera.x, blit_y - self._camera.y)
             surface.blit(ground_renderable.blit_image, blit_coords)
         for renderable in renderables:
             renderable.draw(surface)
@@ -154,11 +154,12 @@ class GameScreen(Screen, GameUICalculator):
         x: float,
         y: float,
     ) -> tuple[float, float]:
-        cam_x = x - self.camera_offset_x * self.screen_scale
-        cam_y = y - self.camera_offset_y * self.screen_scale
-        tx = cam_x / self.world.map.tile_width // 2
-        ty = cam_y / self.world.map.tile_width // 2
-        return isometric_to_cartesian(tx, ty)
+        x -= self.camera_offset_x * self.screen_scale
+        y -= self.camera_offset_y * self.screen_scale
+        return isometric_to_cartesian(
+            x / self.world.map.tile_width // 2,
+            y / self.world.map.tile_width // 2,
+        )
 
     def recalculate_screen_scale_derivatives(self):
         self.screen_width = WIDTH // self.screen_scale
@@ -189,9 +190,5 @@ class GameScreen(Screen, GameUICalculator):
                 return
 
     @property
-    def cam_x(self):
-        return self._cam_x
-
-    @property
-    def cam_y(self):
-        return self._cam_y
+    def camera(self):
+        return self._camera
