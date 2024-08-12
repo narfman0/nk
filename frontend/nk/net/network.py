@@ -1,7 +1,7 @@
+from asyncio import Queue
 from os import environ
 from threading import Thread
 
-from asyncio import Queue
 import httpx
 from loguru import logger
 from nk_shared.proto import Message

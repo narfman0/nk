@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 
 import pygame
-
-from nk.ui.models import GameUICalculator
-from nk.ui.character_sprite import CharacterSprite
 from nk_shared.models.character import Character
 from nk_shared.proto import Direction
 from nk_shared.util import direction_util
+
+from nk.ui.character_sprite import CharacterSprite
+from nk.ui.models import GameUICalculator
 
 
 @dataclass

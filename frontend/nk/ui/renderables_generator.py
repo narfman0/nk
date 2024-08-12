@@ -1,0 +1,76 @@
+from functools import lru_cache
+
+import pygame
+from nk_shared.map import Map
+from nk_shared.models.zone import Environment
+
+from nk.settings import NK_DATA_ROOT
+from nk.ui.models import GameUICalculator
+from nk.ui.renderables import (
+    BlittableRenderable,
+    MapRenderable,
+    renderables_generate_key,
+)
+from nk.world import World
+
+
+def generate_projectile_renderables(world: World, calculator: GameUICalculator):
+    for projectile in world.projectiles:
+        image = load_projectile_image(projectile.attack_profile.image_path)
+        blit_x, blit_y = calculator.calculate_draw_coordinates(
+            projectile.x, projectile.y, image
+        )
+        bottom_y = blit_y - calculator.cam_y + image.get_height()
+        yield BlittableRenderable(
+            renderables_generate_key(world.map.get_1f_layer_id(), bottom_y),
+            image,
+            (blit_x - calculator.cam_x, blit_y - calculator.cam_y),
+        )
+
+
+def generate_map_renderables(
+    calculator: GameUICalculator,
+    ground: bool,
+    tilemap: Map,
+    tile_offset_x: int = 0,
+    tile_offset_y: int = 0,
+):
+    """We can statically generate the blit coords once in the beginning,
+    avoiding a bunch of coordinate conversions."""
+    ground_ids = tilemap.get_ground_layer_ids()
+    for layer in range(tilemap.get_tile_layer_count()):
+        if layer not in ground_ids if ground else layer in ground_ids:
+            continue
+        x_offset, y_offset = tilemap.get_layer_offsets(layer)
+        for x in range(0, tilemap.width):
+            for y in range(0, tilemap.height):
+                blit_image = tilemap.get_tile_image(x, y, layer)
+                if blit_image:
+                    blit_x, blit_y = calculator.calculate_draw_coordinates(
+                        x + tile_offset_x, y + tile_offset_y, blit_image
+                    )
+                    yield MapRenderable(
+                        layer=layer,
+                        blit_image=blit_image,
+                        blit_coords=(blit_x + x_offset, blit_y + y_offset),
+                    )
+
+
+def generate_environment_renderables(
+    calculator: GameUICalculator, environment_features: list[Environment]
+):
+    for environment in environment_features:
+        tilemap = Map(environment.tmx_name)
+        yield from generate_map_renderables(
+            calculator=calculator,
+            ground=False,
+            tilemap=tilemap,
+            tile_offset_y=environment.center_y - tilemap.height // 2,
+            tile_offset_x=environment.center_x - tilemap.width // 2,
+        )
+
+
+@lru_cache
+def load_projectile_image(image_path: str):
+    path = f"{NK_DATA_ROOT}/projectiles/{image_path}.png"
+    return pygame.image.load(path).convert_alpha()

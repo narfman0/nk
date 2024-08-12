@@ -1,6 +1,6 @@
 import os
-
 from asyncio import Queue
+
 from loguru import logger
 from nk_shared.proto import Message
 from websockets.sync.client import connect

@@ -1,12 +1,5 @@
 from math import atan2
 
-from nk.ui.projectile_manager import generate_projectile_renderables
-from nk.ui.models import GameUICalculator
-from nk.ui.character_struct import (
-    CharacterStruct,
-    update_character_structs,
-)
-from nk_shared.map import Map
 import pygame
 from loguru import logger
 from nk_shared import builders
@@ -17,15 +10,21 @@ from pygame.event import Event
 from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.character_sprite import CharacterSprite
+from nk.ui.character_struct import CharacterStruct, update_character_structs
 from nk.ui.game_gui import GameGui
 from nk.ui.input import (
     ActionEnum,
     read_input_player_actions,
     read_input_player_move_direction,
 )
+from nk.ui.models import GameUICalculator
+from nk.ui.renderables_generator import (
+    generate_environment_renderables,
+    generate_map_renderables,
+    generate_projectile_renderables,
+)
 from nk.ui.renderables import (
     BlittableRenderable,
-    MapRenderable,
     SpriteRenderable,
     create_renderable_list,
     renderables_generate_key,
@@ -137,39 +136,6 @@ class GameScreen(Screen, GameUICalculator):
         )
         self.game_gui.draw(self.world.player, dest_surface)
 
-    def generate_environment_renderables(self):
-        for environment in self.world.zone.environment_features:
-            tilemap = Map(environment.tmx_name)
-            yield from self.generate_map_renderables(
-                ground=False,
-                tilemap=tilemap,
-                tile_offset_y=environment.center_y - tilemap.height // 2,
-                tile_offset_x=environment.center_x - tilemap.width // 2,
-            )
-
-    def generate_map_renderables(
-        self, ground: bool, tilemap: Map, tile_offset_x: int = 0, tile_offset_y: int = 0
-    ):
-        """We can statically generate the blit coords once in the beginning,
-        avoiding a bunch of coordinate conversions."""
-        ground_ids = tilemap.get_ground_layer_ids()
-        for layer in range(tilemap.get_tile_layer_count()):
-            if layer not in ground_ids if ground else layer in ground_ids:
-                continue
-            x_offset, y_offset = tilemap.get_layer_offsets(layer)
-            for x in range(0, tilemap.width):
-                for y in range(0, tilemap.height):
-                    blit_image = tilemap.get_tile_image(x, y, layer)
-                    if blit_image:
-                        blit_x, blit_y = self.calculate_draw_coordinates(
-                            x + tile_offset_x, y + tile_offset_y, blit_image
-                        )
-                        yield MapRenderable(
-                            layer=layer,
-                            blit_image=blit_image,
-                            blit_coords=(blit_x + x_offset, blit_y + y_offset),
-                        )
-
     def calculate_draw_coordinates(
         self,
         x: float,
@@ -200,12 +166,15 @@ class GameScreen(Screen, GameUICalculator):
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
         self.ground_renderables = list(
-            self.generate_map_renderables(ground=True, tilemap=self.world.map)
+            generate_map_renderables(self, ground=True, tilemap=self.world.map)
         )
         self.map_renderables = list(
-            self.generate_map_renderables(ground=False, tilemap=self.world.map)
+            generate_map_renderables(self, ground=False, tilemap=self.world.map)
         )
-        self.map_renderables.extend(list(self.generate_environment_renderables()))
+        environment_renderables = generate_environment_renderables(
+            self, self.world.zone.environment_features
+        )
+        self.map_renderables.extend(list(environment_renderables))
 
     def handle_character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)
