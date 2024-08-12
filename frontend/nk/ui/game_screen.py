@@ -52,12 +52,6 @@ class GameScreen(Screen, GameUICalculator):
         self.game_state.character_attacked_callback = self.handle_character_attacked
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
-        sprite = CharacterSprite(self.world.player.character_type_short)
-        sprite.set_position(
-            self.screen_width // 2 - sprite.image.get_width() // 2,
-            self.screen_height // 2 - sprite.image.get_height() // 2,
-        )
-
         self.character_structs = [self.player_struct]
         for enemy in self.world.enemies:
             sprite = CharacterSprite(enemy.character_type.name.lower())
