@@ -94,7 +94,7 @@ class World:  # pylint: disable=too-many-instance-attributes
         for character in self.players + self.enemies + [self.player]:
             if character.uuid == uuid:
                 return character
-        logger.info("Could not find character with uuid {}", uuid)
+        logger.debug("Could not find character with uuid {}", uuid)
         return None
 
     def create_projectile(self, proto: ProjectileProto):

@@ -12,7 +12,11 @@ from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.game.camera import Camera
 from nk.ui.game.character_sprite import CharacterSprite
-from nk.ui.game.character_struct import CharacterStruct, update_character_structs
+from nk.ui.game.character_struct import (
+    CharacterStruct,
+    update_character_structs,
+    update_position as update_character_sprite_position,
+)
 from nk.ui.game.gui import GameGui
 from nk.ui.game.input import (
     ActionEnum,
@@ -54,9 +58,6 @@ class GameScreen(Screen, GameUICalculator):
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
         self.character_structs = [self.player_struct]
-        for enemy in self.world.enemies:
-            sprite = CharacterSprite(enemy.character_type.name.lower())
-            self.character_structs.append(CharacterStruct(enemy, sprite))
         self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
@@ -166,9 +167,8 @@ class GameScreen(Screen, GameUICalculator):
 
     def handle_character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)
-        self.character_structs.append(
-            CharacterStruct(character, sprite, pygame.sprite.Group(sprite), None)
-        )
+        update_character_sprite_position(character, sprite, self)
+        self.character_structs.append(CharacterStruct(character, sprite))
 
     def handle_character_attacked(self, character: Character):
         for cstruct in self.character_structs:
