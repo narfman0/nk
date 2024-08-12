@@ -1,6 +1,7 @@
 from math import atan2
 
 import pygame
+from pygame import Surface
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
@@ -97,13 +98,12 @@ class GameScreen(Screen, GameUICalculator):
             self.screen_scale = min(6, self.screen_scale + 1)  # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
 
-    def draw(self, dest_surface: pygame.Surface):  # pylint: disable=arguments-renamed
+    def draw(self, dest_surface: Surface):  # pylint: disable=arguments-renamed
         renderables = create_renderable_list()
         for map_renderable in self.map_renderables:
             blit_x, blit_y = map_renderable.blit_coords
-            bottom_y = (
-                blit_y - self._camera.y + map_renderable.blit_image.get_height() - 8
-            )
+            img_height = map_renderable.blit_image.get_height()
+            bottom_y = blit_y - self._camera.y + img_height - 8
             renderable = BlittableRenderable(
                 renderables_generate_key(map_renderable.layer, bottom_y),
                 map_renderable.blit_image,
@@ -118,7 +118,7 @@ class GameScreen(Screen, GameUICalculator):
             key = renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y)
             renderables.add(SpriteRenderable(key, character_struct.sprite_group))
 
-        surface = pygame.Surface(size=(self.screen_width, self.screen_height))
+        surface = Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
             blit_coords = (blit_x - self._camera.x, blit_y - self._camera.y)
@@ -131,23 +131,16 @@ class GameScreen(Screen, GameUICalculator):
         self.game_gui.draw(self.world.player, dest_surface)
 
     def calculate_draw_coordinates(
-        self,
-        x: float,
-        y: float,
-        image: pygame.Surface,
+        self, x: float, y: float, image: Surface
     ) -> tuple[float, float]:
-        cartesian_x = x * self.world.map.tile_width // 2
-        cartesian_y = y * self.world.map.tile_width // 2
-        iso_x, iso_y = cartesian_to_isometric(cartesian_x, cartesian_y)
+        x *= self.world.map.tile_width // 2
+        y *= self.world.map.tile_width // 2
+        iso_x, iso_y = cartesian_to_isometric(x, y)
         x = iso_x + self.camera_offset_x - image.get_width() // 2
         y = iso_y + self.camera_offset_y - image.get_height() // 2
         return (x, y)
 
-    def calculate_world_coordinates(
-        self,
-        x: float,
-        y: float,
-    ) -> tuple[float, float]:
+    def calculate_world_coordinates(self, x: float, y: float) -> tuple[float, float]:
         x -= self.camera_offset_x * self.screen_scale
         y -= self.camera_offset_y * self.screen_scale
         return isometric_to_cartesian(
