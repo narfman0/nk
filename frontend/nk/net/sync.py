@@ -1,6 +1,6 @@
 import os
-from queue import Queue
 
+from asyncio import Queue
 from loguru import logger
 from nk_shared.proto import Message
 from websockets.sync.client import connect
@@ -17,12 +17,12 @@ def handle_websocket(
         os._exit(1)
     while True:
         while not to_send.empty():
-            message = to_send.get()
+            message = to_send.get_nowait()
             ws.send(bytes(message))
         try:
             while True:
                 data = ws.recv(timeout=0.001)
-                received.put(Message().parse(data))
+                received.put_nowait(Message().parse(data))
         except TimeoutError:
             pass  # expected
         except:  # pylint: disable=bare-except

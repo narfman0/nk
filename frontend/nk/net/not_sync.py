@@ -1,6 +1,7 @@
 import asyncio
 from queue import Queue
 
+from asyncio import Queue
 from loguru import logger
 from nk_shared.proto import Message
 from websockets import ConnectionClosed, WebSocketClientProtocol
@@ -8,17 +9,16 @@ from websockets.client import connect
 
 
 async def network_async_runner(
-    url: str, received: Queue[Message], to_send: Queue[Message]
+    url: str, received: Queue[Message], to_send: Queue[Message], access_token: str
 ):
     async def consumer_handler(websocket: WebSocketClientProtocol):
         async for message in websocket:
-            received.put(Message().parse(message))
+            await received.put(Message().parse(message))
 
     async def producer_handler(websocket: WebSocketClientProtocol):
         while True:
-            if not to_send.empty():
-                message = to_send.get()
-                await websocket.send(bytes(message))
+            message = await to_send.get()
+            await websocket.send(bytes(message))
 
     async def handler(websocket: WebSocketClientProtocol):
         consumer_task = asyncio.create_task(consumer_handler(websocket))
@@ -30,12 +30,20 @@ async def network_async_runner(
         for task in pending:
             task.cancel()
 
-    async for websocket in connect(url):
+    headers = [("Authorization", f"Bearer {access_token}")]
+    drops = 0
+    async for websocket in connect(url, extra_headers=headers):
+        if drops >= 3:
+            logger.error("Dropped too many connections, exiting")
+            break
         try:
             await handler(websocket)
         except ConnectionClosed:
             logger.warning("Connection closed")
+            drops += 1
 
 
-def handle_websocket(url: str, received: Queue[Message], to_send: Queue[Message]):
-    asyncio.run(network_async_runner(url, received, to_send))
+def handle_websocket(
+    url: str, received: Queue[Message], to_send: Queue[Message], access_token: str
+):
+    asyncio.run(network_async_runner(url, received, to_send, access_token))

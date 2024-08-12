@@ -1,12 +1,12 @@
 from os import environ
-from queue import Queue
 from threading import Thread
 
+from asyncio import Queue
 import httpx
 from loguru import logger
 from nk_shared.proto import Message
 
-from nk.net.sync import handle_websocket
+from nk.net.not_sync import handle_websocket
 
 AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "http://localhost:8080")
 HOST = environ.get("WEBSOCKET_HOST", "localhost")
@@ -34,14 +34,14 @@ class Network:
         network_thread.start()
 
     def send(self, message: Message):
-        self._to_send.put(message)
+        self._to_send.put_nowait(message)
 
     def has_messages(self) -> bool:
         return not self._received_messages.empty()
 
     def next(self) -> Message | None:
         if self.has_messages():
-            return self._received_messages.get()
+            return self._received_messages.get_nowait()
         return None
 
     @classmethod
