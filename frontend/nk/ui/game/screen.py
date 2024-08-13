@@ -93,7 +93,7 @@ class GameScreen(Screen, GameUICalculator):
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to {}", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
-            self.screen_scale = max(3, self.screen_scale - 1)  # pylint: disable=fixme
+            self.screen_scale = max(2, self.screen_scale - 1)  # pylint: disable=fixme
             self.recalculate_screen_scale_derivatives()
         if ActionEnum.ZOOM_IN in player_actions:
             self.screen_scale = min(6, self.screen_scale + 1)  # pylint: disable=fixme
@@ -103,6 +103,8 @@ class GameScreen(Screen, GameUICalculator):
         renderables = create_renderable_list()
         for map_renderable in self.map_renderables:
             blit_x, blit_y = map_renderable.blit_coords
+            if not self.is_visible(blit_x, blit_y):
+                continue
             img_height = map_renderable.blit_image.get_height()
             bottom_y = blit_y - self._camera.y + img_height - 8
             renderable = BlittableRenderable(
@@ -122,6 +124,8 @@ class GameScreen(Screen, GameUICalculator):
         surface = Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
+            if not self.is_visible(blit_x, blit_y):
+                continue
             blit_coords = (blit_x - self._camera.x, blit_y - self._camera.y)
             surface.blit(ground_renderable.blit_image, blit_coords)
         for renderable in renderables:
@@ -130,6 +134,17 @@ class GameScreen(Screen, GameUICalculator):
             surface, dest_surface=dest_surface, factor=self.screen_scale
         )
         self.game_gui.draw(self.world.player, dest_surface)
+
+    def is_visible(self, blit_x, blit_y) -> bool:
+        tw = self.world.map.tile_width
+        sx = blit_x - self._camera.x
+        sy = blit_y - self._camera.y
+        return (
+            sx < self.screen_width + tw
+            and sx > -tw
+            and sy < self.screen_height + tw
+            and sy > -tw
+        )
 
     def calculate_draw_coordinates(
         self, x: float, y: float, image: Surface
