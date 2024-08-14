@@ -35,6 +35,7 @@ def zone(
         tmx_path=None,
         enemy_groups=[single_enemy_enemy_group],
         environment_features=[environment_feature],
+        medics=[],
     )
 
 
