@@ -14,7 +14,6 @@ from nk.world import world
 async def send_messages(player: Player, websocket: WebSocket):
     """Push all messages on player's queue through their socket"""
     message = await player.messages.get()
-    logger.debug("Sending message {} to {}", message, player.uuid)
     if websocket.state != WebSocketState.DISCONNECTED:
         try:
             await websocket.send_bytes(bytes(message))
@@ -58,7 +57,6 @@ async def handle_connected(websocket: WebSocket, user_id: str):
             task.cancel()
 
     player = Player(user_id=user_id)
-    logger.info("Player uuid set to {}", player.uuid)
     try:
         await handler()
     except WebSocketDisconnect:

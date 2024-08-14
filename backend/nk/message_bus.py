@@ -1,3 +1,4 @@
+from beanie import PydanticObjectId
 from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared.proto import (
@@ -52,18 +53,17 @@ class MessageBus:
     async def handle_player_disconnected(self, player: Player):
         self.world.broadcast(Message(player_left=PlayerLeft(uuid=player.uuid)), player)
         x, y = player.position.x, player.position.y  # pylint: disable=no-member
-        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
+        user_id = PydanticObjectId(player.uuid)
+        character = await DBCharacter.find_one(DBCharacter.user_id == user_id)
         if character:
             await character.set({DBCharacter.x: x, DBCharacter.y: y})
         else:
-            await DBCharacter(user_id=player.uuid, x=x, y=y).insert()
-        logger.info("Successfully saved player post-logout")
+            await DBCharacter(user_id=user_id, x=x, y=y).insert()
         self.world.players.remove(player)
 
     async def handle_player_join_request(self, player: Player):
         """A player has joined. Handle initialization."""
         await self.spawn_player(player)
-        logger.info("Join request success: {}", player.uuid)
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
         await player.messages.put(Message(player_join_response=response))
@@ -74,7 +74,9 @@ class MessageBus:
     async def spawn_player(self, player: Player) -> Player:
         """Player 'is' a Character, which i don't love, but its already
         created. Update relevant attrs."""
-        character = await DBCharacter.find_one(DBCharacter.user_id == player.uuid)
+        character = await DBCharacter.find_one(
+            DBCharacter.user_id == PydanticObjectId(player.uuid)
+        )
         if character:
             x, y = character.x, character.y
         else:

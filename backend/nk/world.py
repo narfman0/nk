@@ -13,6 +13,9 @@ from nk.models import Player, WorldComponentProvider
 from nk.projectile_manager import ProjectileManager
 from nk.settings import DATA_ROOT
 
+HEAL_DST_SQ = 5
+HEAL_AMT = 10.0
+
 
 class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attributes
     """Hold and simulate everything happening in the game."""
@@ -31,6 +34,8 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._ai_component.update(dt)
         self.update_characters(dt, self._players, self._ai_component.enemies)
         self.update_characters(dt, self._ai_component.enemies, self._players)
+        for player in self._players:
+            self.update_medic(dt, player)
         self._projectile_component.update(dt)
         self._space.step(dt)
 
@@ -53,6 +58,13 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 self._space.remove(
                     character.body, character.shape, character.hitbox_shape
                 )
+
+    def update_medic(self, dt: float, player: Player):
+        for medic in self._zone.medics:
+            dst_sq = player.position.get_dist_sqrd((medic.x, medic.y))
+            if dst_sq < HEAL_DST_SQ:
+                player.handle_healing_received(HEAL_AMT * dt)
+                return
 
     def process_ranged_attack(self, character: Character):
         projectile = self._projectile_component.create_projectile(character)
