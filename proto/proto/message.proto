@@ -13,10 +13,11 @@ message Message {
     proto.CharacterAttacked character_attacked = 201;
     proto.CharacterDamaged character_damaged = 202;
 
-    proto.PlayerLeft player_left = 101;
+    proto.PlayerDisconnected player_disconnected = 104;
     proto.PlayerJoined player_joined = 100;
     proto.PlayerJoinRequest player_join_request = 102;
     proto.PlayerJoinResponse player_join_response = 103;
+    proto.PlayerLeft player_left = 101;
     
     proto.ProjectileCreated projectile_created = 300;
     proto.ProjectileDestroyed projectile_destroyed = 301;

@@ -27,6 +27,8 @@ class MessageBus:
             self.world.broadcast(msg, player)
         elif serialized_on_wire(msg.character_attacked):
             self.handle_character_attacked(msg.character_attacked)
+        elif serialized_on_wire(msg.player_disconnected):
+            await self.handle_player_disconnected(player)
         elif serialized_on_wire(msg.character_updated):
             self.handle_character_updated(msg.character_updated)
             self.world.broadcast(msg, player)

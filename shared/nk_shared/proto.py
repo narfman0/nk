@@ -52,6 +52,11 @@ class CharacterUpdated(betterproto.Message):
 
 
 @dataclass
+class PlayerDisconnected(betterproto.Message):
+    uuid: str = betterproto.string_field(1)
+
+
+@dataclass
 class PlayerJoined(betterproto.Message):
     uuid: str = betterproto.string_field(1)
 
@@ -109,7 +114,9 @@ class Message(betterproto.Message):
     character_damaged: "CharacterDamaged" = betterproto.message_field(
         202, group="payload"
     )
-    player_left: "PlayerLeft" = betterproto.message_field(101, group="payload")
+    player_disconnected: "PlayerDisconnected" = betterproto.message_field(
+        104, group="payload"
+    )
     player_joined: "PlayerJoined" = betterproto.message_field(100, group="payload")
     player_join_request: "PlayerJoinRequest" = betterproto.message_field(
         102, group="payload"
@@ -117,6 +124,7 @@ class Message(betterproto.Message):
     player_join_response: "PlayerJoinResponse" = betterproto.message_field(
         103, group="payload"
     )
+    player_left: "PlayerLeft" = betterproto.message_field(101, group="payload")
     projectile_created: "ProjectileCreated" = betterproto.message_field(
         300, group="payload"
     )

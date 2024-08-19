@@ -35,6 +35,10 @@ def build_character_updated(character: Character) -> proto.Message:
     )
 
 
+def build_player_disconnected(uuid: str) -> proto.Message:
+    return proto.Message(player_disconnected=proto.PlayerDisconnected(uuid=uuid))
+
+
 def build_projectile_created(projectile: Projectile) -> proto.Message:
     return proto.Message(
         projectile_created=proto.ProjectileCreated(
