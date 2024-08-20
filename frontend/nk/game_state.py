@@ -27,10 +27,7 @@ class GameState:
             message = self.network.next()
             if serialized_on_wire(message.player_join_response):
                 self.handle_player_join_response(message)
-            # TODO this is a hack to prevent messages from being processed before the player has joined
-            if not self.world:
-                continue
-            elif serialized_on_wire(message.character_updated):
+            if serialized_on_wire(message.character_updated):
                 self.handle_character_updated(message)
             elif serialized_on_wire(message.character_attacked):
                 self.handle_character_attacked(message)

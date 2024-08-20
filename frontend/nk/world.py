@@ -56,6 +56,7 @@ class World:  # pylint: disable=too-many-instance-attributes
 
     def update_medic(self, dt: float):
         for medic in self.zone.medics:
+            # pylint: disable-next=no-member
             dst_sq = self.player.position.get_dist_sqrd((medic.x, medic.y))
             if dst_sq < HEAL_DST_SQ:
                 self.player.handle_healing_received(HEAL_AMT * dt)

@@ -6,7 +6,7 @@ isort:
 	isort --profile black tests
 
 lint: isort
-	pylint app/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
+	pylint app/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring --ignore proto.py
 
 test:
 	pytest --cov=app --cov-report term-missing -W ignore::DeprecationWarning tests/

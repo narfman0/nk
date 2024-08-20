@@ -6,8 +6,8 @@ from nk_shared.proto import (
     CharacterUpdated,
     Direction,
     Message,
+    PlayerConnected,
     PlayerDisconnected,
-    PlayerJoinRequest,
     PlayerJoined,
     PlayerJoinResponse,
     PlayerLeft,
@@ -23,8 +23,8 @@ class MessageBus:
 
     async def handle_message(self, msg: Message):
         """Socket-level handler for messages, mostly passing through to world"""
-        if serialized_on_wire(msg.player_join_request):
-            await self.handle_player_join_request(msg.player_join_request)
+        if serialized_on_wire(msg.player_connected):
+            await self.handle_player_connected(msg.player_connected)
         elif serialized_on_wire(msg.text_message):
             await self.world.broadcast(msg)
         elif serialized_on_wire(msg.character_attacked):
@@ -66,11 +66,12 @@ class MessageBus:
             await DBCharacter(user_id=user_id, x=x, y=y).insert()
         self.world.players.remove(player)
 
-    async def handle_player_join_request(self, details: PlayerJoinRequest):
+    async def handle_player_connected(self, details: PlayerConnected):
         """A player has joined. Handle initialization."""
         player = Player(user_id=details.uuid)
         logger.info("Player joined: {}", player)
         await self.spawn_player(player)
+        # pylint: disable-next=no-member
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
         await self.world.broadcast(

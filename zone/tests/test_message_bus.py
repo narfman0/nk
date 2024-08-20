@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from nk_shared import builders
 from nk_shared.proto import Direction, Message, TextMessage

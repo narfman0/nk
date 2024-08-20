@@ -12,9 +12,8 @@ from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.game.camera import Camera
 from nk.ui.game.character_sprite import CharacterSprite
+from nk.ui.game.character_struct import CharacterStruct, update_character_structs
 from nk.ui.game.character_struct import (
-    CharacterStruct,
-    update_character_structs,
     update_position as update_character_sprite_position,
 )
 from nk.ui.game.gui import GameGui
@@ -136,6 +135,7 @@ class GameScreen(Screen, GameUICalculator):
         self.game_gui.draw(self.world.player, dest_surface)
 
     def is_visible(self, blit_x, blit_y) -> bool:
+        # pylint: disable=chained-comparison
         tw = self.world.map.tile_width
         sx = blit_x - self._camera.x
         sy = blit_y - self._camera.y

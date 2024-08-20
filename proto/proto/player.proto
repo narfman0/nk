@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package proto;
 
+message PlayerConnected {
+  string uuid = 1;
+}
+
 message PlayerDisconnected {
   string uuid = 1;
 }
 
 message PlayerJoined {
-  string uuid = 1;
-}
-
-message PlayerJoinRequest {
   string uuid = 1;
 }
 

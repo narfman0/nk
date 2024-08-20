@@ -6,7 +6,7 @@ from fastapi import WebSocket
 from loguru import logger
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
-from app.proto import Message, PlayerDisconnected, PlayerJoinRequest
+from app.proto import Message, PlayerConnected, PlayerDisconnected
 from app.pubsub import publish, subscribe
 
 logger.add("app.log")
@@ -67,7 +67,7 @@ async def handle_connected(websocket: WebSocket, uuid: str):
             task.cancel()
 
     messages = asyncio.Queue[Message]()
-    await publish(bytes(Message(player_join_request=PlayerJoinRequest(uuid=uuid))))
+    await publish(bytes(Message(player_connected=PlayerConnected(uuid=uuid))))
     try:
         await handler()
     except WebSocketDisconnect:

@@ -1,5 +1,7 @@
 from unittest.mock import AsyncMock
+
 import pytest
+
 from app.world import World
 
 

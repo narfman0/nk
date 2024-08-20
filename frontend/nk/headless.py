@@ -4,13 +4,7 @@ from math import cos, sin
 
 from betterproto import serialized_on_wire
 from loguru import logger
-from nk_shared.proto import (
-    CharacterType,
-    CharacterUpdated,
-    Message,
-    PlayerJoinRequest,
-    PlayerJoinResponse,
-)
+from nk_shared.proto import CharacterType, CharacterUpdated, Message, PlayerJoinResponse
 
 from nk.net import Network
 from nk.net.network import LoginException
@@ -42,7 +36,6 @@ def main():
             raise e
     token = network.login(email=email, password="password")
     network.connect(token)
-    network.send(Message(player_join_request=PlayerJoinRequest(requested=True)))
     i = 0
     response = get_start_pos(network)
     x, y = response.x, response.y
