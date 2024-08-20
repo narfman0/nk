@@ -10,7 +10,7 @@ from nk.world import World, Projectile
 @pytest.fixture
 def map_headless():
     with patch("nk_shared.map.pytmx.load_pygame") as load_pygame_mock:
-        load_pygame_mock.return_value = pytmx.TiledMap(f"{DATA_ROOT}/tiled/1.tmx")
+        load_pygame_mock.return_value = pytmx.TiledMap(f"{DATA_ROOT}/tiled/tmx/1.tmx")
         yield
 
 

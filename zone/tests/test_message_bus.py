@@ -26,11 +26,11 @@ class TestMessageBus:
     @pytest.mark.asyncio
     async def test_handle_message_text(self, message_bus: MessageBus):
         msg = Message(text_message=TextMessage(text="test"))
-        await message_bus.handle_message(None, msg)
+        await message_bus.handle_message(msg)
 
     @pytest.mark.asyncio
     async def test_handle_character_updated(self, message_bus: MessageBus):
         player = Player(user_id="1234", moving_direction=Direction.DIRECTION_E)
         message_bus.world.players.append(player)
         msg = builders.build_character_updated(player)
-        await message_bus.handle_message(player, msg)
+        await message_bus.handle_message(msg)
