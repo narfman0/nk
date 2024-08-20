@@ -12,9 +12,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-* Push protos to each project
-* Slim nk_shared
-
 * Town + player respawn
 * Update sprites
 * Sound effects
