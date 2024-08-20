@@ -1,13 +1,9 @@
-docker: auth backend
+docker: auth
 
 auth:
 	docker compose build auth
 	docker push narfman0/nk-auth-docker
 
-backend:
-	docker compose build backend
-	docker push narfman0/nk-backend-docker
-	
 clean: clean-build clean-pyc clean-installer
 
 clean-build: ## remove build artifacts
