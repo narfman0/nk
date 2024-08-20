@@ -6,7 +6,7 @@ import pymunk
 
 from nk_shared.models.character_properties import CharacterProperties
 from nk_shared.proto import CharacterType, Direction
-from nk_shared.util import direction_util
+from nk_shared import direction_util
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 

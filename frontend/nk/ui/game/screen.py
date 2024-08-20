@@ -4,7 +4,6 @@ import pygame
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
-from nk_shared.util.math import cartesian_to_isometric, isometric_to_cartesian
 from pygame import Surface
 from pygame.event import Event
 
@@ -35,6 +34,7 @@ from nk.ui.game.renderables_generator import (
     generate_projectile_renderables,
 )
 from nk.ui.screen import Screen, ScreenManager
+from nk.util.math import cartesian_to_isometric, isometric_to_cartesian
 
 DEFAULT_SCREEN_SCALE = 5
 

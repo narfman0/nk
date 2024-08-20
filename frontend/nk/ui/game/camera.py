@@ -1,5 +1,4 @@
-from nk_shared.util.math import cartesian_to_isometric
-
+from nk.util.math import cartesian_to_isometric
 from nk.world import World
 
 
