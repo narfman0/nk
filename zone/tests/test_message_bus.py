@@ -1,18 +1,18 @@
-from unittest.mock import Mock, patch
-
+from unittest.mock import AsyncMock, patch
 import pytest
 from nk_shared import builders
-from nk_shared.models.character import Character
-from nk_shared.proto import Direction, Message, PlayerJoinRequest, TextMessage
+from nk_shared.proto import Direction, Message, TextMessage
 
-from nk.message_bus import MessageBus
-from nk.models import Player
-from nk.world import World
+from app.message_bus import MessageBus
+from app.models import Player
+from app.world import World
 
 
 @pytest.fixture
 def world() -> World:
-    return World()
+    world = World()
+    world.broadcast = AsyncMock(return_value=None)
+    return world
 
 
 @pytest.fixture

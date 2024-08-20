@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from nk_shared.models.zone import Environment
 from nk_shared.proto import CharacterType
 
-from nk.ai.models import SpawnerStruct
-from nk.models import Enemy
+from app.ai.models import SpawnerStruct
+from app.models import Enemy
 
 
 class SpawnerProvider(ABC):  # pylint: disable=too-few-public-methods

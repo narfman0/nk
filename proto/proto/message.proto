@@ -8,6 +8,8 @@ import "proto/projectile.proto";
 import "proto/text_message.proto";
 
 message Message {
+  string destination_uuid = 10;
+
   oneof payload {
     proto.CharacterUpdated character_updated = 200;
     proto.CharacterAttacked character_attacked = 201;

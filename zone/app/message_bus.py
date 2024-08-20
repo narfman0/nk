@@ -6,32 +6,34 @@ from nk_shared.proto import (
     CharacterUpdated,
     Direction,
     Message,
+    PlayerDisconnected,
+    PlayerJoinRequest,
     PlayerJoined,
     PlayerJoinResponse,
     PlayerLeft,
 )
 
-from nk.db import Character as DBCharacter
-from nk.models import Player, WorldComponentProvider
+from app.db import Character as DBCharacter
+from app.models import Player, WorldComponentProvider
 
 
 class MessageBus:
     def __init__(self, world: WorldComponentProvider):
         self.world = world
 
-    async def handle_message(self, player: Player, msg: Message):
+    async def handle_message(self, msg: Message):
         """Socket-level handler for messages, mostly passing through to world"""
         if serialized_on_wire(msg.player_join_request):
-            await self.handle_player_join_request(player)
+            await self.handle_player_join_request(msg.player_join_request)
         elif serialized_on_wire(msg.text_message):
-            self.world.broadcast(msg, player)
+            await self.world.broadcast(msg)
         elif serialized_on_wire(msg.character_attacked):
             self.handle_character_attacked(msg.character_attacked)
         elif serialized_on_wire(msg.player_disconnected):
-            await self.handle_player_disconnected(player)
+            await self.handle_player_disconnected(msg.player_disconnected)
         elif serialized_on_wire(msg.character_updated):
             self.handle_character_updated(msg.character_updated)
-            self.world.broadcast(msg, player)
+            await self.world.broadcast(msg)
 
     def handle_character_attacked(self, details: CharacterAttacked):
         """Call character attack, does nothing if character does not exist"""
@@ -52,10 +54,11 @@ class MessageBus:
         character.facing_direction = Direction(details.facing_direction)
         character.body.velocity = (details.dx, details.dy)
 
-    async def handle_player_disconnected(self, player: Player):
-        self.world.broadcast(Message(player_left=PlayerLeft(uuid=player.uuid)), player)
+    async def handle_player_disconnected(self, details: PlayerDisconnected):
+        player = self.world.get_character_by_uuid(details.uuid)
+        await self.world.broadcast(Message(player_left=PlayerLeft(uuid=details.uuid)))
         x, y = player.position.x, player.position.y  # pylint: disable=no-member
-        user_id = PydanticObjectId(player.uuid)
+        user_id = PydanticObjectId(details.uuid)
         character = await DBCharacter.find_one(DBCharacter.user_id == user_id)
         if character:
             await character.set({DBCharacter.x: x, DBCharacter.y: y})
@@ -63,14 +66,19 @@ class MessageBus:
             await DBCharacter(user_id=user_id, x=x, y=y).insert()
         self.world.players.remove(player)
 
-    async def handle_player_join_request(self, player: Player):
+    async def handle_player_join_request(self, details: PlayerJoinRequest):
         """A player has joined. Handle initialization."""
+        player = Player(user_id=details.uuid)
+        logger.info("Player joined: {}", player)
         await self.spawn_player(player)
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
-        await player.messages.put(Message(player_join_response=response))
-        self.world.broadcast(
-            Message(player_joined=PlayerJoined(uuid=player.uuid)), player
+        await self.world.broadcast(
+            Message(player_join_response=response, destination_uuid=player.uuid),
+            channel=f"player-{player.uuid}",
+        )
+        await self.world.broadcast(
+            Message(player_joined=PlayerJoined(uuid=player.uuid))
         )
 
     async def spawn_player(self, player: Player) -> Player:

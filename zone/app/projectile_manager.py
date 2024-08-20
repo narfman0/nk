@@ -9,8 +9,8 @@ from nk_shared.models.attack_profile import AttackProfile
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
 
-from nk.models import WorldComponentProvider
-from nk.settings import DATA_ROOT
+from app.models import WorldComponentProvider
+from app.settings import DATA_ROOT
 
 
 class ProjectileManager:
@@ -19,16 +19,16 @@ class ProjectileManager:
         self.world = world
         self.projectiles: list[Projectile] = []
 
-    def update(self, dt: float):
+    async def update(self, dt: float):
         for projectile in self.projectiles[:]:
             projectile.update(dt)
-            if self.handle_projectile_collisions(projectile):
+            if await self.handle_projectile_collisions(projectile):
                 self.projectiles.remove(projectile)
                 msg = builders.build_projectile_destroyed(projectile.uuid)
-                self.world.broadcast(msg)
+                await self.world.broadcast(msg)
                 logger.debug("Projectile destroyed: {}", projectile.uuid)
 
-    def handle_projectile_collisions(self, projectile: Projectile) -> bool:
+    async def handle_projectile_collisions(self, projectile: Projectile) -> bool:
         """Handle collisions for a single projectile."""
         for query_info in self.world.space.shape_query(projectile.shape):
             if hasattr(query_info.shape.body, "character"):
@@ -37,7 +37,7 @@ class ProjectileManager:
                     dmg = 1
                     character.handle_damage_received(dmg)
                     msg = builders.build_character_damaged(character, dmg)
-                    self.world.broadcast(msg)
+                    await self.world.broadcast(msg)
                     return True
             else:
                 return True

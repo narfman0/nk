@@ -3,7 +3,7 @@ from typing import Callable
 from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared import builders
-from nk_shared.proto import CharacterType, Direction, Message, PlayerJoinRequest
+from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
 
 from nk.net.network import Network
@@ -27,6 +27,9 @@ class GameState:
             message = self.network.next()
             if serialized_on_wire(message.player_join_response):
                 self.handle_player_join_response(message)
+            # TODO this is a hack to prevent messages from being processed before the player has joined
+            if not self.world:
+                continue
             elif serialized_on_wire(message.character_updated):
                 self.handle_character_updated(message)
             elif serialized_on_wire(message.character_attacked):
@@ -44,10 +47,6 @@ class GameState:
         access_token = self.network.login(email, password)
         self.network.connect(access_token)
         self.player_joined_callback = callback
-        self.network.send(
-            Message(player_join_request=PlayerJoinRequest(requested=True))
-        )
-        logger.info("Sent join request, waiting for response")
 
     def register(self, email: str, password: str):
         self.network.register(email, password)

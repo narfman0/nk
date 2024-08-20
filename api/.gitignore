@@ -93,7 +93,6 @@ ENV/
 *.avi
 output/
 .vscode/
-nk.zip
 bin/
 *_config.*
 *.tiled-session

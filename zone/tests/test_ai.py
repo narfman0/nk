@@ -1,11 +1,11 @@
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from nk_shared.models.zone import EnemyGroup, Environment, Spawner, Zone
 
-from nk.ai import Ai
-from nk.models import Player
-from nk.world import World
+from app.ai import Ai
+from app.models import Player
+from app.world import World
 
 
 @pytest.fixture
@@ -23,6 +23,7 @@ def single_enemy_enemy_group() -> EnemyGroup:
 @pytest.fixture
 def world(player) -> World:
     world = World()
+    world.broadcast = AsyncMock(return_value=None)
     world.players.append(player)
     return world
 
@@ -58,13 +59,15 @@ def ai(world: World, zone: Zone) -> Ai:
 
 
 class TestAi:
-    def test_trivial_update(self, ai: Ai):
-        ai.update(0.016)
+    @pytest.mark.asyncio
+    async def test_trivial_update(self, ai: Ai):
+        await ai.update(0.016)
 
     def test_closest_player(self, ai: Ai, player: Player):
         assert ai.closest_player(0, 0) == player
 
-    def test_spawner(self, ai: Ai):
+    @pytest.mark.asyncio
+    async def test_spawner(self, ai: Ai):
         assert len(ai.enemies) == 1
-        ai.update(10)
+        await ai.update(10)
         assert len(ai.enemies) == 2

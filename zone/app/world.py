@@ -7,11 +7,12 @@ from nk_shared.map import Map
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 
-from nk.ai import Ai
-from nk.message_bus import MessageBus
-from nk.models import Player, WorldComponentProvider
-from nk.projectile_manager import ProjectileManager
-from nk.settings import DATA_ROOT
+from app.ai import Ai
+from app.message_bus import MessageBus
+from app.models import Player, WorldComponentProvider
+from app.projectile_manager import ProjectileManager
+from app.pubsub import publish
+from app.settings import DATA_ROOT
 
 HEAL_DST_SQ = 5
 HEAL_AMT = 10.0
@@ -30,16 +31,16 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._projectile_component = ProjectileManager(self)
         self._message_component = MessageBus(self)
 
-    def update(self, dt: float):
-        self._ai_component.update(dt)
-        self.update_characters(dt, self._players, self._ai_component.enemies)
-        self.update_characters(dt, self._ai_component.enemies, self._players)
+    async def update(self, dt: float):
+        await self._ai_component.update(dt)
+        await self.update_characters(dt, self._players, self._ai_component.enemies)
+        await self.update_characters(dt, self._ai_component.enemies, self._players)
         for player in self._players:
             self.update_medic(dt, player)
-        self._projectile_component.update(dt)
+        await self._projectile_component.update(dt)
         self._space.step(dt)
 
-    def update_characters(
+    async def update_characters(
         self,
         dt: float,
         characters: list[Character],
@@ -50,9 +51,9 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
             character.update(dt)
             if character.should_process_attack:
                 if character.attack_type == AttackType.MELEE:
-                    self.process_attack_damage(character, targets)
+                    await self.process_attack_damage(character, targets)
                 elif character.attack_type == AttackType.RANGED:
-                    self.process_ranged_attack(character)
+                    await self.process_ranged_attack(character)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
                 self._space.remove(
@@ -66,20 +67,22 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 player.handle_healing_received(HEAL_AMT * dt)
                 return
 
-    def process_ranged_attack(self, character: Character):
+    async def process_ranged_attack(self, character: Character):
         projectile = self._projectile_component.create_projectile(character)
-        self.broadcast(builders.build_projectile_created(projectile))
+        await self.broadcast(builders.build_projectile_created(projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
 
-    def process_attack_damage(self, attacker: Character, targets: list[Character]):
+    async def process_attack_damage(
+        self, attacker: Character, targets: list[Character]
+    ):
         """Attack trigger frame reached, let's find who was hit and apply dmg"""
         attacker.should_process_attack = False
         for target in targets:
             if attacker.hitbox_shape.shapes_collide(target.shape).points:
                 damage = 1
                 target.handle_damage_received(damage)
-                self.broadcast(builders.build_character_damaged(target, damage))
+                await self.broadcast(builders.build_character_damaged(target, damage))
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         for character in self._players + self._ai_component.enemies:
@@ -87,13 +90,11 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 return character
         return None
 
-    async def handle_message(self, player: Player, msg: Message):
-        await self._message_component.handle_message(player, msg)
+    async def handle_message(self, msg: Message):
+        await self._message_component.handle_message(msg)
 
-    def broadcast(self, message: Message, origin: Player | None = None) -> None:
-        for player in self._players:
-            if player != origin:
-                player.messages.put_nowait(message)
+    async def broadcast(self, message: Message, **kwargs) -> None:
+        await publish(bytes(message), **kwargs)
 
     @property
     def map(self) -> Map:
@@ -106,8 +107,3 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     @property
     def space(self) -> pymunk.Space:
         return self._space
-
-
-# Locally, this is the world directly. When deployed, this might be a handle to
-# a message forwarder to the larger system.
-world = World()

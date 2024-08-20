@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from nk import main
+from app import main
 
 
 class TestMain:

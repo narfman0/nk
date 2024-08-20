@@ -19,6 +19,34 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASS:-rootpass}
       ME_CONFIG_MONGODB_URL: mongodb://${MONGODB_USER:-root}:${MONGODB_PASS:-rootpass}@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+
+  api:
+    image: 'narfman0/nk-api-docker:latest'
+    restart: always
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      MONGODB_HOST: ${MONGODB_HOST:-mongo}
+      REDIS_URL: ${REDIS_URL:-redis://redis}
+      UVICORN_RELOAD: ${UVICORN_RELOAD:-true}
+    build:
+      context: ./api
+    ports:
+      - 7666:7666
+    develop:
+      watch:
+        - path: ./api/requirements.txt
+          action: rebuild
+        - path: ./api/app
+          action: sync
+          target: /app/app
   auth:
     image: 'narfman0/nk-auth-docker:latest'
     restart: always
@@ -33,32 +61,29 @@ services:
       context: ./auth
     ports:
       - 8080:8080
-  backend:
-    image: 'narfman0/nk-backend-docker:latest'
+  zone:
+    image: 'narfman0/nk-zone-docker:latest'
     restart: always
     depends_on:
       - mongo
     env_file:
       - .env
     environment:
-      SECRET: ${SECRET}
       MONGODB_HOST: ${MONGODB_HOST:-mongo}
-      UVICORN_RELOAD: ${UVICORN_RELOAD:-true}
+      REDIS_URL: ${REDIS_URL:-redis://redis}
     build:
       context: .
-      dockerfile: backend.Dockerfile
-    ports:
-      - 7666:7666
+      dockerfile: zone.Dockerfile
     develop:
       watch:
-        - path: ./backend/requirements.txt
+        - path: ./zone/requirements.txt
           action: rebuild
         - path: ./shared/nk_shared
           action: sync
           target: /app/nk_shared
-        - path: ./backend/nk
-          action: sync
-          target: /app/nk
+        - path: ./zone/app
+          action: sync+restart
+          target: /app/app
         - path: ./data
           action: sync
           target: /data

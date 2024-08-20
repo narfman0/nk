@@ -4,17 +4,17 @@ import asyncio
 
 from fastapi import WebSocket
 from loguru import logger
-from nk_shared import builders
-from nk_shared.proto import Message
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
-from nk.models import Player
-from nk.world import world
+from app.proto import Message, PlayerDisconnected, PlayerJoinRequest
+from app.pubsub import publish, subscribe
+
+logger.add("app.log")
 
 
-async def send_messages(player: Player, websocket: WebSocket):
-    """Push all messages on player's queue through their socket"""
-    message = await player.messages.get()
+async def send_messages(messages: asyncio.Queue[Message], websocket: WebSocket):
+    """Push all messages on queue through their socket"""
+    message = await messages.get()
     if websocket.state != WebSocketState.DISCONNECTED:
         try:
             await websocket.send_bytes(bytes(message))
@@ -33,33 +33,43 @@ async def send_messages(player: Player, websocket: WebSocket):
             logger.debug("WebSocketDisconnect after all")
 
 
-async def handle_connected(websocket: WebSocket, user_id: str):
+async def handle_connected(websocket: WebSocket, uuid: str):
     """Handle the lifecycle of the websocket"""
 
     async def consumer():
         """Translate bytes on the wire to messages"""
         async for data in websocket.iter_bytes():
-            await world.handle_message(player, Message().parse(data))
+            await publish(data)
+
+    async def pubsub_consumer():
+        channel = await subscribe(uuid)
+        while True:
+            message = await channel.get_message(ignore_subscribe_messages=True)
+            if message is not None:
+                proto = Message().parse(message["data"])
+                messages.put_nowait(proto)
 
     async def producer():
-        """Emit queued messages to player"""
+        """Emit queued messages"""
         while True:
-            await send_messages(player, websocket)
+            await send_messages(messages, websocket)
 
     async def handler():
         """Socket lifecycle handler. Handles producing and consuming simultaneously."""
         consumer_task = asyncio.create_task(consumer())
+        pubsub_consumer_task = asyncio.create_task(pubsub_consumer())
         producer_task = asyncio.create_task(producer())
         _done, pending = await asyncio.wait(
-            [consumer_task, producer_task],
+            [consumer_task, pubsub_consumer_task, producer_task],
             return_when=asyncio.FIRST_COMPLETED,
         )
         for task in pending:
             task.cancel()
 
-    player = Player(user_id=user_id)
+    messages = asyncio.Queue[Message]()
+    await publish(bytes(Message(player_join_request=PlayerJoinRequest(uuid=uuid))))
     try:
         await handler()
     except WebSocketDisconnect:
-        logger.info("Disconnected from {}", player)
-    await world.handle_message(player, builders.build_player_disconnected(player.uuid))
+        logger.info("Disconnected from {}", uuid)
+    await publish(bytes(Message(player_disconnected=PlayerDisconnected(uuid=uuid))))

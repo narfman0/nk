@@ -11,7 +11,7 @@ message PlayerJoined {
 }
 
 message PlayerJoinRequest {
-  bool requested = 1;
+  string uuid = 1;
 }
 
 message PlayerJoinResponse {

@@ -1,0 +1,7 @@
+betterproto
+fastapi
+httpx
+loguru
+redis
+uvicorn[standard]
+#-e ../shared

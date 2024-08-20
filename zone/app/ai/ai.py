@@ -6,8 +6,8 @@ from nk_shared.models.zone import Zone
 from nk_shared.proto import CharacterType
 from nk_shared.util import direction_util
 
-from nk.ai.spawner_manager import SpawnerManager, SpawnerProvider
-from nk.models import Enemy, Player, WorldComponentProvider
+from app.ai.spawner_manager import SpawnerManager, SpawnerProvider
+from app.models import Enemy, Player, WorldComponentProvider
 
 UPDATE_FREQUENCY = 0.1
 
@@ -31,7 +31,7 @@ class Ai(SpawnerProvider):
                     enemy_group.center_y + random.randint(-r, r),
                 )
 
-    def update(self, dt: float):
+    async def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
         if self.world.players:
             self.spawn_manager.update(dt)
@@ -42,10 +42,10 @@ class Ai(SpawnerProvider):
         self.next_update_time = UPDATE_FREQUENCY
         for enemy in self.enemies:
             if enemy.alive:
-                self.update_enemy_behavior(enemy)
-                self.world.broadcast(builders.build_character_updated(enemy))
+                await self.update_enemy_behavior(enemy)
+                await self.world.broadcast(builders.build_character_updated(enemy))
 
-    def update_enemy_behavior(self, enemy: Enemy):
+    async def update_enemy_behavior(self, enemy: Enemy):
         """Update behavior for a single enemy."""
         enemy.moving_direction = None
         player = self.closest_player(enemy.position.x, enemy.position.y)
@@ -59,16 +59,16 @@ class Ai(SpawnerProvider):
             )
 
         if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
-            self.enemy_attack(enemy, player)
+            await self.enemy_attack(enemy, player)
 
-    def enemy_attack(self, enemy: Enemy, player: Player):
+    async def enemy_attack(self, enemy: Enemy, player: Player):
         """Handle enemy attack behavior."""
         direction = atan2(
             player.position.y - enemy.position.y,
             player.position.x - enemy.position.x,
         )
         enemy.attack(direction)
-        self.world.broadcast(builders.build_character_attacked(enemy, direction))
+        await self.world.broadcast(builders.build_character_attacked(enemy, direction))
 
     def closest_player(self, x: float, y: float) -> Player | None:
         """Retrieve the closest player to the given x,y pair.

@@ -1,12 +1,10 @@
 beanie
 betterproto
 dataclass-wizard
-fastapi
-httpx
 loguru
 pygame-ce
 pymunk
 pytmx
 pyyaml
-uvicorn[standard]
+redis
 #-e ../shared

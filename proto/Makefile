@@ -1,14 +1,7 @@
-SRC_DIR := proto/
-BUILD_DIR := ../shared/nk_shared/
-
-build: build_dir lint
-	protoc --python_betterproto_out=$(BUILD_DIR) $(SRC_DIR)*.proto
-
-build_dir:
-	mkdir -p $(BUILD_DIR)
-
-clean:
-	rm -rf $(BUILD_DIR)
+build: lint
+	protoc proto/*.proto \
+		--python_betterproto_out=../shared/nk_shared/ \
+		--python_betterproto_out=../api/app/
 
 lint:
 	protolint lint -fix proto
