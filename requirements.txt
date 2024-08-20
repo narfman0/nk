@@ -1,6 +1,7 @@
 watchdog
 betterproto[compiler]
 -e shared --config-settings editable_mode=strict 
+-r api/requirements.txt
 -r auth/requirements.txt
 -r frontend/requirements.txt
--r backend/requirements.txt
+-r zone/requirements.txt

@@ -1,3 +1,4 @@
+-r api/requirements_test.txt
 -r auth/requirements_test.txt
--r backend/requirements_test.txt
 -r frontend/requirements_test.txt
+-r zone/requirements_test.txt

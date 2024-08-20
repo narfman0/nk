@@ -1,5 +1,6 @@
 import asyncio
 
+import sentry_sdk
 from beanie import init_beanie
 from loguru import logger
 from nk_shared.proto import Message
@@ -7,6 +8,7 @@ from pygame.time import Clock
 
 from app.db import Character, db
 from app.pubsub import subscribe
+from app.settings import SENTRY_DSN
 from app.world import World
 
 
@@ -43,9 +45,26 @@ async def handler(world: World):
         task.cancel()
 
 
+def init_sentry():
+    if not SENTRY_DSN:
+        logger.warning("SENTRY_DSN not set, skipping Sentry initialization")
+        return
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for tracing.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
+
+
 async def main():
     """App-level startup and teardown method. We need to tick world regularly,
     and this is how we do it with the current implementation."""
+    init_sentry()
     await init_beanie(
         database=db,
         document_models=[

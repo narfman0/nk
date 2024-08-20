@@ -7,4 +7,5 @@ pymunk
 pytmx
 pyyaml
 redis
+sentry-sdk
 #-e ../shared

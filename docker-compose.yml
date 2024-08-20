@@ -71,6 +71,7 @@ services:
     environment:
       MONGODB_HOST: ${MONGODB_HOST:-mongo}
       REDIS_URL: ${REDIS_URL:-redis://redis}
+      SENTRY_DSN: ${SENTRY_DSN}
     build:
       context: .
       dockerfile: zone.Dockerfile

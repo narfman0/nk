@@ -25,18 +25,20 @@ class GameState:
     def update(self):
         while self.network.has_messages():
             message = self.network.next()
-            if serialized_on_wire(message.player_join_response):
-                self.handle_player_join_response(message)
-            if serialized_on_wire(message.character_updated):
-                self.handle_character_updated(message)
-            elif serialized_on_wire(message.character_attacked):
-                self.handle_character_attacked(message)
-            elif serialized_on_wire(message.character_damaged):
-                self.handle_character_damaged(message)
-            elif serialized_on_wire(message.projectile_created):
-                self.handle_projectile_created(message)
-            elif serialized_on_wire(message.projectile_destroyed):
-                self.handle_projectile_destroyed(message)
+            if self.world:
+                if serialized_on_wire(message.character_updated):
+                    self.handle_character_updated(message)
+                elif serialized_on_wire(message.character_attacked):
+                    self.handle_character_attacked(message)
+                elif serialized_on_wire(message.character_damaged):
+                    self.handle_character_damaged(message)
+                elif serialized_on_wire(message.projectile_created):
+                    self.handle_projectile_created(message)
+                elif serialized_on_wire(message.projectile_destroyed):
+                    self.handle_projectile_destroyed(message)
+            else:
+                if serialized_on_wire(message.player_join_response):
+                    self.handle_player_join_response(message)
         if self.world:
             self.handle_self_updated()
 
