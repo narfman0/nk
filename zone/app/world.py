@@ -69,7 +69,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
 
     async def process_ranged_attack(self, character: Character):
         projectile = self._projectile_component.create_projectile(character)
-        await self.broadcast(builders.build_projectile_created(projectile))
+        await self.publish(builders.build_projectile_created(projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
 
@@ -82,7 +82,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
             if attacker.hitbox_shape.shapes_collide(target.shape).points:
                 damage = 1
                 target.handle_damage_received(damage)
-                await self.broadcast(builders.build_character_damaged(target, damage))
+                await self.publish(builders.build_character_damaged(target, damage))
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         for character in self._players + self._ai_component.enemies:
@@ -93,7 +93,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     async def handle_message(self, msg: Message):
         await self._message_component.handle_message(msg)
 
-    async def broadcast(self, message: Message, **kwargs) -> None:
+    async def publish(self, message: Message, **kwargs) -> None:
         await publish(bytes(message), **kwargs)
 
     @property

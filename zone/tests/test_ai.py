@@ -23,7 +23,7 @@ def single_enemy_enemy_group() -> EnemyGroup:
 @pytest.fixture
 def world(player) -> World:
     world = World()
-    world.broadcast = AsyncMock(return_value=None)
+    world.publish = AsyncMock(return_value=None)
     world.players.append(player)
     return world
 

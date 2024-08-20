@@ -26,14 +26,14 @@ class MessageBus:
         if serialized_on_wire(msg.player_connected):
             await self.handle_player_connected(msg.player_connected)
         elif serialized_on_wire(msg.text_message):
-            await self.world.broadcast(msg)
+            await self.world.publish(msg)
         elif serialized_on_wire(msg.character_attacked):
             self.handle_character_attacked(msg.character_attacked)
         elif serialized_on_wire(msg.player_disconnected):
             await self.handle_player_disconnected(msg.player_disconnected)
         elif serialized_on_wire(msg.character_updated):
             self.handle_character_updated(msg.character_updated)
-            await self.world.broadcast(msg)
+            await self.world.publish(msg)
 
     def handle_character_attacked(self, details: CharacterAttacked):
         """Call character attack, does nothing if character does not exist"""
@@ -56,7 +56,7 @@ class MessageBus:
 
     async def handle_player_disconnected(self, details: PlayerDisconnected):
         player = self.world.get_character_by_uuid(details.uuid)
-        await self.world.broadcast(Message(player_left=PlayerLeft(uuid=details.uuid)))
+        await self.world.publish(Message(player_left=PlayerLeft(uuid=details.uuid)))
         x, y = player.position.x, player.position.y  # pylint: disable=no-member
         user_id = PydanticObjectId(details.uuid)
         character = await DBCharacter.find_one(DBCharacter.user_id == user_id)
@@ -74,13 +74,11 @@ class MessageBus:
         # pylint: disable-next=no-member
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
-        await self.world.broadcast(
+        await self.world.publish(
             Message(player_join_response=response, destination_uuid=player.uuid),
             channel=f"player-{player.uuid}",
         )
-        await self.world.broadcast(
-            Message(player_joined=PlayerJoined(uuid=player.uuid))
-        )
+        await self.world.publish(Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
     async def spawn_player(self, player: Player) -> Player:
         """Player 'is' a Character, which i don't love, but its already

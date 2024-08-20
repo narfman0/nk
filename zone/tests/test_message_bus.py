@@ -12,7 +12,7 @@ from app.world import World
 @pytest.fixture
 def world() -> World:
     world = World()
-    world.broadcast = AsyncMock(return_value=None)
+    world.publish = AsyncMock(return_value=None)
     return world
 
 

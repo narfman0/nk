@@ -43,7 +43,7 @@ class Ai(SpawnerProvider):
         for enemy in self.enemies:
             if enemy.alive:
                 await self.update_enemy_behavior(enemy)
-                await self.world.broadcast(builders.build_character_updated(enemy))
+                await self.world.publish(builders.build_character_updated(enemy))
 
     async def update_enemy_behavior(self, enemy: Enemy):
         """Update behavior for a single enemy."""
@@ -68,7 +68,7 @@ class Ai(SpawnerProvider):
             player.position.x - enemy.position.x,
         )
         enemy.attack(direction)
-        await self.world.broadcast(builders.build_character_attacked(enemy, direction))
+        await self.world.publish(builders.build_character_attacked(enemy, direction))
 
     def closest_player(self, x: float, y: float) -> Player | None:
         """Retrieve the closest player to the given x,y pair.

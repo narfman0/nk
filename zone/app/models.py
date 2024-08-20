@@ -30,7 +30,7 @@ class Enemy(Character):
 
 class WorldComponentProvider(ABC):
     @abstractmethod
-    async def broadcast(self, message: Message, **kwargs) -> None:
+    async def publish(self, message: Message, **kwargs) -> None:
         raise NotImplementedError()
 
     @abstractmethod

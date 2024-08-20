@@ -9,5 +9,5 @@ class TestWorld:
     @pytest.mark.asyncio
     async def test_trivial_update(self):
         world = World()
-        world.broadcast = AsyncMock(return_value=None)
+        world.publish = AsyncMock(return_value=None)
         await world.update(0.016)

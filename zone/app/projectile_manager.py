@@ -25,7 +25,7 @@ class ProjectileManager:
             if await self.handle_projectile_collisions(projectile):
                 self.projectiles.remove(projectile)
                 msg = builders.build_projectile_destroyed(projectile.uuid)
-                await self.world.broadcast(msg)
+                await self.world.publish(msg)
                 logger.debug("Projectile destroyed: {}", projectile.uuid)
 
     async def handle_projectile_collisions(self, projectile: Projectile) -> bool:
@@ -37,7 +37,7 @@ class ProjectileManager:
                     dmg = 1
                     character.handle_damage_received(dmg)
                     msg = builders.build_character_damaged(character, dmg)
-                    await self.world.broadcast(msg)
+                    await self.world.publish(msg)
                     return True
             else:
                 return True
