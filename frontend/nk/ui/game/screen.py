@@ -91,10 +91,14 @@ class GameScreen(Screen, GameUICalculator):
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to {}", self.world.player.invincible)
         if ActionEnum.ZOOM_OUT in player_actions:
-            self.screen_scale = max(2, self.screen_scale - 1)  # pylint: disable=fixme
-            self.recalculate_screen_scale_derivatives()
+            self.change_screen_scale(-1)
         if ActionEnum.ZOOM_IN in player_actions:
-            self.screen_scale = min(6, self.screen_scale + 1)  # pylint: disable=fixme
+            self.change_screen_scale(1)
+
+    def change_screen_scale(self, difference: int):
+        previous_screen_scale = self.screen_scale
+        self.screen_scale = min(6, max(2, self.screen_scale + difference))
+        if previous_screen_scale != self.screen_scale:
             self.recalculate_screen_scale_derivatives()
 
     def draw(self, dest_surface: Surface):  # pylint: disable=arguments-renamed
