@@ -6,7 +6,7 @@ import httpx
 from loguru import logger
 from nk_shared.proto import Message
 
-from nk.net.socket_handler import handle_websocket
+from nk.net.not_sync import handle_websocket
 
 AUTH_BASE_URL = environ.get("AUTH_BASE_URL", "http://localhost:8080")
 HOST = environ.get("WEBSOCKET_HOST", "localhost")
