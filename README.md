@@ -12,6 +12,8 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
+* Send all characters upon player connect via full update
+* Send out delta updates only when sufficiently different
 * Town + player respawn
 * Update sprites
 * Sound effects

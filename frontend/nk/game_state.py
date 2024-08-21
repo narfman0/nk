@@ -114,6 +114,7 @@ class GameState:
                 self.character_added_callback(character)  # pylint: disable=not-callable
         character.facing_direction = Direction(details.facing_direction)
         character.moving_direction = Direction(details.moving_direction)
+        character.hp = details.hp
 
     def handle_player_join_response(self, message: Message):
         details = message.player_join_response

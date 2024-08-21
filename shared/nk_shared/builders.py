@@ -32,6 +32,7 @@ def build_character_updated(character: Character) -> proto.Message:
             character_type=character.character_type,
             facing_direction=character.facing_direction,
             moving_direction=character.moving_direction,
+            hp=character.hp,
         ),
     )
 

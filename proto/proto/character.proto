@@ -32,4 +32,5 @@ message CharacterUpdated {
   CharacterType character_type = 4;
   Direction facing_direction = 5;
   Direction moving_direction = 6;
+  int32 hp = 9;
 }

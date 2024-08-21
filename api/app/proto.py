@@ -49,6 +49,7 @@ class CharacterUpdated(betterproto.Message):
     character_type: "CharacterType" = betterproto.enum_field(4)
     facing_direction: "Direction" = betterproto.enum_field(5)
     moving_direction: "Direction" = betterproto.enum_field(6)
+    hp: int = betterproto.int32_field(9)
 
 
 @dataclass
