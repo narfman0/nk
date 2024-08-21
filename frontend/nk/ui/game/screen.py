@@ -134,6 +134,22 @@ class GameScreen(Screen, GameUICalculator):
         )
         self.game_gui.draw(self.world.player, dest_surface)
 
+    def recalculate_screen_scale_derivatives(self):
+        self.screen_width = WIDTH // self.screen_scale
+        self.screen_height = HEIGHT // self.screen_scale
+        self.camera_offset_x = self.screen_width // 2
+        self.camera_offset_y = self.screen_height // 2
+        self.ground_renderables = list(
+            generate_map_renderables(self, ground=True, tilemap=self.world.map)
+        )
+        self.map_renderables = list(
+            generate_map_renderables(self, ground=False, tilemap=self.world.map)
+        )
+        environment_renderables = generate_environment_renderables(
+            self, self.world.zone.environment_features
+        )
+        self.map_renderables.extend(list(environment_renderables))
+
     def is_visible(self, blit_x, blit_y) -> bool:
         # pylint: disable=chained-comparison
         tw = self.world.map.tile_width
@@ -163,22 +179,6 @@ class GameScreen(Screen, GameUICalculator):
             x / self.world.map.tile_width // 2,
             y / self.world.map.tile_width // 2,
         )
-
-    def recalculate_screen_scale_derivatives(self):
-        self.screen_width = WIDTH // self.screen_scale
-        self.screen_height = HEIGHT // self.screen_scale
-        self.camera_offset_x = self.screen_width // 2
-        self.camera_offset_y = self.screen_height // 2
-        self.ground_renderables = list(
-            generate_map_renderables(self, ground=True, tilemap=self.world.map)
-        )
-        self.map_renderables = list(
-            generate_map_renderables(self, ground=False, tilemap=self.world.map)
-        )
-        environment_renderables = generate_environment_renderables(
-            self, self.world.zone.environment_features
-        )
-        self.map_renderables.extend(list(environment_renderables))
 
     def handle_character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)

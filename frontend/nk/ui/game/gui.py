@@ -16,7 +16,7 @@ class GameGui:
         self.manager.draw_ui(surface)
 
         text_sf = self.font.render(
-            f"dt ewma: {self.dt_ewma}", False, pygame.Color("white")
+            f"dt: {int(self.dt_ewma*1000)}ms", False, pygame.Color("white")
         )
         surface.blit(text_sf, (32, 0))
         text_sf = self.font.render(f"HP: {player.hp}", False, pygame.Color("white"))
