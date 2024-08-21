@@ -5,12 +5,14 @@ from pygame.sprite import Group as SpriteGroup
 from pygame.surface import Surface  # pylint: disable=no-name-in-module
 from sortedcontainers import SortedKeyList
 
+from nk.ui.game.camera import Camera
+
 
 @dataclass
 class Renderable(ABC):
     key: float
 
-    def draw(self, surface: Surface):
+    def draw(self, surface: Surface, camera: Camera):
         raise NotImplementedError
 
 
@@ -19,26 +21,19 @@ class BlittableRenderable(Renderable):
     blit_image: Surface
     blit_coords: tuple[float, float]
 
-    def draw(self, surface: Surface):
-        surface.blit(self.blit_image, self.blit_coords)
+    def draw(self, surface: Surface, camera: Camera):
+        if not camera.is_visible(*self.blit_coords):
+            return
+        x, y = self.blit_coords
+        surface.blit(self.blit_image, (x - camera.x, y - camera.y))
 
 
 @dataclass
 class SpriteRenderable(Renderable):
     sprite_group: SpriteGroup
 
-    def draw(self, surface: Surface):
+    def draw(self, surface: Surface, camera: Camera):
         self.sprite_group.draw(surface)
-
-
-@dataclass
-class MapRenderable:
-    layer: int
-    blit_image: Surface
-    blit_coords: tuple[float, float]
-
-    def draw(self, surface: Surface):
-        surface.blit(self.blit_image, self.blit_coords)
 
 
 def renderables_key(a: Renderable):

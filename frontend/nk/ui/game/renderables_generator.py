@@ -6,11 +6,7 @@ from nk_shared.models.zone import Environment
 
 from nk.settings import NK_DATA_ROOT
 from nk.ui.game.models import GameUICalculator
-from nk.ui.game.renderables import (
-    BlittableRenderable,
-    MapRenderable,
-    renderables_generate_key,
-)
+from nk.ui.game.renderables import BlittableRenderable, renderables_generate_key
 from nk.world import World
 
 
@@ -20,11 +16,11 @@ def generate_projectile_renderables(world: World, calculator: GameUICalculator):
         blit_x, blit_y = calculator.calculate_draw_coordinates(
             projectile.x, projectile.y, image
         )
-        bottom_y = blit_y - calculator.camera.y + image.get_height()
+        bottom_y = blit_y + image.get_height()
         yield BlittableRenderable(
             renderables_generate_key(world.map.get_1f_layer_id(), bottom_y),
             image,
-            (blit_x - calculator.camera.x, blit_y - calculator.camera.y),
+            (blit_x, blit_y),
         )
 
 
@@ -49,10 +45,13 @@ def generate_map_renderables(
                     blit_x, blit_y = calculator.calculate_draw_coordinates(
                         x + tile_offset_x, y + tile_offset_y, blit_image
                     )
-                    yield MapRenderable(
-                        layer=layer,
-                        blit_image=blit_image,
-                        blit_coords=(blit_x + x_offset, blit_y + y_offset),
+                    blit_coords = (blit_x + x_offset, blit_y + y_offset)
+                    img_height = blit_image.get_height()
+                    bottom_y = blit_y + y_offset + img_height - 8
+                    yield BlittableRenderable(
+                        renderables_generate_key(layer, bottom_y),
+                        blit_image,
+                        blit_coords,
                     )
 
 

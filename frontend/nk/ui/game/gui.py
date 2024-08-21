@@ -11,20 +11,27 @@ class GameGui:
         self.manager = pygame_gui.UIManager((WIDTH, HEIGHT))
         self.dt_ewma = 0
 
-    def draw(self, player: Character, surface: pygame.Surface):
+    def draw(
+        self,
+        player: Character,
+        surface: pygame.Surface,
+        renderable_count: int,
+        draw_ticks: int,
+    ):
         x, y = player.position
         self.manager.draw_ui(surface)
-
-        text_sf = self.font.render(
-            f"dt: {int(self.dt_ewma*1000)}ms", False, pygame.Color("white")
-        )
-        surface.blit(text_sf, (32, 0))
-        text_sf = self.font.render(f"HP: {player.hp}", False, pygame.Color("white"))
-        surface.blit(text_sf, (32, 32))
-        text_sf = self.font.render(
-            f"x,y: {int(x)},{int(y)}", False, pygame.Color("white")
-        )
-        surface.blit(text_sf, (32, 64))
+        guiables = [
+            f"dt: {int(self.dt_ewma*1000)}ms",
+            f"ticks: {draw_ticks}",
+            f"renderables: {renderable_count}",
+            f"HP: {player.hp}",
+            f"x,y: {int(x)},{int(y)}",
+        ]
+        draw_y = 0
+        for guiable in guiables:
+            text_sf = self.font.render(guiable, False, pygame.Color("white"))
+            surface.blit(text_sf, (32, draw_y))
+            draw_y += 32
 
     def update(self, dt: float):
         self.manager.update(dt)

@@ -23,7 +23,6 @@ from nk.ui.game.input import (
 )
 from nk.ui.game.models import GameUICalculator
 from nk.ui.game.renderables import (
-    BlittableRenderable,
     SpriteRenderable,
     create_renderable_list,
     renderables_generate_key,
@@ -49,7 +48,7 @@ class GameScreen(Screen, GameUICalculator):
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
-        self._camera = Camera(game_state.world)
+        self._camera = Camera(game_state.world, 0, 0)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.character_added_callback = self.handle_character_added
@@ -99,67 +98,60 @@ class GameScreen(Screen, GameUICalculator):
             self.recalculate_screen_scale_derivatives()
 
     def draw(self, dest_surface: Surface):  # pylint: disable=arguments-renamed
-        renderables = create_renderable_list()
-        for map_renderable in self.map_renderables:
-            blit_x, blit_y = map_renderable.blit_coords
-            if not self.is_visible(blit_x, blit_y):
-                continue
-            img_height = map_renderable.blit_image.get_height()
-            bottom_y = blit_y - self._camera.y + img_height - 8
-            renderable = BlittableRenderable(
-                renderables_generate_key(map_renderable.layer, bottom_y),
-                map_renderable.blit_image,
-                (blit_x - self._camera.x, blit_y - self._camera.y),
-            )
-            renderables.add(renderable)
+        curtime = pygame.time.get_ticks()
+        renderables = self.map_renderables.copy()
         for renderable in generate_projectile_renderables(self.world, self):
             renderables.add(renderable)
         for character_struct in self.character_structs:
+            if not self.camera.is_visible(
+                character_struct.sprite.rect.centerx + self._camera.x,
+                character_struct.sprite.rect.centery + self._camera.y,
+            ):
+                continue
             img_height = character_struct.sprite.image.get_height()
-            bottom_y = character_struct.sprite.rect.top + img_height // 2
+            bottom_y = (
+                character_struct.sprite.rect.top + img_height // 2 + self._camera.y
+            )
             key = renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y)
             renderables.add(SpriteRenderable(key, character_struct.sprite_group))
 
         surface = Surface(size=(self.screen_width, self.screen_height))
         for ground_renderable in self.ground_renderables:
             blit_x, blit_y = ground_renderable.blit_coords
-            if not self.is_visible(blit_x, blit_y):
+            if not self.camera.is_visible(blit_x, blit_y):
                 continue
             blit_coords = (blit_x - self._camera.x, blit_y - self._camera.y)
             surface.blit(ground_renderable.blit_image, blit_coords)
+
         for renderable in renderables:
-            renderable.draw(surface)
+            renderable.draw(surface, self._camera)
+
+        endtime = pygame.time.get_ticks()
         pygame.transform.scale_by(
             surface, dest_surface=dest_surface, factor=self.screen_scale
         )
-        self.game_gui.draw(self.world.player, dest_surface)
+        self.game_gui.draw(
+            self.world.player,
+            dest_surface,
+            len(renderables),
+            endtime - curtime,
+        )
 
     def recalculate_screen_scale_derivatives(self):
         self.screen_width = WIDTH // self.screen_scale
         self.screen_height = HEIGHT // self.screen_scale
         self.camera_offset_x = self.screen_width // 2
         self.camera_offset_y = self.screen_height // 2
+        self.camera.update_screen_width_height(self.screen_width, self.screen_height)
         self.ground_renderables = list(
             generate_map_renderables(self, ground=True, tilemap=self.world.map)
         )
-        self.map_renderables = list(
+        self.map_renderables = create_renderable_list()
+        self.map_renderables += list(
             generate_map_renderables(self, ground=False, tilemap=self.world.map)
         )
-        environment_renderables = generate_environment_renderables(
-            self, self.world.zone.environment_features
-        )
-        self.map_renderables.extend(list(environment_renderables))
-
-    def is_visible(self, blit_x, blit_y) -> bool:
-        # pylint: disable=chained-comparison
-        tw = self.world.map.tile_width
-        sx = blit_x - self._camera.x
-        sy = blit_y - self._camera.y
-        return (
-            sx < self.screen_width + tw
-            and sx > -tw
-            and sy < self.screen_height + tw
-            and sy > -tw
+        self.map_renderables += list(
+            generate_environment_renderables(self, self.world.zone.environment_features)
         )
 
     def calculate_draw_coordinates(
