@@ -28,7 +28,6 @@ async def update_position(dt: float, world: WorldComponentProvider, enemy: Enemy
         ):
             return  # too similar to previous update, skip
     enemy_remote_positions[enemy.uuid] = proto.character_position_updated
-    logger.info("Publishing positonal update for enemy {}", enemy.uuid)
     await world.publish(proto)
 
 
