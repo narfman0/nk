@@ -17,6 +17,10 @@ from app.db import Character as DBCharacter
 from app.models import Player, WorldComponentProvider
 
 
+class UnknownCharacterError(Exception):
+    pass
+
+
 class MessageBus:
     def __init__(self, world: WorldComponentProvider):
         self.world = world
@@ -49,6 +53,7 @@ class MessageBus:
         character = self.world.get_character_by_uuid(details.uuid)
         if not character:
             logger.warning("No character maching uuid: {}", details.uuid)
+            raise UnknownCharacterError(details.uuid)
         character.body.position = (details.x, details.y)
         character.moving_direction = Direction(details.moving_direction)
         character.facing_direction = Direction(details.facing_direction)

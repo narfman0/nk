@@ -106,6 +106,7 @@ class TextMessage(betterproto.Message):
 @dataclass
 class Message(betterproto.Message):
     destination_uuid: str = betterproto.string_field(10)
+    origin_uuid: str = betterproto.string_field(11)
     character_updated: "CharacterUpdated" = betterproto.message_field(
         200, group="payload"
     )

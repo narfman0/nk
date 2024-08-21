@@ -47,7 +47,8 @@ async def handle_connected(websocket: WebSocket, uuid: str):
             message = await channel.get_message(ignore_subscribe_messages=True)
             if message is not None:
                 proto = Message().parse(message["data"])
-                messages.put_nowait(proto)
+                if proto.origin_uuid != uuid:
+                    messages.put_nowait(proto)
 
     async def producer():
         """Emit queued messages"""

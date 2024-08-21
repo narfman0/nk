@@ -9,6 +9,7 @@ import "proto/text_message.proto";
 
 message Message {
   string destination_uuid = 10;
+  string origin_uuid = 11;
 
   oneof payload {
     proto.CharacterUpdated character_updated = 200;
