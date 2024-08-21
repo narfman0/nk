@@ -20,6 +20,30 @@ def build_character_damaged(character: Character, damage: float) -> proto.Messag
     )
 
 
+def build_character_position_updated(character: Character) -> proto.Message:
+    return proto.Message(
+        origin_uuid=character.uuid,
+        character_position_updated=proto.CharacterPositionUpdated(
+            uuid=character.uuid,
+            x=character.body.position.x,
+            y=character.body.position.y,
+            dx=character.body.velocity.x,
+            dy=character.body.velocity.y,
+        ),
+    )
+
+
+def build_character_direction_updated(character: Character) -> proto.Message:
+    return proto.Message(
+        origin_uuid=character.uuid,
+        character_direction_updated=proto.CharacterDirectionUpdated(
+            uuid=character.uuid,
+            facing_direction=character.facing_direction,
+            moving_direction=character.moving_direction,
+        ),
+    )
+
+
 def build_character_updated(character: Character) -> proto.Message:
     return proto.Message(
         origin_uuid=character.uuid,

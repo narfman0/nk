@@ -1,8 +1,11 @@
 from beanie import PydanticObjectId
 from betterproto import serialized_on_wire
 from loguru import logger
+from nk_shared import builders
 from nk_shared.proto import (
     CharacterAttacked,
+    CharacterDirectionUpdated,
+    CharacterPositionUpdated,
     CharacterUpdated,
     Direction,
     Message,
@@ -36,8 +39,13 @@ class MessageBus:
         elif serialized_on_wire(msg.player_disconnected):
             await self.handle_player_disconnected(msg.player_disconnected)
         elif serialized_on_wire(msg.character_updated):
-            self.handle_character_updated(msg.character_updated)
-            await self.world.publish(msg)
+            await self.handle_character_updated(msg.character_updated)
+        elif serialized_on_wire(msg.character_position_updated):
+            await self.handle_character_position_updated(msg.character_position_updated)
+        elif serialized_on_wire(msg.character_direction_updated):
+            await self.handle_character_direction_updated(
+                msg.character_direction_updated
+            )
 
     def handle_character_attacked(self, details: CharacterAttacked):
         """Call character attack, does nothing if character does not exist"""
@@ -47,7 +55,9 @@ class MessageBus:
         logger.info(details)
         character.attack(details.direction)
 
-    def handle_character_updated(self, details: CharacterUpdated):
+    async def handle_character_position_updated(
+        self, details: CharacterPositionUpdated
+    ):
         """Apply message details to relevant character. If character
         does not exist, do not do anything."""
         character = self.world.get_character_by_uuid(details.uuid)
@@ -55,9 +65,38 @@ class MessageBus:
             logger.warning("No character maching uuid: {}", details.uuid)
             raise UnknownCharacterError(details.uuid)
         character.body.position = (details.x, details.y)
+        character.body.velocity = (details.dx, details.dy)
+        await self.world.publish(
+            Message(origin_uuid=character.uuid, character_updated=details)
+        )
+
+    async def handle_character_direction_updated(
+        self, details: CharacterDirectionUpdated
+    ):
+        character = self.world.get_character_by_uuid(details.uuid)
+        if not character:
+            logger.warning("No character maching uuid: {}", details.uuid)
+            raise UnknownCharacterError(details.uuid)
         character.moving_direction = Direction(details.moving_direction)
         character.facing_direction = Direction(details.facing_direction)
+        await self.world.publish(
+            Message(origin_uuid=character.uuid, character_direction_updated=details)
+        )
+
+    async def handle_character_updated(self, details: CharacterUpdated):
+        """Apply message details to relevant character. If character
+        does not exist, do not do anything."""
+        character = self.world.get_character_by_uuid(details.uuid)
+        if not character:
+            logger.warning("No character maching uuid: {}", details.uuid)
+            raise UnknownCharacterError(details.uuid)
+        character.body.position = (details.x, details.y)
         character.body.velocity = (details.dx, details.dy)
+        character.moving_direction = Direction(details.moving_direction)
+        character.facing_direction = Direction(details.facing_direction)
+        await self.world.publish(
+            Message(origin_uuid=character.uuid, character_updated=details)
+        )
 
     async def handle_player_disconnected(self, details: PlayerDisconnected):
         player = self.world.get_character_by_uuid(details.uuid)
@@ -74,11 +113,16 @@ class MessageBus:
     async def handle_player_connected(self, details: PlayerConnected):
         """A player has joined. Handle initialization."""
         player = Player(user_id=details.uuid)
-        logger.info("Player joined: {}", player)
+        logger.info("Player joined: {}", player.uuid)
         await self.spawn_player(player)
         # pylint: disable-next=no-member
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
+        await self.world.publish(
+            Message(player_join_response=response, destination_uuid=player.uuid),
+            channel=f"player-{player.uuid}",
+        )
+        await self.send_player_full_character_updates(player.uuid)
         await self.world.publish(
             Message(player_join_response=response, destination_uuid=player.uuid),
             channel=f"player-{player.uuid}",
@@ -99,3 +143,12 @@ class MessageBus:
         self.world.space.add(player.body, player.shape, player.hitbox_shape)
         self.world.players.append(player)
         return player
+
+    async def send_player_full_character_updates(self, player_uuid: str):
+        for character in self.world.enemies + self.world.players:
+            if character.uuid == player_uuid:
+                continue
+            await self.world.publish(
+                builders.build_character_updated(character),
+                channel=f"player-{player_uuid}",
+            )

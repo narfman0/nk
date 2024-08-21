@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Callable
 
 from betterproto import serialized_on_wire
@@ -26,7 +27,11 @@ class GameState:
         while self.network.has_messages():
             message = self.network.next()
             if self.world:
-                if serialized_on_wire(message.character_updated):
+                if serialized_on_wire(message.character_position_updated):
+                    self.handle_character_position_updated(message)
+                if serialized_on_wire(message.character_direction_updated):
+                    self.handle_character_direction_updated(message)
+                elif serialized_on_wire(message.character_updated):
                     self.handle_character_updated(message)
                 elif serialized_on_wire(message.character_attacked):
                     self.handle_character_attacked(message)
@@ -86,6 +91,30 @@ class GameState:
             logger.warning(
                 "character_damaged no character found with uuid {}", details.uuid
             )
+
+    def handle_character_direction_updated(self, message: Message):
+        details = message.character_direction_updated
+        if self.world.player.uuid == details.uuid:
+            logger.warning("Received character_updated for self")
+            return
+        character = self.world.get_character_by_uuid(details.uuid)
+        if character:
+            character.facing_direction = Direction(details.facing_direction)
+            character.moving_direction = Direction(details.moving_direction)
+        else:
+            logger.warning("No character found with uuid: {}", details.uuid)
+
+    def handle_character_position_updated(self, message: Message):
+        details = message.character_position_updated
+        if self.world.player.uuid == details.uuid:
+            logger.warning("Received character_updated for self")
+            return
+        character = self.world.get_character_by_uuid(details.uuid)
+        if character:
+            character.body.position = Vec2d(details.x, details.y)
+            character.body.velocity = Vec2d(details.dx, details.dy)
+        else:
+            logger.warning("No character found with uuid: {}", details.uuid)
 
     def handle_character_updated(self, message: Message):
         details = message.character_updated

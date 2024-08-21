@@ -12,6 +12,8 @@ message Message {
   string origin_uuid = 11;
 
   oneof payload {
+    proto.CharacterDirectionUpdated character_direction_updated = 204;
+    proto.CharacterPositionUpdated character_position_updated = 203;
     proto.CharacterUpdated character_updated = 200;
     proto.CharacterAttacked character_attacked = 201;
     proto.CharacterDamaged character_damaged = 202;

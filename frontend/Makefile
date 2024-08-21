@@ -1,4 +1,4 @@
-default: test
+default: app
 
 clean: clean-build clean-pyc clean-installer
 
@@ -45,8 +45,8 @@ pyinstaller: clean
 test:
 	pytest --cov=nk --cov-report term-missing -W ignore::DeprecationWarning tests/
 
-main:
-	python -m nk.main
+app:
+	python -m app
 
 release: test clean pyinstaller
 

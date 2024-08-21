@@ -40,6 +40,22 @@ class CharacterDamaged(betterproto.Message):
 
 
 @dataclass
+class CharacterDirectionUpdated(betterproto.Message):
+    uuid: str = betterproto.string_field(1)
+    facing_direction: "Direction" = betterproto.enum_field(5)
+    moving_direction: "Direction" = betterproto.enum_field(6)
+
+
+@dataclass
+class CharacterPositionUpdated(betterproto.Message):
+    uuid: str = betterproto.string_field(1)
+    x: float = betterproto.float_field(2)
+    y: float = betterproto.float_field(3)
+    dx: float = betterproto.float_field(7)
+    dy: float = betterproto.float_field(8)
+
+
+@dataclass
 class CharacterUpdated(betterproto.Message):
     uuid: str = betterproto.string_field(1)
     x: float = betterproto.float_field(2)
@@ -49,7 +65,7 @@ class CharacterUpdated(betterproto.Message):
     character_type: "CharacterType" = betterproto.enum_field(4)
     facing_direction: "Direction" = betterproto.enum_field(5)
     moving_direction: "Direction" = betterproto.enum_field(6)
-    hp: int = betterproto.int32_field(9)
+    hp: float = betterproto.float_field(9)
 
 
 @dataclass
@@ -108,6 +124,12 @@ class TextMessage(betterproto.Message):
 class Message(betterproto.Message):
     destination_uuid: str = betterproto.string_field(10)
     origin_uuid: str = betterproto.string_field(11)
+    character_direction_updated: "CharacterDirectionUpdated" = (
+        betterproto.message_field(204, group="payload")
+    )
+    character_position_updated: "CharacterPositionUpdated" = betterproto.message_field(
+        203, group="payload"
+    )
     character_updated: "CharacterUpdated" = betterproto.message_field(
         200, group="payload"
     )

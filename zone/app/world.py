@@ -9,7 +9,7 @@ from nk_shared.proto import Message
 
 from app.ai import Ai
 from app.message_bus import MessageBus
-from app.models import Player, WorldComponentProvider
+from app.models import Enemy, Player, WorldComponentProvider
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
 from app.settings import DATA_ROOT
@@ -99,6 +99,10 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     @property
     def map(self) -> Map:
         return self._map
+
+    @property
+    def enemies(self) -> list[Enemy]:
+        return self._ai_component.enemies
 
     @property
     def players(self) -> list[Player]:

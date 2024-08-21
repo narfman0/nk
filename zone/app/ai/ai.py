@@ -3,12 +3,16 @@ from math import atan2
 
 from nk_shared import builders, direction_util
 from nk_shared.models.zone import Zone
-from nk_shared.proto import CharacterType
+from nk_shared.proto import (
+    CharacterType,
+    Message,
+)
 
+from app.ai import incrementals
 from app.ai.spawner_manager import SpawnerManager, SpawnerProvider
 from app.models import Enemy, Player, WorldComponentProvider
 
-UPDATE_FREQUENCY = 0.1
+FULL_UPDATE_FREQUENCY = 10
 
 
 class Ai(SpawnerProvider):
@@ -33,16 +37,21 @@ class Ai(SpawnerProvider):
     async def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
         if self.world.players:
-            self.spawn_manager.update(dt)
+            await self.spawn_manager.update(dt)
 
         self.next_update_time -= dt
-        if self.next_update_time > 0:
-            return
-        self.next_update_time = UPDATE_FREQUENCY
+        full_update = self.next_update_time <= 0
+        if full_update:
+            self.next_update_time = FULL_UPDATE_FREQUENCY
         for enemy in self.enemies:
             if enemy.alive:
                 await self.update_enemy_behavior(enemy)
-                await self.world.publish(builders.build_character_updated(enemy))
+                if not full_update:
+                    await incrementals.update_direction(self.world, enemy)
+                    await incrementals.update_position(dt, self.world, enemy)
+            if full_update:
+                proto = builders.build_character_updated(enemy)
+                await self.world.publish(proto)
 
     async def update_enemy_behavior(self, enemy: Enemy):
         """Update behavior for a single enemy."""
@@ -95,3 +104,6 @@ class Ai(SpawnerProvider):
         self.enemies.append(character)
         self.world.space.add(character.body, character.shape, character.hitbox_shape)
         return character
+
+    async def publish(self, message: Message, **kwargs) -> None:
+        await self.world.publish(message, **kwargs)

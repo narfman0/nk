@@ -39,6 +39,11 @@ class WorldComponentProvider(ABC):
 
     @property
     @abstractmethod
+    def enemies(self) -> list[Enemy]:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
     def players(self) -> list[Player]:
         raise NotImplementedError()
 
