@@ -16,6 +16,7 @@ def build_character_damaged(character: Character, damage: float) -> proto.Messag
         character_damaged=proto.CharacterDamaged(
             uuid=character.uuid,
             damage=damage,
+            hp=character.hp,
         )
     )
 

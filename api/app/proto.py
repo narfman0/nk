@@ -37,6 +37,7 @@ class CharacterAttacked(betterproto.Message):
 class CharacterDamaged(betterproto.Message):
     uuid: str = betterproto.string_field(1)
     damage: float = betterproto.float_field(2)
+    hp: float = betterproto.float_field(3)
 
 
 @dataclass

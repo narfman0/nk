@@ -21,6 +21,7 @@ message CharacterAttacked {
 message CharacterDamaged {
   string uuid = 1;
   float damage = 2;
+  float hp = 3;
 }
 
 message CharacterDirectionUpdated {

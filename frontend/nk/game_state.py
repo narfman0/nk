@@ -87,6 +87,7 @@ class GameState:
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.handle_damage_received(details.damage)
+            character.hp = details.hp
         else:
             logger.warning(
                 "character_damaged no character found with uuid {}", details.uuid
