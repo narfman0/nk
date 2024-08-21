@@ -112,9 +112,8 @@ class MessageBus:
 
     async def handle_player_connected(self, details: PlayerConnected):
         """A player has joined. Handle initialization."""
-        player = Player(user_id=details.uuid)
-        logger.info("Player joined: {}", player.uuid)
-        await self.spawn_player(player)
+        logger.info("Player joined: {}", details.uuid)
+        player = await self.spawn_player(details.uuid)
         # pylint: disable-next=no-member
         x, y = player.position.x, player.position.y
         response = PlayerJoinResponse(uuid=player.uuid, x=x, y=y)
@@ -129,17 +128,17 @@ class MessageBus:
         )
         await self.world.publish(Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
-    async def spawn_player(self, player: Player) -> Player:
+    async def spawn_player(self, player_uuid: str) -> Player:
         """Player 'is' a Character, which i don't love, but its already
         created. Update relevant attrs."""
         character = await DBCharacter.find_one(
-            DBCharacter.user_id == PydanticObjectId(player.uuid)
+            DBCharacter.user_id == PydanticObjectId(player_uuid)
         )
         if character:
             x, y = character.x, character.y
         else:
             x, y = self.world.map.get_start_tile()
-        player.body.position = (x, y)
+        player = Player(user_id=player_uuid, start_x=x, start_y=y)
         self.world.space.add(player.body, player.shape, player.hitbox_shape)
         self.world.players.append(player)
         return player
