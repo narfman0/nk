@@ -9,8 +9,6 @@ from starlette.websockets import WebSocketDisconnect, WebSocketState
 from app.proto import Message, PlayerConnected, PlayerDisconnected
 from app.pubsub import publish, subscribe
 
-logger.add("app.log")
-
 
 async def send_messages(messages: asyncio.Queue[Message], websocket: WebSocket):
     """Push all messages on queue through their socket"""
