@@ -160,7 +160,9 @@ class GameState:
             self.player_joined_callback()  # pylint: disable=not-callable
 
     def handle_projectile_created(self, message: Message):
-        self.world.create_projectile(message.projectile_created.projectile)
+        if message.projectile_created.origin_uuid == self.world.player.uuid:
+            return
+        self.world.create_projectile(message.projectile_created)
 
     def handle_projectile_destroyed(self, message: Message):
         details = message.projectile_destroyed
