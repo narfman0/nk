@@ -1,4 +1,5 @@
-from nk_shared.models import Character, Projectile
+from nk_shared.proto import Projectile
+from nk_shared.models import Character
 from nk_shared import proto
 
 
@@ -76,10 +77,12 @@ def build_player_respawned(character: Character) -> proto.Message:
     )
 
 
-def build_projectile_created(projectile: Projectile) -> proto.Message:
+def build_projectile_created(
+    origin: Character, projectile: Projectile
+) -> proto.Message:
     return proto.Message(
         projectile_created=proto.ProjectileCreated(
-            projectile=build_projectile(projectile)
+            origin_uuid=origin.uuid, projectile=build_projectile(projectile)
         )
     )
 

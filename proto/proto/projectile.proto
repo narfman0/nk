@@ -12,6 +12,7 @@ message Projectile {
 }
 
 message ProjectileCreated {
+  string origin_uuid = 2;
   Projectile projectile = 1;
 }
 

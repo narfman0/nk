@@ -101,7 +101,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
 
     async def process_ranged_attack(self, character: Character):
         projectile = self._projectile_component.create_projectile(character)
-        await self.publish(builders.build_projectile_created(projectile))
+        await self.publish(builders.build_projectile_created(character, projectile))
         character.should_process_attack = False
         logger.debug("Projectile created: {}", projectile.uuid)
 

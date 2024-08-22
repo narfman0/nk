@@ -115,6 +115,7 @@ class Projectile(betterproto.Message):
 
 @dataclass
 class ProjectileCreated(betterproto.Message):
+    origin_uuid: str = betterproto.string_field(2)
     projectile: "Projectile" = betterproto.message_field(1)
 
 
