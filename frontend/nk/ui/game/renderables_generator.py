@@ -11,7 +11,7 @@ from nk.world import World
 
 
 def generate_projectile_renderables(world: World, calculator: GameUICalculator):
-    for projectile in world.projectiles:
+    for projectile in world.projectile_manager.projectiles:
         image = load_projectile_image(projectile.attack_profile.image_path)
         blit_x, blit_y = calculator.calculate_draw_coordinates(
             projectile.x, projectile.y, image
@@ -24,7 +24,7 @@ def generate_projectile_renderables(world: World, calculator: GameUICalculator):
         )
 
 
-def generate_map_renderables(
+def generate_map_renderables(  # pylint: disable=too-many-locals
     calculator: GameUICalculator,
     ground: bool,
     tilemap: Map,

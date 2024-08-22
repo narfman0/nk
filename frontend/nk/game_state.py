@@ -1,4 +1,3 @@
-from collections import deque
 from typing import Callable
 
 from betterproto import serialized_on_wire
@@ -162,10 +161,10 @@ class GameState:
     def handle_projectile_created(self, message: Message):
         if message.projectile_created.origin_uuid == self.world.player.uuid:
             return
-        self.world.create_projectile(message.projectile_created)
+        self.world.projectile_manager.create_projectile(message.projectile_created)
 
     def handle_projectile_destroyed(self, message: Message):
         details = message.projectile_destroyed
-        projectile = self.world.get_projectile_by_uuid(details.uuid)
+        projectile = self.world.projectile_manager.get_projectile_by_uuid(details.uuid)
         if projectile:
-            self.world.projectiles.remove(projectile)
+            self.world.projectile_manager.projectiles.remove(projectile)
