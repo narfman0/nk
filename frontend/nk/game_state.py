@@ -23,7 +23,7 @@ class GameState:
         self.world: World = None
         self.network = Network()
 
-    def update(self):
+    def update(self, _dt: float):
         while self.network.has_messages():
             message = self.network.next()
             if self.world:

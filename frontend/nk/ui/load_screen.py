@@ -26,7 +26,7 @@ class LoadScreen(Screen):
 
     def update(self, dt: float, events: list[Event]):
         super().update(dt, events)
-        self.game_state.update()
+        self.game_state.update(dt)
 
     def handle_player_joined(self):
         logger.info("Player joined, loading...")

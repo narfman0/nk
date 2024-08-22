@@ -68,7 +68,7 @@ class GameScreen(Screen, GameUICalculator):
             self.world.player.facing_direction = player_move_direction
         assert self.world.player.facing_direction is not None
         update_character_structs(dt, self.character_structs, self)
-        self.game_state.update()
+        self.game_state.update(dt)
         self.game_gui.update(dt)
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
