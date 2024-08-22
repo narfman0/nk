@@ -12,9 +12,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
-* Send all characters upon player connect via full update
-* Send out delta updates only when sufficiently different (HP)
-* Player respawn (on death, look up closest medic)
 * Update sprites
 * Sound effects
 

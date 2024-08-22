@@ -97,6 +97,13 @@ class PlayerLeft(betterproto.Message):
 
 
 @dataclass
+class PlayerRespawned(betterproto.Message):
+    uuid: str = betterproto.string_field(1)
+    x: float = betterproto.float_field(2)
+    y: float = betterproto.float_field(3)
+
+
+@dataclass
 class Projectile(betterproto.Message):
     uuid: str = betterproto.string_field(1)
     x: float = betterproto.float_field(2)
@@ -151,6 +158,9 @@ class Message(betterproto.Message):
         103, group="payload"
     )
     player_left: "PlayerLeft" = betterproto.message_field(101, group="payload")
+    player_respawned: "PlayerRespawned" = betterproto.message_field(
+        105, group="payload"
+    )
     projectile_created: "ProjectileCreated" = betterproto.message_field(
         300, group="payload"
     )

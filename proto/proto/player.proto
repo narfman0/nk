@@ -23,3 +23,9 @@ message PlayerJoinResponse {
 message PlayerLeft {
   string uuid = 1;
 }
+
+message PlayerRespawned {
+  string uuid = 1;
+  float x = 2;
+  float y = 3;
+}

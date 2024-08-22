@@ -23,6 +23,7 @@ message Message {
     proto.PlayerJoined player_joined = 100;
     proto.PlayerJoinResponse player_join_response = 103;
     proto.PlayerLeft player_left = 101;
+    proto.PlayerRespawned player_respawned = 105;
     
     proto.ProjectileCreated projectile_created = 300;
     proto.ProjectileDestroyed projectile_destroyed = 301;

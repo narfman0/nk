@@ -37,6 +37,8 @@ class GameState:
                     self.handle_character_attacked(message)
                 elif serialized_on_wire(message.character_damaged):
                     self.handle_character_damaged(message)
+                elif serialized_on_wire(message.player_respawned):
+                    self.handle_player_respawned(message)
                 elif serialized_on_wire(message.projectile_created):
                     self.handle_projectile_created(message)
                 elif serialized_on_wire(message.projectile_destroyed):
@@ -64,9 +66,6 @@ class GameState:
     def handle_character_attacked(self, message: Message):
         details = message.character_attacked
         logger.info(details)
-        if not details.uuid:
-            logger.warning("character_attacked has no associated uuid!")
-            return
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.attack(details.direction)
@@ -78,12 +77,20 @@ class GameState:
                 "character_attacked no character found with uuid {}", details.uuid
             )
 
+    def handle_player_respawned(self, message: Message):
+        details = message.player_respawned
+        character = self.world.get_character_by_uuid(details.uuid)
+        if character:
+            character.hp = character.hp_max
+            character.body.position = Vec2d(details.x, details.y)
+        else:
+            logger.warning(
+                "character_damaged no character found with uuid {}", details.uuid
+            )
+
     def handle_character_damaged(self, message: Message):
         details = message.character_damaged
         logger.info(details)
-        if not details.uuid:
-            logger.warning("character_damaged has no associated uuid!")
-            return
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.handle_damage_received(details.damage)
