@@ -1,7 +1,6 @@
 """Inteligently update the network state of the enemy.
 If we have not changed (much), skip the update."""
 
-from loguru import logger
 from nk_shared import builders
 from nk_shared.proto import CharacterDirectionUpdated, CharacterPositionUpdated
 

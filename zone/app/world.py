@@ -1,6 +1,5 @@
 """Simulates the world's characters"""
 
-from collections import deque
 import pymunk
 from loguru import logger
 from nk_shared import builders
@@ -9,7 +8,7 @@ from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 
 from app.ai import Ai
-from app.message_bus import MessageBus
+from app.messages.handler import MessageHandler
 from app.models import Enemy, Player, WorldComponentProvider
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
@@ -31,7 +30,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._players: list[Player] = []
         self._ai_component = Ai(self, self._zone)
         self._projectile_component = ProjectileManager(self)
-        self._message_component = MessageBus(self)
+        self._message_component = MessageHandler(self)
         self._player_respawns: dict[str, float] = {}
 
     async def update(self, dt: float):

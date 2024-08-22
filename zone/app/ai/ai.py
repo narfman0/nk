@@ -3,10 +3,7 @@ from math import atan2
 
 from nk_shared import builders, direction_util
 from nk_shared.models.zone import Zone
-from nk_shared.proto import (
-    CharacterType,
-    Message,
-)
+from nk_shared.proto import CharacterType, Message
 
 from app.ai import incrementals
 from app.ai.spawner_manager import SpawnerManager, SpawnerProvider
