@@ -4,10 +4,10 @@ import pygame
 from nk_shared.map import Map
 from nk_shared.models.zone import Environment
 
+from nk.game.world import World
 from nk.settings import NK_DATA_ROOT
 from nk.ui.game.models import GameUICalculator
 from nk.ui.game.renderables import BlittableRenderable, renderables_generate_key
-from nk.world import World
 
 
 def generate_projectile_renderables(world: World, calculator: GameUICalculator):

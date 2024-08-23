@@ -1,4 +1,4 @@
-from nk.world import World
+from nk.game.world import World
 
 
 def test_get_character_by_uuid(world: World):

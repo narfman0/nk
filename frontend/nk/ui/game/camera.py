@@ -1,5 +1,5 @@
+from nk.game.world import World
 from nk.util.math import cartesian_to_isometric
-from nk.world import World
 
 
 class Camera:  # pylint: disable=too-few-public-methods

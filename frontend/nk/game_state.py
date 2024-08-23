@@ -6,8 +6,8 @@ from nk_shared import builders
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
 
+from nk.game.world import World
 from nk.net.network import Network
-from nk.world import World
 
 TICKS_BEFORE_UPDATE = 6
 
