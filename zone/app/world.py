@@ -8,15 +8,12 @@ from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 
 from app.ai import Ai
+from app.medical_manager import MedicalManager
 from app.messages.handler import MessageHandler
 from app.models import Enemy, Player, WorldComponentProvider
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
 from app.settings import DATA_ROOT
-
-HEAL_DST_SQ = 5
-HEAL_AMT = 10.0
-RESPAWN_TIME = 5.0
 
 
 class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attributes
@@ -31,15 +28,13 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._ai_component = Ai(self, self._zone)
         self._projectile_component = ProjectileManager(self)
         self._message_component = MessageHandler(self)
-        self._player_respawns: dict[str, float] = {}
+        self._medical_manager = MedicalManager(self, self._zone.medics)
 
     async def update(self, dt: float):
         await self._ai_component.update(dt)
         await self.update_characters(dt, self._players, self._ai_component.enemies)
         await self.update_characters(dt, self._ai_component.enemies, self._players)
-        for player in self._players:
-            self.update_medic(dt, player)
-        await self.update_respawns(dt)
+        await self._medical_manager.update(dt)
         await self._projectile_component.update(dt)
         self._space.step(dt)
 
@@ -64,40 +59,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 )
                 if character in self.players:
                     logger.info("Player killed {}", character.uuid)
-                    self._player_respawns[character.uuid] = RESPAWN_TIME
-
-    async def update_respawns(self, dt: float):
-        """Update respawn timers for players"""
-        for player_uuid in list(self._player_respawns):
-            respawn_time = self._player_respawns[player_uuid]
-            respawn_time -= dt
-            if respawn_time <= 0:
-                del self._player_respawns[player_uuid]
-                player = self.get_character_by_uuid(player_uuid)
-                await self.respawn_player(player)
-            else:
-                self._player_respawns[player_uuid] = respawn_time
-
-    async def respawn_player(self, player: Player):
-        player.hp = player.hp_max
-
-        closest_dst_sq = float("inf")
-        spawn_point = None
-        for medic in self._zone.medics:
-            dst_sq = player.position.get_dist_sqrd((medic.x, medic.y))
-            if dst_sq < closest_dst_sq:
-                closest_dst_sq = dst_sq
-                spawn_point = (medic.x, medic.y)
-        player.body.position = spawn_point
-        await self.publish(builders.build_player_respawned(player))
-
-    def update_medic(self, dt: float, player: Player):
-        """Check if player is in range of a medic and heal if so"""
-        for medic in self._zone.medics:
-            dst_sq = player.position.get_dist_sqrd((medic.x, medic.y))
-            if dst_sq < HEAL_DST_SQ:
-                player.handle_healing_received(HEAL_AMT * dt)
-                return
+                    self._medical_manager.schedule_respawn(character)
 
     async def process_ranged_attack(self, character: Character):
         projectile = self._projectile_component.create_projectile(character)

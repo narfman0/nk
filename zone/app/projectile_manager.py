@@ -5,9 +5,9 @@ from uuid import uuid4
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.models.weapon import Weapon
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
+from nk_shared.models.weapon import Weapon
 
 from app.models import WorldComponentProvider
 from app.settings import DATA_ROOT
@@ -44,7 +44,7 @@ class ProjectileManager:
         return False
 
     def create_projectile(self, character: Character):
-        weapon = self.get_weapon_by_name(character.weapon_name)
+        weapon = get_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
         ).scale_to_length(weapon.speed)
