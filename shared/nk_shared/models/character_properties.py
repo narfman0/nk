@@ -18,6 +18,6 @@ class CharacterProperties(YAMLWizard):  # pylint: disable=too-many-instance-attr
     attack_distance: float = None
     attack_time_until_damage: float = None
     attack_type: AttackType = AttackType.MELEE
-    attack_profile_name: str = None
+    weapon_name: str = None
     hp_max: int = 1
     chase_distance: float = 15

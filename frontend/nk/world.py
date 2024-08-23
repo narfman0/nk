@@ -1,7 +1,7 @@
 import pymunk
 from loguru import logger
 from nk_shared.map import Map
-from nk_shared.models import AttackProfile, Character, Zone
+from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction
 from typing_extensions import Unpack
 
@@ -15,7 +15,7 @@ HEAL_AMT = 10.0
 class World:  # pylint: disable=too-many-instance-attributes
     def __init__(self, uuid: str, x: float, y: float, zone_name="1"):
         self.projectile_manager: ProjectileManager = ProjectileManager(self)
-        self.attack_profiles: dict[str, AttackProfile] = {}
+        self.weapons: dict[str, Weapon] = {}
         self.space = pymunk.Space()
         self.zone = Zone.from_yaml_file(f"{NK_DATA_ROOT}/zones/{zone_name}.yml")
         self.map = Map(self.zone.tmx_path)

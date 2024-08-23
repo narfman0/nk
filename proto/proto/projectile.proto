@@ -8,7 +8,7 @@ message Projectile {
   float y = 3;
   float dx = 4;
   float dy = 5;
-  string attack_profile_name = 6;
+  string weapon_name = 6;
 }
 
 message ProjectileCreated {

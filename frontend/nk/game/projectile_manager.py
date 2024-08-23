@@ -6,7 +6,7 @@ from uuid import uuid4
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.models import AttackProfile, Character, Projectile
+from nk_shared.models import Character, Projectile, Weapon
 from nk_shared.proto import Projectile as ProjectileProto
 from nk_shared.proto import ProjectileCreated
 
@@ -34,17 +34,17 @@ class ProjectileManager:
                 self.projectiles.remove(projectile)
 
     def process_local_attack(self, character: Character) -> ProjectileCreated:
-        attack_profile = load_attack_profile_by_name(character.attack_profile_name)
+        weapon = load_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
-        ).scale_to_length(attack_profile.speed)
+        ).scale_to_length(weapon.speed)
         projectile = ProjectileProto(
             uuid=str(uuid4()),
-            x=character.position.x + attack_profile.emitter_offset_x,
-            y=character.position.y + attack_profile.emitter_offset_y,
+            x=character.position.x + weapon.emitter_offset_x,
+            y=character.position.y + weapon.emitter_offset_y,
             dx=speed.x,
             dy=speed.y,
-            attack_profile_name=character.attack_profile_name,
+            weapon_name=character.weapon_name,
         )
         proto = builders.build_projectile_created(character, projectile)
         self.create_projectile(proto.projectile_created)
@@ -61,14 +61,12 @@ class ProjectileManager:
         return False
 
     def create_projectile(self, proto: ProjectileCreated):
-        attack_profile = load_attack_profile_by_name(
-            proto.projectile.attack_profile_name
-        )
+        weapon = load_weapon_by_name(proto.projectile.weapon_name)
         self.projectiles.append(
             Projectile(
                 origin=self.world.get_character_by_uuid(proto.origin_uuid),
                 uuid=proto.projectile.uuid,
-                attack_profile=attack_profile,
+                weapon=weapon,
                 x=proto.projectile.x,
                 y=proto.projectile.y,
                 dx=proto.projectile.dx,
@@ -85,6 +83,6 @@ class ProjectileManager:
 
 
 @lru_cache
-def load_attack_profile_by_name(attack_profile_name: str) -> AttackProfile:
-    path = f"{NK_DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
-    return AttackProfile.from_yaml_file(path)
+def load_weapon_by_name(weapon_name: str) -> Weapon:
+    path = f"{NK_DATA_ROOT}/weapons/{weapon_name}.yml"
+    return Weapon.from_yaml_file(path)

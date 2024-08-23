@@ -110,7 +110,7 @@ class Projectile(betterproto.Message):
     y: float = betterproto.float_field(3)
     dx: float = betterproto.float_field(4)
     dy: float = betterproto.float_field(5)
-    attack_profile_name: str = betterproto.string_field(6)
+    weapon_name: str = betterproto.string_field(6)
 
 
 @dataclass

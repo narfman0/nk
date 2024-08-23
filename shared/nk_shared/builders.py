@@ -98,5 +98,5 @@ def build_projectile(projectile: Projectile) -> proto.Message:
         y=projectile.y,
         dx=projectile.dx,
         dy=projectile.dy,
-        attack_profile_name=projectile.attack_profile_name,
+        weapon_name=projectile.weapon_name,
     )

@@ -5,7 +5,7 @@ from uuid import uuid4
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.models.attack_profile import AttackProfile
+from nk_shared.models.weapon import Weapon
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
 
@@ -44,24 +44,25 @@ class ProjectileManager:
         return False
 
     def create_projectile(self, character: Character):
-        attack_profile = self.get_attack_profile_by_name(character.attack_profile_name)
+        weapon = self.get_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
-        ).scale_to_length(attack_profile.speed)
+        ).scale_to_length(weapon.speed)
         projectile = Projectile(
-            x=character.position.x + attack_profile.emitter_offset_x,
-            y=character.position.y + attack_profile.emitter_offset_y,
+            x=character.position.x + weapon.emitter_offset_x,
+            y=character.position.y + weapon.emitter_offset_y,
             dx=speed.x,
             dy=speed.y,
             origin=character,
-            attack_profile=attack_profile,
-            attack_profile_name=attack_profile.name,
+            weapon=weapon,
+            weapon_name=weapon.name,
             uuid=str(uuid4()),
         )
         self.projectiles.append(projectile)
         return projectile
 
-    @lru_cache
-    def get_attack_profile_by_name(self, attack_profile_name: str) -> AttackProfile:
-        path = f"{DATA_ROOT}/attack_profiles/{attack_profile_name}.yml"
-        return AttackProfile.from_yaml_file(path)
+
+@lru_cache
+def get_weapon_by_name(weapon_name: str) -> Weapon:
+    path = f"{DATA_ROOT}/weapons/{weapon_name}.yml"
+    return Weapon.from_yaml_file(path)

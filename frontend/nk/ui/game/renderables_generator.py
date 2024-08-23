@@ -12,7 +12,7 @@ from nk.world import World
 
 def generate_projectile_renderables(world: World, calculator: GameUICalculator):
     for projectile in world.projectile_manager.projectiles:
-        image = load_projectile_image(projectile.attack_profile.image_path)
+        image = load_projectile_image(projectile.weapon.image_path)
         blit_x, blit_y = calculator.calculate_draw_coordinates(
             projectile.x, projectile.y, image
         )

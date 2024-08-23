@@ -22,7 +22,7 @@ def handle_character_attacked(
     character = world.get_character_by_uuid(details.uuid)
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
-    logger.info(details)
+        return
     character.attack(details.direction)
 
 
@@ -34,7 +34,7 @@ async def handle_character_position_updated(
     character = world.get_character_by_uuid(details.uuid)
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
-        raise UnknownCharacterError(details.uuid)
+        return
     character.body.position = (details.x, details.y)
     character.body.velocity = (details.dx, details.dy)
     await world.publish(Message(origin_uuid=character.uuid, character_updated=details))
@@ -46,7 +46,7 @@ async def handle_character_direction_updated(
     character = world.get_character_by_uuid(details.uuid)
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
-        raise UnknownCharacterError(details.uuid)
+        return
     character.moving_direction = Direction(details.moving_direction)
     character.facing_direction = Direction(details.facing_direction)
     await world.publish(
@@ -62,7 +62,7 @@ async def handle_character_updated(
     character = world.get_character_by_uuid(details.uuid)
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
-        raise UnknownCharacterError(details.uuid)
+        return
     character.body.position = (details.x, details.y)
     character.body.velocity = (details.dx, details.dy)
     character.moving_direction = Direction(details.moving_direction)

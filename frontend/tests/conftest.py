@@ -21,6 +21,4 @@ def world(map_headless) -> World:
 
 @pytest.fixture
 def projectile_proto() -> Projectile:
-    return Projectile(
-        uuid="abcde", attack_profile_name="laserball", x=0, y=0, dx=1, dy=1
-    )
+    return Projectile(uuid="abcde", weapon_name="laserball", x=0, y=0, dx=1, dy=1)

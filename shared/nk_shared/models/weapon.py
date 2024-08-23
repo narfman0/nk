@@ -3,7 +3,7 @@ from dataclass_wizard import YAMLWizard
 
 
 @dataclass
-class AttackProfile(YAMLWizard):
+class Weapon(YAMLWizard):
     name: str
     image_path: str
     speed: float
