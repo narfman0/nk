@@ -21,7 +21,7 @@ from nk.ui.game.input import (
     read_input_player_actions,
     read_input_player_move_direction,
 )
-from nk.ui.game.models import GameUICalculator
+from nk.ui.game.models import UIInterface
 from nk.ui.game.renderables import (
     SpriteRenderable,
     create_renderable_list,
@@ -39,7 +39,7 @@ DEFAULT_SCREEN_SCALE = 5
 
 
 # pylint: disable-next=too-many-instance-attributes
-class GameScreen(Screen, GameUICalculator):
+class GameScreen(Screen, UIInterface):
     """UI screen for game state"""
 
     def __init__(self, screen_manager: ScreenManager, game_state: GameState):

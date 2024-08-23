@@ -5,7 +5,7 @@ import pygame
 from nk.ui.game.camera import Camera
 
 
-class GameUICalculator(ABC):
+class UIInterface(ABC):
     @abstractmethod
     def calculate_draw_coordinates(
         self,

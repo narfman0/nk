@@ -4,7 +4,8 @@ import pytmx
 
 from nk_shared.map import DATA_ROOT
 
-from nk.game.world import World, Projectile
+from nk.game.world import World
+from nk_shared.proto import Projectile
 
 
 @pytest.fixture

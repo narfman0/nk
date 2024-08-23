@@ -6,14 +6,14 @@ from nk_shared.models.zone import Environment
 
 from nk.game.world import World
 from nk.settings import NK_DATA_ROOT
-from nk.ui.game.models import GameUICalculator
+from nk.ui.game.models import UIInterface
 from nk.ui.game.renderables import BlittableRenderable, renderables_generate_key
 
 
-def generate_projectile_renderables(world: World, calculator: GameUICalculator):
+def generate_projectile_renderables(world: World, ui_interface: UIInterface):
     for projectile in world.projectile_manager.projectiles:
         image = load_projectile_image(projectile.weapon.image_path)
-        blit_x, blit_y = calculator.calculate_draw_coordinates(
+        blit_x, blit_y = ui_interface.calculate_draw_coordinates(
             projectile.x, projectile.y, image
         )
         bottom_y = blit_y + image.get_height()
@@ -25,7 +25,7 @@ def generate_projectile_renderables(world: World, calculator: GameUICalculator):
 
 
 def generate_map_renderables(  # pylint: disable=too-many-locals
-    calculator: GameUICalculator,
+    ui_interface: UIInterface,
     ground: bool,
     tilemap: Map,
     tile_offset_x: int = 0,
@@ -42,7 +42,7 @@ def generate_map_renderables(  # pylint: disable=too-many-locals
             for y in range(0, tilemap.height):
                 blit_image = tilemap.get_tile_image(x, y, layer)
                 if blit_image:
-                    blit_x, blit_y = calculator.calculate_draw_coordinates(
+                    blit_x, blit_y = ui_interface.calculate_draw_coordinates(
                         x + tile_offset_x, y + tile_offset_y, blit_image
                     )
                     blit_coords = (blit_x + x_offset, blit_y + y_offset)
@@ -56,12 +56,12 @@ def generate_map_renderables(  # pylint: disable=too-many-locals
 
 
 def generate_environment_renderables(
-    calculator: GameUICalculator, environment_features: list[Environment]
+    ui_interface: UIInterface, environment_features: list[Environment]
 ):
     for environment in environment_features:
         tilemap = Map(environment.tmx_name)
         yield from generate_map_renderables(
-            calculator=calculator,
+            ui_interface=ui_interface,
             ground=False,
             tilemap=tilemap,
             tile_offset_y=environment.center_y - tilemap.height // 2,

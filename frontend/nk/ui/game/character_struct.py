@@ -6,7 +6,7 @@ from nk_shared.models.character import Character
 from nk_shared.proto import Direction
 
 from nk.ui.game.character_sprite import CharacterSprite
-from nk.ui.game.models import GameUICalculator
+from nk.ui.game.models import UIInterface
 
 
 @dataclass
@@ -22,14 +22,14 @@ class CharacterStruct:
 
 
 def update_position(
-    character: Character, sprite: CharacterSprite, calculator: GameUICalculator
+    character: Character, sprite: CharacterSprite, ui_interface: UIInterface
 ):
-    x, y = calculator.calculate_draw_coordinates(
+    x, y = ui_interface.calculate_draw_coordinates(
         character.position.x,  # pylint: disable=no-member
         character.position.y,  # pylint: disable=no-member
         sprite.image,
     )
-    sprite.set_position(x - calculator.camera.x, y - calculator.camera.y)
+    sprite.set_position(x - ui_interface.camera.x, y - ui_interface.camera.y)
 
 
 def update_animation(
@@ -52,11 +52,11 @@ def update_animation(
 def update_character_structs(
     dt: float,
     character_structs: list[CharacterStruct],
-    calculator: GameUICalculator,
+    ui_interface: UIInterface,
 ):
     for character_struct in character_structs:
         character = character_struct.character
         sprite = character_struct.sprite
         update_animation(character, sprite, character_struct)
-        update_position(character, sprite, calculator)
+        update_position(character, sprite, ui_interface)
         character_struct.sprite_group.update(dt)
