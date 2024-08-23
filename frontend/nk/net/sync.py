@@ -15,6 +15,7 @@ def handle_websocket(
     except TimeoutError:
         logger.error("Timed out connected to {}", url)
         os._exit(1)
+    logger.info("Connected to {}", url)
     while True:
         while not to_send.empty():
             message = to_send.get_nowait()

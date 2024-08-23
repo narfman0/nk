@@ -64,5 +64,5 @@ class Network:
         )
         if response.is_error:
             raise LoginException(f"Login failed: {response.text}")
-        logger.info("Access token retrieved, connecting")
+        logger.info("Successfully logged in user {}", email)
         return response.json()["access_token"]
