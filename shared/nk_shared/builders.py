@@ -1,6 +1,6 @@
-from nk_shared.proto import Projectile
-from nk_shared.models import Character
 from nk_shared import proto
+from nk_shared.models import Character
+from nk_shared.proto import Projectile
 
 
 def build_character_attacked(character: Character, direction: float) -> proto.Message:

@@ -22,7 +22,7 @@ class GameState:
         self.world: World = None
         self.network = Network()
 
-    def update(self, _dt: float):
+    def update(self, _dt: float):  # pylint: disable=too-many-branches
         while self.network.has_messages():
             message = self.network.next()
             if self.world:
@@ -36,6 +36,8 @@ class GameState:
                     self.handle_character_attacked(message)
                 elif serialized_on_wire(message.character_damaged):
                     self.handle_character_damaged(message)
+                elif serialized_on_wire(message.character_reloaded):
+                    self.handle_character_reloaded(message)
                 elif serialized_on_wire(message.player_respawned):
                     self.handle_player_respawned(message)
                 elif serialized_on_wire(message.projectile_created):
@@ -89,7 +91,6 @@ class GameState:
 
     def handle_character_damaged(self, message: Message):
         details = message.character_damaged
-        logger.info(details)
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.handle_damage_received(details.damage)
@@ -97,6 +98,16 @@ class GameState:
         else:
             logger.warning(
                 "character_damaged no character found with uuid {}", details.uuid
+            )
+
+    def handle_character_reloaded(self, message: Message):
+        details = message.character_reloaded
+        character = self.world.get_character_by_uuid(details.uuid)
+        if character:
+            character.reload()
+        else:
+            logger.warning(
+                "character_reloaded no character found with uuid {}", details.uuid
             )
 
     def handle_character_direction_updated(self, message: Message):

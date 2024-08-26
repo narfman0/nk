@@ -5,10 +5,11 @@ from uuid import uuid4 as generate_uuid
 
 import pymunk
 
+from nk_shared import direction_util
+from nk_shared.models.attack_type import AttackType
 from nk_shared.models.character_properties import CharacterProperties
 from nk_shared.models.weapon import Weapon, load_weapon_by_name
 from nk_shared.proto import CharacterType, Direction
-from nk_shared import direction_util
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 
@@ -29,6 +30,8 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     attack_time_remaining: float = 0
     attack_damage_time_remaining: float = 0
     attack_direction: float = 0
+    reloading: bool = False
+    reload_time_remaining: float = 0
     should_process_attack: bool = False
     hp: float = 0
     invincible: bool = False
@@ -41,6 +44,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
         self.apply_character_properties()
         self.hp = float(self.hp_max)
         self.weapon = load_weapon_by_name(self.weapon_name)
+        self.weapon.rounds_remaining = self.weapon.clip_size
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
@@ -63,6 +67,14 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             self.body.body_type = pymunk.Body.DYNAMIC
 
     def update(self, dt: float):
+        self.update_movement(dt)
+        if not self.alive:
+            return
+        self.update_dashing(dt)
+        self.update_attacking(dt)
+        self.update_reloading(dt)
+
+    def update_movement(self, dt: float):
         if self.alive and self.moving_direction:
             self.facing_direction = self.moving_direction
             self.body.angle = direction_util.angle(self.facing_direction)
@@ -87,8 +99,8 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
                 )
             else:
                 self.body.velocity = (0, 0)
-        if not self.alive:
-            return
+
+    def update_dashing(self, dt: float):
         if self.dashing:
             self.dash_time_remaining -= dt
             if self.dash_time_remaining <= 0:
@@ -99,6 +111,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             self.dash_cooldown_remaining -= dt
             self.dash_cooldown_remaining = max(self.dash_cooldown_remaining, 0)
 
+    def update_attacking(self, dt: float):
         if self.attacking:
             self.attack_time_remaining -= dt
             if self.attack_damage_time_remaining > 0:
@@ -109,19 +122,40 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             if self.attack_time_remaining <= 0:
                 self.attacking = False
 
+    def update_reloading(self, dt: float):
+        if self.reloading:
+            self.reload_time_remaining -= dt
+            if self.reload_time_remaining <= 0:
+                self.reloading = False
+                self.weapon.rounds_remaining = self.weapon.clip_size
+
     def attack(self, direction: float | None):
-        if not self.attacking:
+        ranged = (
+            self.weapon.attack_type != AttackType.RANGED
+            or self.weapon.rounds_remaining > 0
+        )
+        if self.can_action() and ranged:
             self.attacking = True
             self.attack_time_remaining = self.weapon.attack_duration
             self.attack_damage_time_remaining = self.weapon.attack_time_until_damage
             self.attack_direction = direction
             if self.moving_direction:  # maybe standing still
                 self.facing_direction = self.moving_direction
+            if self.weapon.attack_type == AttackType.RANGED:
+                self.weapon.rounds_remaining -= 1
+
+    def reload(self):
+        if self.can_action() and self.weapon.attack_type == AttackType.RANGED:
+            self.reloading = True
+            self.reload_time_remaining = self.weapon.reload_time
 
     def dash(self):
-        if not self.dashing and self.dash_cooldown_remaining <= 0:
+        if self.can_action() and self.dash_cooldown_remaining <= 0:
             self.dashing = True
             self.dash_time_remaining = self.dash_duration
+
+    def can_action(self):
+        return not self.attacking and not self.reloading and not self.dashing
 
     def apply_character_properties(self):
         props = load_character_properties_by_name(self.character_type_short)

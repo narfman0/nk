@@ -3,6 +3,7 @@ from nk_shared.proto import (
     CharacterAttacked,
     CharacterDirectionUpdated,
     CharacterPositionUpdated,
+    CharacterReloaded,
     CharacterUpdated,
     Direction,
     Message,
@@ -38,6 +39,19 @@ async def handle_character_position_updated(
     character.body.position = (details.x, details.y)
     character.body.velocity = (details.dx, details.dy)
     await world.publish(Message(origin_uuid=character.uuid, character_updated=details))
+
+
+async def handle_character_reloaded(
+    world: WorldComponentProvider, details: CharacterReloaded
+):
+    """Apply message details to relevant character. If character
+    does not exist, do not do anything."""
+    character = world.get_character_by_uuid(details.uuid)
+    if not character:
+        logger.warning("No character maching uuid: {}", details.uuid)
+        return
+    character.reload()
+    await world.publish(Message(origin_uuid=character.uuid, character_reloaded=details))
 
 
 async def handle_character_direction_updated(

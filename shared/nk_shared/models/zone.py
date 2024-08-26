@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+
 from dataclass_wizard import YAMLWizard
 
 from nk_shared.proto import CharacterType

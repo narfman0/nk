@@ -1,5 +1,5 @@
 # pylint: disable=no-member
-from enum import Enum
+from enum import Enum, auto
 
 import pygame
 from nk_shared.proto import Direction
@@ -7,12 +7,13 @@ from pygame.event import Event
 
 
 class ActionEnum(Enum):
-    DASH = 1
-    ATTACK = 2
-    PLAYER_HEAL = 4
-    PLAYER_INVICIBILITY = 5
-    ZOOM_OUT = 6
-    ZOOM_IN = 7
+    DASH = auto()
+    ATTACK = auto()
+    PLAYER_HEAL = auto()
+    PLAYER_INVICIBILITY = auto()
+    ZOOM_OUT = auto()
+    ZOOM_IN = auto()
+    RELOAD = auto()
 
 
 def read_input_player_move_direction():
@@ -55,6 +56,8 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
                 actions.append(ActionEnum.PLAYER_HEAL)
             elif event.key == pygame.K_F3:
                 actions.append(ActionEnum.PLAYER_INVICIBILITY)
+            elif event.key == pygame.K_r:
+                actions.append(ActionEnum.RELOAD)
         if event.type == pygame.MOUSEWHEEL:
             if event.y < 0:
                 actions.append(ActionEnum.ZOOM_OUT)

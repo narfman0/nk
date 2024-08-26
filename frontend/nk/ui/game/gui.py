@@ -25,6 +25,7 @@ class GameGui:
             f"ticks: {draw_ticks}",
             f"renderables: {renderable_count}",
             f"HP: {player.hp}",
+            f"Ammo: {player.weapon.rounds_remaining}",
             f"x,y: {int(x)},{int(y)}",
         ]
         draw_y = 0

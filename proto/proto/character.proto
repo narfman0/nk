@@ -38,6 +38,10 @@ message CharacterPositionUpdated {
   float dy = 8;
 }
 
+message CharacterReloaded {
+  string uuid = 1;
+}
+
 message CharacterUpdated {
   string uuid = 1;
   float x = 2;

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from dataclass_wizard import YAMLWizard
 
-from nk_shared.models.attack_type import AttackType
+from dataclass_wizard import YAMLWizard
 
 
 @dataclass

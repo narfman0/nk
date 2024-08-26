@@ -1,8 +1,9 @@
 from functools import lru_cache
 
-from nk_shared.settings import DATA_ROOT
 import pymunk
 import pytmx
+
+from nk_shared.settings import DATA_ROOT
 
 
 class Map:

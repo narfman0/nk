@@ -1,6 +1,8 @@
 projectile_image_path: bullet
 projectile_speed: 50
 projectile_radius: 0.3
+clip_size: 30
+reload_time: 1.5
 
 attack_distance: 15
 attack_duration: 0.1

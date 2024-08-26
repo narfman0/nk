@@ -22,6 +22,10 @@ class MessageHandler:  # pylint: disable=too-few-public-methods
             await character_handlers.handle_character_position_updated(
                 self.world, msg.character_position_updated
             )
+        elif serialized_on_wire(msg.character_reloaded):
+            await character_handlers.handle_character_reloaded(
+                self.world, msg.character_reloaded
+            )
         elif serialized_on_wire(msg.character_direction_updated):
             await character_handlers.handle_character_direction_updated(
                 self.world, msg.character_direction_updated

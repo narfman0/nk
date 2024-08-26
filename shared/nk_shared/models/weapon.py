@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from functools import lru_cache
+
 from dataclass_wizard import YAMLWizard
+
 from nk_shared.map import DATA_ROOT
 from nk_shared.models.attack_type import AttackType
 
@@ -15,6 +17,9 @@ class Weapon(YAMLWizard):
     projectile_image_path: str = None
     projectile_speed: float = None
     projectile_radius: float = None
+    clip_size: int = None
+    rounds_remaining: int = None
+    reload_time: float = None
 
 
 @lru_cache

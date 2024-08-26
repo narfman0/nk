@@ -90,6 +90,9 @@ class GameScreen(Screen, UIInterface):
         if ActionEnum.PLAYER_INVICIBILITY in player_actions:
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to {}", self.world.player.invincible)
+        if ActionEnum.RELOAD in player_actions:
+            self.world.player.reload()
+            logger.info("Player reloading")
         if ActionEnum.ZOOM_OUT in player_actions:
             self.change_screen_scale(-1)
         if ActionEnum.ZOOM_IN in player_actions:

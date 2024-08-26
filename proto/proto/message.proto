@@ -17,6 +17,7 @@ message Message {
     proto.CharacterUpdated character_updated = 200;
     proto.CharacterAttacked character_attacked = 201;
     proto.CharacterDamaged character_damaged = 202;
+    proto.CharacterReloaded character_reloaded = 205;
 
     proto.PlayerConnected player_connected = 102;
     proto.PlayerDisconnected player_disconnected = 104;

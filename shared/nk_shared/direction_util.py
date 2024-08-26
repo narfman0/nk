@@ -1,5 +1,5 @@
-from math import atan2, pi
 from functools import lru_cache
+from math import atan2, pi
 
 from pymunk import Vec2d
 

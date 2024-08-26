@@ -57,6 +57,11 @@ class CharacterPositionUpdated(betterproto.Message):
 
 
 @dataclass
+class CharacterReloaded(betterproto.Message):
+    uuid: str = betterproto.string_field(1)
+
+
+@dataclass
 class CharacterUpdated(betterproto.Message):
     uuid: str = betterproto.string_field(1)
     x: float = betterproto.float_field(2)
@@ -147,6 +152,9 @@ class Message(betterproto.Message):
     )
     character_damaged: "CharacterDamaged" = betterproto.message_field(
         202, group="payload"
+    )
+    character_reloaded: "CharacterReloaded" = betterproto.message_field(
+        205, group="payload"
     )
     player_connected: "PlayerConnected" = betterproto.message_field(
         102, group="payload"
