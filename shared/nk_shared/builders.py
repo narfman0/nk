@@ -35,6 +35,14 @@ def build_character_position_updated(character: Character) -> proto.Message:
     )
 
 
+def build_character_reloaded(character: Character) -> proto.Message:
+    return proto.Message(
+        character_reloaded=proto.CharacterReloaded(
+            uuid=character.uuid,
+        )
+    )
+
+
 def build_character_direction_updated(character: Character) -> proto.Message:
     return proto.Message(
         origin_uuid=character.uuid,

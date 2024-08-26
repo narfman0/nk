@@ -51,6 +51,7 @@ async def handle_character_reloaded(
         logger.warning("No character maching uuid: {}", details.uuid)
         return
     character.reload()
+    logger.info("Character reloading: {}", details.uuid)
     await world.publish(Message(origin_uuid=character.uuid, character_reloaded=details))
 
 

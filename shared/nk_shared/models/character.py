@@ -8,7 +8,7 @@ import pymunk
 from nk_shared import direction_util
 from nk_shared.models.attack_type import AttackType
 from nk_shared.models.character_properties import CharacterProperties
-from nk_shared.models.weapon import Weapon, load_weapon_by_name
+from nk_shared.models.weapon import RangedWeapon, Weapon, load_weapon_by_name
 from nk_shared.proto import CharacterType, Direction
 
 DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
@@ -38,13 +38,15 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     body_removal_processed: bool = False
     start_x: float = 0
     start_y: float = 0
-    weapon: Weapon = None
+    weapon: Weapon | RangedWeapon = None
+    rounds_remaining: int = 0
 
     def __post_init__(self):
         self.apply_character_properties()
         self.hp = float(self.hp_max)
         self.weapon = load_weapon_by_name(self.weapon_name)
-        self.weapon.rounds_remaining = self.weapon.clip_size
+        if self.weapon.attack_type == AttackType.RANGED:
+            self.rounds_remaining = self.weapon.clip_size
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
@@ -127,14 +129,13 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             self.reload_time_remaining -= dt
             if self.reload_time_remaining <= 0:
                 self.reloading = False
-                self.weapon.rounds_remaining = self.weapon.clip_size
+                self.rounds_remaining = self.weapon.clip_size
 
     def attack(self, direction: float | None):
         ranged = (
-            self.weapon.attack_type != AttackType.RANGED
-            or self.weapon.rounds_remaining > 0
+            self.weapon.attack_type != AttackType.RANGED or self.rounds_remaining > 0
         )
-        if self.can_action() and ranged:
+        if not self.attacking and not self.reloading and ranged:
             self.attacking = True
             self.attack_time_remaining = self.weapon.attack_duration
             self.attack_damage_time_remaining = self.weapon.attack_time_until_damage
@@ -142,20 +143,17 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             if self.moving_direction:  # maybe standing still
                 self.facing_direction = self.moving_direction
             if self.weapon.attack_type == AttackType.RANGED:
-                self.weapon.rounds_remaining -= 1
+                self.rounds_remaining -= 1
 
     def reload(self):
-        if self.can_action() and self.weapon.attack_type == AttackType.RANGED:
+        if not self.reloading and self.weapon.attack_type == AttackType.RANGED:
             self.reloading = True
             self.reload_time_remaining = self.weapon.reload_time
 
     def dash(self):
-        if self.can_action() and self.dash_cooldown_remaining <= 0:
+        if not self.dashing and self.dash_cooldown_remaining <= 0:
             self.dashing = True
             self.dash_time_remaining = self.dash_duration
-
-    def can_action(self):
-        return not self.attacking and not self.reloading and not self.dashing
 
     def apply_character_properties(self):
         props = load_character_properties_by_name(self.character_type_short)

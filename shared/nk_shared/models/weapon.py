@@ -14,15 +14,20 @@ class Weapon(YAMLWizard):
     attack_time_until_damage: float = None
     attack_type: AttackType = AttackType.MELEE
 
+
+@dataclass
+class RangedWeapon(Weapon):
     projectile_image_path: str = None
     projectile_speed: float = None
     projectile_radius: float = None
     clip_size: int = None
-    rounds_remaining: int = None
     reload_time: float = None
 
 
 @lru_cache
 def load_weapon_by_name(weapon_name: str) -> Weapon:
     path = f"{DATA_ROOT}/weapons/{weapon_name}.yml"
-    return Weapon.from_yaml_file(path)
+    weapon = Weapon.from_yaml_file(path)
+    if weapon.attack_type == AttackType.RANGED:
+        weapon = RangedWeapon.from_yaml_file(path)
+    return weapon

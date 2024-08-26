@@ -24,7 +24,6 @@ class ProjectileManager:
                 self.projectiles.remove(projectile)
                 msg = builders.build_projectile_destroyed(projectile.uuid)
                 await self.world.publish(msg)
-                logger.debug("Projectile destroyed: {}", projectile.uuid)
 
     async def handle_projectile_collisions(self, projectile: Projectile) -> bool:
         """Handle collisions for a single projectile."""
