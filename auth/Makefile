@@ -3,6 +3,7 @@ run:
 
 isort:
 	isort --profile black app/
+	isort --profile black tests
 
 lint: isort
 	pylint app/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring

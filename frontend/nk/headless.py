@@ -13,7 +13,11 @@ UPDATE_FREQUENCY = 0.1
 
 
 class Headless:
+
     def __init__(self):
+        self.start_x = None
+        self.start_y = None
+        self.uuid = None
         self.character_type = CharacterType.CHARACTER_TYPE_PIGSASSIN
         self.network = Network()
         self.i = 0

@@ -8,13 +8,13 @@ DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 
 
 class Map:
-    def __init__(self, area: str, pygame=True):
+    def __init__(self, area: str, headless=False):
         self.area = area
         path = f"{DATA_ROOT}/tiled/tmx/{area}.tmx"
-        if pygame:
-            self._tmxdata = pytmx.load_pygame(path)
-        else:
+        if headless:
             self._tmxdata = pytmx.TiledMap(path)
+        else:
+            self._tmxdata = pytmx.load_pygame(path)
 
     def get_start_tile(self) -> tuple[int, int]:
         x, y = map(int, self._tmxdata.properties.get("StartXY").split(","))

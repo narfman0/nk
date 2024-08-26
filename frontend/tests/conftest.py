@@ -1,23 +1,18 @@
-from unittest.mock import Mock, patch
 import pytest
-import pytmx
-
-from nk_shared.map import DATA_ROOT
-
-from nk.game.world import World
+from nk_shared.map import Map
 from nk_shared.proto import Projectile
 
-
-@pytest.fixture
-def map_headless():
-    with patch("nk_shared.map.pytmx.load_pygame") as load_pygame_mock:
-        load_pygame_mock.return_value = pytmx.TiledMap(f"{DATA_ROOT}/tiled/tmx/1.tmx")
-        yield
+from nk.game.world import World
 
 
 @pytest.fixture
-def world(map_headless) -> World:
-    return World(uuid="1234", x=0, y=0)
+def map():
+    return Map("1", headless=True)
+
+
+@pytest.fixture
+def world(map) -> World:
+    return World(uuid="1234", x=0, y=0, map=map)
 
 
 @pytest.fixture

@@ -28,6 +28,7 @@ init-dev:
 
 isort:
 	isort --profile black nk
+	isort --profile black tests
 
 lint: isort
 	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring

@@ -22,7 +22,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     def __init__(self, zone_name: str = "1"):
         self._space = pymunk.Space()
         self._zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
-        self._map = Map(self._zone.tmx_path, pygame=False)
+        self._map = Map(self._zone.tmx_path, headless=True)
         self._map.add_map_geometry_to_space(self._space)
         self._players: list[Player] = []
         self._ai_component = Ai(self, self._zone)
