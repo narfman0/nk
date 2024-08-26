@@ -6,13 +6,13 @@ from nk.game.world import World
 
 
 @pytest.fixture
-def map():
+def tmxmap():
     return Map("1", headless=True)
 
 
 @pytest.fixture
-def world(map) -> World:
-    return World(uuid="1234", x=0, y=0, map=map)
+def world(tmxmap) -> World:
+    return World(uuid="1234", x=0, y=0, tmxmap=tmxmap)
 
 
 @pytest.fixture

@@ -1,4 +1,3 @@
-from functools import lru_cache
 from math import cos, sin
 from uuid import uuid4
 
@@ -7,10 +6,9 @@ from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
-from nk_shared.models.weapon import Weapon
+from nk_shared.models.weapon import load_weapon_by_name
 
 from app.models import WorldComponentProvider
-from app.settings import DATA_ROOT
 
 
 class ProjectileManager:
@@ -44,7 +42,7 @@ class ProjectileManager:
         return False
 
     def create_projectile(self, character: Character):
-        weapon = get_weapon_by_name(character.weapon_name)
+        weapon = load_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
         ).scale_to_length(weapon.speed)
@@ -60,9 +58,3 @@ class ProjectileManager:
         )
         self.projectiles.append(projectile)
         return projectile
-
-
-@lru_cache
-def get_weapon_by_name(weapon_name: str) -> Weapon:
-    path = f"{DATA_ROOT}/weapons/{weapon_name}.yml"
-    return Weapon.from_yaml_file(path)

@@ -55,12 +55,11 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
                 actions.append(ActionEnum.PLAYER_HEAL)
             elif event.key == pygame.K_F3:
                 actions.append(ActionEnum.PLAYER_INVICIBILITY)
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if pygame.mouse.get_pressed()[0]:
-                actions.append(ActionEnum.ATTACK)
         if event.type == pygame.MOUSEWHEEL:
             if event.y < 0:
                 actions.append(ActionEnum.ZOOM_OUT)
             else:
                 actions.append(ActionEnum.ZOOM_IN)
+    if pygame.mouse.get_pressed()[0]:
+        actions.append(ActionEnum.ATTACK)
     return actions

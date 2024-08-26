@@ -1,0 +1,6 @@
+name: ak47
+image_path: bullet
+speed: 50
+radius: 0.3
+emitter_offset_x: 0
+emitter_offset_y: 0

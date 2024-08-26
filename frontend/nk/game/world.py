@@ -12,13 +12,15 @@ HEAL_DST_SQ = 5  # this should be on the backend but whatevs
 HEAL_AMT = 10.0
 
 
-class World:  # pylint: disable=too-many-instance-attributes
-    def __init__(self, uuid: str, x: float, y: float, zone_name="1", map: Map = None):
+class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
+    def __init__(
+        self, uuid: str, x: float, y: float, zone_name="1", tmxmap: Map = None
+    ):
         self.projectile_manager: ProjectileManager = ProjectileManager(self)
         self.weapons: dict[str, Weapon] = {}
         self.space = pymunk.Space()
         self.zone = Zone.from_yaml_file(f"{NK_DATA_ROOT}/zones/{zone_name}.yml")
-        self.map = map if map else Map(self.zone.tmx_path)
+        self.map = tmxmap if tmxmap else Map(self.zone.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
         for feature in self.zone.environment_features:
             tilemap = Map(feature.tmx_name, headless=True)

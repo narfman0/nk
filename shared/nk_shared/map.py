@@ -1,10 +1,8 @@
 from functools import lru_cache
-from os import environ
 
+from nk_shared.settings import DATA_ROOT
 import pymunk
 import pytmx
-
-DATA_ROOT = environ.get("NK_DATA_ROOT", "../data")
 
 
 class Map:

@@ -1,4 +1,3 @@
-from functools import lru_cache
 from math import cos, sin
 from typing import Protocol
 from uuid import uuid4
@@ -6,11 +5,10 @@ from uuid import uuid4
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.models import Character, Projectile, Weapon
+from nk_shared.models import Character, Projectile
+from nk_shared.models.weapon import load_weapon_by_name
 from nk_shared.proto import Projectile as ProjectileProto
 from nk_shared.proto import ProjectileCreated
-
-from nk.settings import NK_DATA_ROOT
 
 
 class WorldProtocol(Protocol):
@@ -80,9 +78,3 @@ class ProjectileManager:
             if projectile.uuid == uuid:
                 return projectile
         return None
-
-
-@lru_cache
-def load_weapon_by_name(weapon_name: str) -> Weapon:
-    path = f"{NK_DATA_ROOT}/weapons/{weapon_name}.yml"
-    return Weapon.from_yaml_file(path)
