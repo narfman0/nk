@@ -1,52 +1,52 @@
 idle:
   E:
     images:
-    - shadow_guardian9.png 
-    - shadow_guardian10.png 
-    - shadow_guardian11.png 
-    - shadow_guardian12.png 
-    - shadow_guardian13.png 
-    - shadow_guardian14.png 
-    - shadow_guardian15.png 
-    - shadow_guardian16.png 
-    - shadow_guardian17.png 
+    - shadow_guardian9.png
+    - shadow_guardian10.png
+    - shadow_guardian11.png
+    - shadow_guardian12.png
+    - shadow_guardian13.png
+    - shadow_guardian14.png
+    - shadow_guardian15.png
+    - shadow_guardian16.png
+    - shadow_guardian17.png
 run:
   E:
     images:
-    - shadow_guardian1.png 
-    - shadow_guardian2.png 
-    - shadow_guardian3.png 
-    - shadow_guardian4.png 
-    - shadow_guardian5.png 
-    - shadow_guardian6.png 
-    - shadow_guardian7.png 
-    - shadow_guardian8.png 
+    - shadow_guardian1.png
+    - shadow_guardian2.png
+    - shadow_guardian3.png
+    - shadow_guardian4.png
+    - shadow_guardian5.png
+    - shadow_guardian6.png
+    - shadow_guardian7.png
+    - shadow_guardian8.png
 attack:
   E:
     images:
-    - shadow_guardian18.png 
-    - shadow_guardian19.png 
-    - shadow_guardian20.png 
-    - shadow_guardian21.png 
-    - shadow_guardian22.png 
-    - shadow_guardian23.png 
-    - shadow_guardian24.png 
-    - shadow_guardian25.png 
-    - shadow_guardian26.png 
-    - shadow_guardian27.png 
+    - shadow_guardian18.png
+    - shadow_guardian19.png
+    - shadow_guardian20.png
+    - shadow_guardian21.png
+    - shadow_guardian22.png
+    - shadow_guardian23.png
+    - shadow_guardian24.png
+    - shadow_guardian25.png
+    - shadow_guardian26.png
+    - shadow_guardian27.png
 death:
   E:
     images:
-    - shadow_guardian30.png 
-    - shadow_guardian31.png 
-    - shadow_guardian32.png 
-    - shadow_guardian33.png 
-    - shadow_guardian34.png 
-    - shadow_guardian35.png 
-    - shadow_guardian36.png 
-    - shadow_guardian37.png 
+    - shadow_guardian30.png
+    - shadow_guardian31.png
+    - shadow_guardian32.png
+    - shadow_guardian33.png
+    - shadow_guardian34.png
+    - shadow_guardian35.png
+    - shadow_guardian36.png
+    - shadow_guardian37.png
 hit:
   E:
     images:
-    - shadow_guardian28.png 
-    - shadow_guardian29.png 
+    - shadow_guardian28.png
+    - shadow_guardian29.png

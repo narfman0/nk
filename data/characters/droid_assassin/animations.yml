@@ -1,27 +1,27 @@
 idle:
   E:
     images:
-    - droid_assassin1.png 
-    - droid_assassin2.png 
-    - droid_assassin3.png 
-    - droid_assassin4.png 
-    - droid_assassin5.png 
-    - droid_assassin6.png 
-    - droid_assassin7.png 
-    - droid_assassin8.png 
-    - droid_assassin9.png 
-    - droid_assassin10.png 
+    - droid_assassin1.png
+    - droid_assassin2.png
+    - droid_assassin3.png
+    - droid_assassin4.png
+    - droid_assassin5.png
+    - droid_assassin6.png
+    - droid_assassin7.png
+    - droid_assassin8.png
+    - droid_assassin9.png
+    - droid_assassin10.png
 run:
   E:
     images:
-    - droid_assassin30.png 
+    - droid_assassin30.png
     - droid_assassin31.png
     - droid_assassin32.png
     - droid_assassin33.png
     - droid_assassin34.png
     - droid_assassin35.png
     - droid_assassin36.png
-    - droid_assassin37.png 
+    - droid_assassin37.png
 attack:
   E:
     images:
@@ -47,7 +47,7 @@ attack:
 death:
   E:
     images:
-    - droid_assassin38.png 
+    - droid_assassin38.png
     - droid_assassin39.png
     - droid_assassin40.png
     - droid_assassin41.png

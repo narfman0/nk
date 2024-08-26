@@ -10,6 +10,12 @@ space squad-y multiplayer RPG!
 
 Tweak your IDE/vs code run configurations to mirror that behavior :D
 
+## Development
+
+* `pip install -r requirements_test.txt`
+* Install [pre-commit](https://pre-commit.com/) hooks with `pre-commit install`
+* `python -m app` to run like how pyinstaller will build the exe
+
 ## TODO
 
 * Update sprites

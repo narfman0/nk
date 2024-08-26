@@ -1,3 +1,4 @@
+pre-commit
 -r api/requirements_test.txt
 -r auth/requirements_test.txt
 -r frontend/requirements_test.txt
