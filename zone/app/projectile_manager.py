@@ -45,15 +45,15 @@ class ProjectileManager:
         weapon = load_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
-        ).scale_to_length(weapon.speed)
+        ).scale_to_length(weapon.projectile_speed)
         projectile = Projectile(
-            x=character.position.x + weapon.emitter_offset_x,
-            y=character.position.y + weapon.emitter_offset_y,
+            x=character.position.x,
+            y=character.position.y,
             dx=speed.x,
             dy=speed.y,
             origin=character,
             weapon=weapon,
-            weapon_name=weapon.name,
+            weapon_name=character.weapon_name,
             uuid=str(uuid4()),
         )
         self.projectiles.append(projectile)

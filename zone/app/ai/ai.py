@@ -63,7 +63,7 @@ class Ai(SpawnerProvider):
                 enemy.position, player.position
             )
 
-        if player_dst_sqrd < enemy.attack_distance**2 and not enemy.attacking:
+        if player_dst_sqrd < enemy.weapon.attack_distance**2 and not enemy.attacking:
             await self.enemy_attack(enemy, player)
 
     async def enemy_attack(self, enemy: Enemy, player: Player):

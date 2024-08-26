@@ -48,9 +48,9 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         for character in characters:
             character.update(dt)
             if character.should_process_attack:
-                if character.attack_type == AttackType.MELEE:
+                if character.weapon.attack_type == AttackType.MELEE:
                     await self.process_attack_damage(character, targets)
-                elif character.attack_type == AttackType.RANGED:
+                elif character.weapon.attack_type == AttackType.RANGED:
                     await self.process_ranged_attack(character)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True

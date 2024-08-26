@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
+from functools import lru_cache
 from os import environ
 from uuid import uuid4 as generate_uuid
 
 import pymunk
 
 from nk_shared.models.character_properties import CharacterProperties
+from nk_shared.models.weapon import Weapon, load_weapon_by_name
 from nk_shared.proto import CharacterType, Direction
 from nk_shared import direction_util
 
@@ -33,17 +35,19 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     body_removal_processed: bool = False
     start_x: float = 0
     start_y: float = 0
+    weapon: Weapon = None
 
     def __post_init__(self):
         self.apply_character_properties()
         self.hp = float(self.hp_max)
+        self.weapon = load_weapon_by_name(self.weapon_name)
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
         self.shape = pymunk.Circle(self.body, self.radius)
         self.shape.mass = self.mass
         self.hitbox_shape = pymunk.Segment(
-            self.body, (0, 0), (self.attack_distance, 0), radius=1
+            self.body, (0, 0), (self.weapon.attack_distance, 0), radius=1
         )
         self.hitbox_shape.sensor = True
 
@@ -108,8 +112,8 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     def attack(self, direction: float | None):
         if not self.attacking:
             self.attacking = True
-            self.attack_time_remaining = self.attack_duration
-            self.attack_damage_time_remaining = self.attack_time_until_damage
+            self.attack_time_remaining = self.weapon.attack_duration
+            self.attack_damage_time_remaining = self.weapon.attack_time_until_damage
             self.attack_direction = direction
             if self.moving_direction:  # maybe standing still
                 self.facing_direction = self.moving_direction
@@ -120,9 +124,8 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             self.dash_time_remaining = self.dash_duration
 
     def apply_character_properties(self):
-        path = f"{DATA_ROOT}/characters/{self.character_type_short}/character.yml"
-        character_properties = CharacterProperties.from_yaml_file(path)
-        self.__dict__.update(character_properties.__dict__)
+        props = load_character_properties_by_name(self.character_type_short)
+        self.__dict__.update(props.__dict__)
 
     @property
     def position(self) -> pymunk.Vec2d:
@@ -135,3 +138,9 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     @property
     def character_type_short(self):
         return self.character_type.name.lower()[15:]
+
+
+@lru_cache
+def load_character_properties_by_name(character_type_short: str):
+    path = f"{DATA_ROOT}/characters/{character_type_short}/character.yml"
+    return CharacterProperties.from_yaml_file(path)

@@ -17,7 +17,7 @@ class Projectile(ProjectileProto):
     def __post_init__(self):
         self.body = Body()
         self.body.position = (self.x, self.y)
-        self.shape = Circle(body=self.body, radius=self.weapon.radius)
+        self.shape = Circle(body=self.body, radius=self.weapon.projectile_radius)
 
     def update(self, dt: float):
         self.x += dt * self.dx

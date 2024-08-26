@@ -3,7 +3,6 @@ from typing import Protocol
 from uuid import uuid4
 
 import pymunk
-from loguru import logger
 from nk_shared import builders
 from nk_shared.models import Character, Projectile
 from nk_shared.models.weapon import load_weapon_by_name
@@ -35,11 +34,11 @@ class ProjectileManager:
         weapon = load_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)
-        ).scale_to_length(weapon.speed)
+        ).scale_to_length(weapon.projectile_speed)
         projectile = ProjectileProto(
             uuid=str(uuid4()),
-            x=character.position.x + weapon.emitter_offset_x,
-            y=character.position.y + weapon.emitter_offset_y,
+            x=character.position.x,
+            y=character.position.y,
             dx=speed.x,
             dy=speed.y,
             weapon_name=character.weapon_name,
@@ -71,7 +70,6 @@ class ProjectileManager:
                 dy=proto.projectile.dy,
             )
         )
-        logger.debug("Created projectile: {}", self.projectiles[-1])
 
     def get_projectile_by_uuid(self, uuid: str) -> Projectile | None:
         for projectile in self.projectiles:

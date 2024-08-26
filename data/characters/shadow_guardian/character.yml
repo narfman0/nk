@@ -1,9 +1,10 @@
 mass: 10
+dash_cooldown: 0.25
+dash_duration: 0.25
+dash_scalar: 3
 run_force: 5000
 running_stop_threshold: 1
 max_velocity: 1
 radius: 1.0
-attack_distance: 2.5
-attack_duration: 1.0
-attack_time_until_damage: 0.5
-hp_max: 3
+weapon_name: shadow_guardian
+hp_max: 20

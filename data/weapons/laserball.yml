@@ -1,6 +1,0 @@
-name: laserball
-image_path: laserball
-speed: 25
-radius: 0.1
-emitter_offset_x: 0
-emitter_offset_y: 0

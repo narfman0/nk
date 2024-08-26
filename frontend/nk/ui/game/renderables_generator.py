@@ -12,7 +12,7 @@ from nk.ui.game.renderables import BlittableRenderable, renderables_generate_key
 
 def generate_projectile_renderables(world: World, ui_interface: UIInterface):
     for projectile in world.projectile_manager.projectiles:
-        image = load_projectile_image(projectile.weapon.image_path)
+        image = load_projectile_image(projectile.weapon.projectile_image_path)
         blit_x, blit_y = ui_interface.calculate_draw_coordinates(
             projectile.x, projectile.y, image
         )

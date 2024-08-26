@@ -6,9 +6,5 @@ run_force: 25000
 running_stop_threshold: 2
 max_velocity: 5
 radius: 0.5
-attack_distance: 15
-attack_duration: 0.1
-attack_time_until_damage: 0.01
-attack_type: 2
 weapon_name: ak47
 hp_max: 100

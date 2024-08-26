@@ -1,6 +1,8 @@
-name: ak47
-image_path: bullet
-speed: 50
-radius: 0.3
-emitter_offset_x: 0
-emitter_offset_y: 0
+projectile_image_path: bullet
+projectile_speed: 50
+projectile_radius: 0.3
+
+attack_distance: 15
+attack_duration: 0.1
+attack_time_until_damage: 0.01
+attack_type: 2

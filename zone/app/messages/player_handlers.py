@@ -19,6 +19,8 @@ async def handle_player_disconnected(
 ):
     player = world.get_character_by_uuid(details.uuid)
     await world.publish(Message(player_left=PlayerLeft(uuid=details.uuid)))
+    if player is None:
+        return
     x, y = player.position.x, player.position.y  # pylint: disable=no-member
     user_id = PydanticObjectId(details.uuid)
     character = await DBCharacter.find_one(DBCharacter.user_id == user_id)

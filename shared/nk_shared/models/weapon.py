@@ -2,16 +2,19 @@ from dataclasses import dataclass
 from functools import lru_cache
 from dataclass_wizard import YAMLWizard
 from nk_shared.map import DATA_ROOT
+from nk_shared.models.attack_type import AttackType
 
 
 @dataclass
 class Weapon(YAMLWizard):
-    name: str
-    image_path: str
-    speed: float
-    radius: float
-    emitter_offset_x: float = 0
-    emitter_offset_y: float = 0
+    attack_duration: float = None
+    attack_distance: float = None
+    attack_time_until_damage: float = None
+    attack_type: AttackType = AttackType.MELEE
+
+    projectile_image_path: str = None
+    projectile_speed: float = None
+    projectile_radius: float = None
 
 
 @lru_cache
