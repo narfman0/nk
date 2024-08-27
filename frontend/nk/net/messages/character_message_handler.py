@@ -6,15 +6,15 @@ from nk_shared.models.character import Character
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
 
-from nk.game.listeners import WorldListener
 from nk.game.world import World
+from nk.net.messages.message_handler import MessageHandler
 
 
 class CharacterMessageListener(Protocol):
     def character_attacked(self, character: Character): ...
 
 
-class CharacterMessageHandler:
+class CharacterMessageHandler(MessageHandler):
     def __init__(self, world: World):
         self.world = world
         self.listeners: list[CharacterMessageListener] = []

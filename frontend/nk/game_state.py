@@ -1,10 +1,11 @@
-from typing import Callable, Protocol
+from typing import Callable
 
 from nk_shared import builders
 from nk_shared.proto import Message
 
 from nk.game.world import World
 from nk.net.messages.character_message_handler import CharacterMessageHandler
+from nk.net.messages.message_handler import MessageHandler
 from nk.net.messages.player_join_response_handler import PlayerJoinResponseHandler
 from nk.net.messages.player_message_handler import PlayerMessageHandler
 from nk.net.messages.projectile_message_handler import ProjectileMessageHandler
@@ -13,15 +14,11 @@ from nk.net.network import Network
 TICKS_BEFORE_UPDATE = 6
 
 
-class MessageHandlerProtocol(Protocol):  # pylint: disable=too-few-public-methods
-    def handle_message(self, message: Message) -> bool: ...
-
-
 class GameState:
 
     def __init__(self):
         self.character_msg_handler: CharacterMessageHandler = None
-        self.message_handlers: list[MessageHandlerProtocol] = []
+        self.message_handlers: list[MessageHandler] = []
         self.message_handlers.append(
             PlayerJoinResponseHandler(self.handle_player_join_response)
         )

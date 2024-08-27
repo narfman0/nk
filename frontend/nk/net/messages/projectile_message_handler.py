@@ -2,9 +2,10 @@ from betterproto import serialized_on_wire
 from nk_shared.proto import Message
 
 from nk.game.world import World
+from nk.net.messages.message_handler import MessageHandler
 
 
-class ProjectileMessageHandler:
+class ProjectileMessageHandler(MessageHandler):
     def __init__(self, world: World):
         self.world = world
 

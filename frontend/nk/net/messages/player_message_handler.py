@@ -4,9 +4,10 @@ from nk_shared.proto import Message
 from pymunk import Vec2d
 
 from nk.game.world import World
+from nk.net.messages.message_handler import MessageHandler
 
 
-class PlayerMessageHandler:
+class PlayerMessageHandler(MessageHandler):
     def __init__(self, world: World):
         self.world = world
 
