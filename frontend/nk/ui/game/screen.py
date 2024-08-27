@@ -4,6 +4,7 @@ import pygame
 from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
+from nk_shared.proto import Direction
 from pygame import Surface
 from pygame.event import Event
 
@@ -66,18 +67,21 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
-        player_actions = read_input_player_actions(events)
-        self.handle_player_actions(player_actions)
-        player_move_direction = read_input_player_move_direction()
+        player_move_direction = self.update_input(events)
         self.world.update(dt, player_move_direction)
         self._camera.update()
-        if player_move_direction:
-            self.world.player.facing_direction = player_move_direction
-        assert self.world.player.facing_direction is not None
         self.update_character_struct_remove_queue(dt)
         update_character_structs(dt, self.character_structs, self)
         self.game_state.update(dt)
         self.game_gui.update(dt)
+
+    def update_input(self, events: list[Event]) -> Direction | None:
+        player_actions = read_input_player_actions(events)
+        self.handle_player_actions(player_actions)
+        player_move_direction = read_input_player_move_direction()
+        if player_move_direction:
+            self.world.player.facing_direction = player_move_direction
+        return player_move_direction
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
