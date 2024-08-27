@@ -52,9 +52,7 @@ class Headless:
             )
             logger.debug("Sent: ({},{})", x, y)
         while self.network.has_messages():
-            msg = self.network.next()
-            if serialized_on_wire(msg.character_attacked):
-                logger.info("Received: {}", msg.character_attacked)
+            self.network.next()
 
     def handle_join_response(self):
         while True:
