@@ -1,4 +1,3 @@
-from collections import deque
 from typing import Callable, Protocol
 
 from nk_shared import builders

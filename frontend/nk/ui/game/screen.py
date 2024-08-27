@@ -51,12 +51,7 @@ class GameScreen(Screen, UIInterface):
         self._camera = Camera(game_state.world, 0, 0)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
-        self.game_state.character_msg_handler.character_added_callback = (
-            self.handle_character_added
-        )
-        self.game_state.character_msg_handler.character_attacked_callback = (
-            self.handle_character_attacked
-        )
+        self.game_state.character_msg_handler.listeners.append(self)
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
         self.character_structs = [self.player_struct]
@@ -184,12 +179,12 @@ class GameScreen(Screen, UIInterface):
             y / self.world.map.tile_width // 2,
         )
 
-    def handle_character_added(self, character: Character):
+    def character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)
         update_character_sprite_position(character, sprite, self)
         self.character_structs.append(CharacterStruct(character, sprite))
 
-    def handle_character_attacked(self, character: Character):
+    def character_attacked(self, character: Character):
         for cstruct in self.character_structs:
             if cstruct.character == character:
                 cstruct.sprite.change_animation("attack")

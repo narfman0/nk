@@ -1,18 +1,23 @@
-from typing import Callable
+from typing import Callable, Protocol
 
 from betterproto import serialized_on_wire
 from loguru import logger
+from nk_shared.models.character import Character
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
 
 from nk.game.world import World
 
 
+class CharacterMessageListener(Protocol):
+    def character_added(self, character: Character): ...
+    def character_attacked(self, character: Character): ...
+
+
 class CharacterMessageHandler:
     def __init__(self, world: World):
         self.world = world
-        self.character_added_callback: Callable = None
-        self.character_attacked_callback: Callable = None
+        self.listeners: list[CharacterMessageListener] = []
 
     def handle_message(self, message: Message) -> bool:
         if serialized_on_wire(message.character_position_updated):
@@ -37,9 +42,8 @@ class CharacterMessageHandler:
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.attack(details.direction)
-            if self.character_attacked_callback:
-                # pylint: disable-next=not-callable
-                self.character_attacked_callback(character)
+            for listener in self.listeners:
+                listener.character_attacked(character)
         else:
             logger.warning(
                 "character_attacked no character found with uuid {}", details.uuid
@@ -113,8 +117,8 @@ class CharacterMessageHandler:
                     start_y=details.y,
                     character_type=CharacterType(details.character_type),
                 )
-            if self.character_added_callback:
-                self.character_added_callback(character)  # pylint: disable=not-callable
+            for listener in self.listeners:
+                listener.character_added(character)
         character.facing_direction = Direction(details.facing_direction)
         character.moving_direction = Direction(details.moving_direction)
         character.hp = details.hp
