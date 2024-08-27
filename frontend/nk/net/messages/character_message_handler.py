@@ -38,7 +38,6 @@ class CharacterMessageHandler:
 
     def handle_character_attacked(self, message: Message):
         details = message.character_attacked
-        logger.info(details)
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.attack(details.direction)
