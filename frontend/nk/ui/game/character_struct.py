@@ -21,6 +21,12 @@ class CharacterStruct:
             self.sprite_group.add(self.sprite)
 
 
+@dataclass
+class CharacterStructRemoveStruct:
+    character_struct: CharacterStruct
+    time_until_removal: float
+
+
 def update_position(
     character: Character, sprite: CharacterSprite, ui_interface: UIInterface
 ):

@@ -2,6 +2,7 @@ from math import atan2
 
 import pygame
 from loguru import logger
+from nk.game.listeners import WorldListener
 from nk_shared import builders
 from nk_shared.models.character import Character
 from pygame import Surface
@@ -11,7 +12,11 @@ from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.game.camera import Camera
 from nk.ui.game.character_sprite import CharacterSprite
-from nk.ui.game.character_struct import CharacterStruct, update_character_structs
+from nk.ui.game.character_struct import (
+    CharacterStruct,
+    CharacterStructRemoveStruct,
+    update_character_structs,
+)
 from nk.ui.game.character_struct import (
     update_position as update_character_sprite_position,
 )
@@ -36,10 +41,11 @@ from nk.ui.screen import Screen, ScreenManager
 from nk.util.math import cartesian_to_isometric, isometric_to_cartesian
 
 DEFAULT_SCREEN_SCALE = 5
+TIME_TO_REMOVE = 5
 
 
 # pylint: disable-next=too-many-instance-attributes
-class GameScreen(Screen, UIInterface):
+class GameScreen(Screen, UIInterface, WorldListener):
     """UI screen for game state"""
 
     def __init__(self, screen_manager: ScreenManager, game_state: GameState):
@@ -52,9 +58,11 @@ class GameScreen(Screen, UIInterface):
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
         self.game_state.character_msg_handler.listeners.append(self)
+        self.world.listeners.append(self)
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
         self.character_structs = [self.player_struct]
+        self.character_struct_remove_queue: list[CharacterStructRemoveStruct] = []
         self.game_gui = GameGui()
 
     def update(self, dt: float, events: list[Event]):
@@ -66,6 +74,7 @@ class GameScreen(Screen, UIInterface):
         if player_move_direction:
             self.world.player.facing_direction = player_move_direction
         assert self.world.player.facing_direction is not None
+        self.update_character_struct_remove_queue(dt)
         update_character_structs(dt, self.character_structs, self)
         self.game_state.update(dt)
         self.game_gui.update(dt)
@@ -179,16 +188,31 @@ class GameScreen(Screen, UIInterface):
             y / self.world.map.tile_width // 2,
         )
 
-    def character_added(self, character: Character):
-        sprite = CharacterSprite(character.character_type_short)
-        update_character_sprite_position(character, sprite, self)
-        self.character_structs.append(CharacterStruct(character, sprite))
-
     def character_attacked(self, character: Character):
         for cstruct in self.character_structs:
             if cstruct.character == character:
                 cstruct.sprite.change_animation("attack")
                 return
+
+    def character_added(self, character: Character):
+        sprite = CharacterSprite(character.character_type_short)
+        update_character_sprite_position(character, sprite, self)
+        self.character_structs.append(CharacterStruct(character, sprite))
+
+    def character_removed(self, character: Character):
+        for cstruct in self.character_structs:
+            if cstruct.character == character:
+                self.character_struct_remove_queue.append(
+                    CharacterStructRemoveStruct(cstruct, TIME_TO_REMOVE)
+                )
+                return
+
+    def update_character_struct_remove_queue(self, dt: float):
+        for struct in list(self.character_struct_remove_queue):
+            struct.time_until_removal -= dt
+            if struct.time_until_removal <= 0:
+                self.character_structs.remove(struct.character_struct)
+                self.character_struct_remove_queue.remove(struct)
 
     @property
     def camera(self):

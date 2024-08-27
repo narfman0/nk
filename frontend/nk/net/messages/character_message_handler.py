@@ -1,7 +1,8 @@
-from typing import Callable, Protocol
+from typing import Protocol
 
 from betterproto import serialized_on_wire
 from loguru import logger
+from nk.game.listeners import WorldListener
 from nk_shared.models.character import Character
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
@@ -10,7 +11,6 @@ from nk.game.world import World
 
 
 class CharacterMessageListener(Protocol):
-    def character_added(self, character: Character): ...
     def character_attacked(self, character: Character): ...
 
 
@@ -117,8 +117,6 @@ class CharacterMessageHandler:
                     start_y=details.y,
                     character_type=CharacterType(details.character_type),
                 )
-            for listener in self.listeners:
-                listener.character_added(character)
         character.facing_direction = Direction(details.facing_direction)
         character.moving_direction = Direction(details.moving_direction)
         character.hp = details.hp

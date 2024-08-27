@@ -1,3 +1,4 @@
+from collections import deque
 import pymunk
 from loguru import logger
 from nk_shared.map import Map
@@ -5,6 +6,7 @@ from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction
 from typing_extensions import Unpack
 
+from nk.game.listeners import WorldListener
 from nk.game.projectile_manager import ProjectileManager
 from nk.settings import NK_DATA_ROOT
 
@@ -16,6 +18,7 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def __init__(
         self, uuid: str, x: float, y: float, zone_name="1", tmxmap: Map = None
     ):
+        self.listeners: deque[WorldListener] = deque()
         self.projectile_manager: ProjectileManager = ProjectileManager(self)
         self.weapons: dict[str, Weapon] = {}
         self.space = pymunk.Space()
@@ -86,11 +89,15 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
         character = Character(**character_kwargs)
         self.space.add(character.body, character.shape, character.hitbox_shape)
         self.characters[character.uuid] = character
+        for listener in self.listeners:
+            listener.character_added(character)
         return character
 
     def remove_character(self, character: Character):
         self.space.remove(character.body, character.shape, character.hitbox_shape)
         del self.characters[character.uuid]
+        for listener in self.listeners:
+            listener.character_removed(character)
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
         return self.characters.get(uuid)
