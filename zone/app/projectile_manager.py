@@ -40,7 +40,7 @@ class ProjectileManager:
                 return True
         return False
 
-    def create_projectile(self, character: Character):
+    def create_projectile(self, character: Character) -> Projectile:
         weapon = load_weapon_by_name(character.weapon_name)
         speed = pymunk.Vec2d(
             cos(character.attack_direction), sin(character.attack_direction)

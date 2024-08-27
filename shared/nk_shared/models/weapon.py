@@ -25,9 +25,10 @@ class RangedWeapon(Weapon):
 
 
 @lru_cache
-def load_weapon_by_name(weapon_name: str) -> Weapon:
+def load_weapon_by_name(weapon_name: str) -> Weapon | RangedWeapon:
     path = f"{DATA_ROOT}/weapons/{weapon_name}.yml"
-    weapon = Weapon.from_yaml_file(path)
-    if weapon.attack_type == AttackType.RANGED:
-        weapon = RangedWeapon.from_yaml_file(path)
+    with open(path) as in_file:
+        weapon = Weapon.from_yaml(in_file)
+        if weapon.attack_type == AttackType.RANGED:
+            weapon = RangedWeapon.from_yaml(in_file)
     return weapon
