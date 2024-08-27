@@ -30,6 +30,9 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
                 feature.center_y - tilemap.height // 2,
             )
 
+        self.enemies: list[Character] = []
+        self.players: list[Character] = []
+        self.characters: dict[str, Character] = {}
         # initialize player
         self.player = self.add_character(
             uuid=uuid,
@@ -37,9 +40,6 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
             start_x=x,
             start_y=y,
         )
-
-        self.enemies: list[Character] = []
-        self.players: list[Character] = []
 
     def update(
         self,
@@ -70,9 +70,7 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
             character.update(dt)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
-                self.space.remove(
-                    character.body, character.shape, character.hitbox_shape
-                )
+                self.remove_character(character)
 
     def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
         character = self.add_character(**character_kwargs)
@@ -87,23 +85,12 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def add_character(self, **character_kwargs: Unpack[Character]) -> Character:
         character = Character(**character_kwargs)
         self.space.add(character.body, character.shape, character.hitbox_shape)
+        self.characters[character.uuid] = character
         return character
 
-    def get_enemy_by_uuid(self, uuid: str) -> Character | None:
-        for character in self.enemies:
-            if character.uuid == uuid:
-                return character
-        return None
-
-    def get_player_by_uuid(self, uuid: str) -> Character | None:
-        for character in self.players:
-            if character.uuid == uuid:
-                return character
-        return None
+    def remove_character(self, character: Character):
+        self.space.remove(character.body, character.shape, character.hitbox_shape)
+        del self.characters[character.uuid]
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        for character in self.players + self.enemies + [self.player]:
-            if character.uuid == uuid:
-                return character
-        logger.debug("Could not find character with uuid {}", uuid)
-        return None
+        return self.characters.get(uuid)
