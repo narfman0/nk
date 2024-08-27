@@ -13,15 +13,12 @@ RESPAWN_TIME = 5.0
 
 
 class ProviderProtocol(Protocol):
-    def get_character_by_uuid(self, uuid: str) -> Character | None:
-        pass
+    def get_character_by_uuid(self, uuid: str) -> Character | None: ...
 
-    async def publish(self, message: Message, **kwargs) -> None:
-        pass
+    async def publish(self, message: Message, **kwargs) -> None: ...
 
     @property
-    def players(self) -> list[Player]:
-        pass
+    def players(self) -> list[Player]: ...
 
 
 class MedicalManager:

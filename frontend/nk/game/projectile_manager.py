@@ -12,11 +12,8 @@ from nk_shared.proto import ProjectileCreated
 
 class WorldProtocol(Protocol):
     @property
-    def space(self) -> pymunk.Space:
-        pass
-
-    def get_character_by_uuid(self, uuid: str) -> Character | None:
-        pass
+    def space(self) -> pymunk.Space: ...
+    def get_character_by_uuid(self, uuid: str) -> Character | None: ...
 
 
 class ProjectileManager:

@@ -1,5 +1,6 @@
 from typing import Callable
 
+from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
@@ -12,6 +13,23 @@ class CharacterMessageHandler:
         self.world = world
         self.character_added_callback: Callable = None
         self.character_attacked_callback: Callable = None
+
+    def handle_message(self, message: Message) -> bool:
+        if serialized_on_wire(message.character_position_updated):
+            self.handle_character_position_updated(message)
+        if serialized_on_wire(message.character_direction_updated):
+            self.handle_character_direction_updated(message)
+        elif serialized_on_wire(message.character_updated):
+            self.handle_character_updated(message)
+        elif serialized_on_wire(message.character_attacked):
+            self.handle_character_attacked(message)
+        elif serialized_on_wire(message.character_damaged):
+            self.handle_character_damaged(message)
+        elif serialized_on_wire(message.character_reloaded):
+            self.handle_character_reloaded(message)
+        else:
+            return False
+        return True
 
     def handle_character_attacked(self, message: Message):
         details = message.character_attacked
