@@ -62,7 +62,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.world.listeners.append(self)
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
-        self.character_structs = [self.player_struct]
+        self.character_structs = {self.world.player.uuid: self.player_struct}
         self.character_struct_remove_queue: list[CharacterStructRemoveStruct] = []
         self.game_gui = GameGui()
 
@@ -122,7 +122,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         renderables = self.map_renderables.copy()
         for renderable in generate_projectile_renderables(self.world, self):
             renderables.add(renderable)
-        for character_struct in self.character_structs:
+        for character_struct in self.character_structs.values():
             if not self.camera.is_visible(
                 character_struct.sprite.rect.centerx + self._camera.x,
                 character_struct.sprite.rect.centery + self._camera.y,
@@ -193,29 +193,26 @@ class GameScreen(Screen, UIInterface, WorldListener):
         )
 
     def character_attacked(self, character: Character):
-        for cstruct in self.character_structs:
-            if cstruct.character == character:
-                cstruct.sprite.change_animation("attack")
-                return
+        struct = self.character_structs.get(character.uuid)
+        if struct:
+            struct.sprite.change_animation("attack")
 
     def character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)
         update_character_sprite_position(character, sprite, self)
-        self.character_structs.append(CharacterStruct(character, sprite))
+        self.character_structs[character.uuid] = CharacterStruct(character, sprite)
 
     def character_removed(self, character: Character):
-        for cstruct in self.character_structs:
-            if cstruct.character == character:
-                self.character_struct_remove_queue.append(
-                    CharacterStructRemoveStruct(cstruct, TIME_TO_REMOVE)
-                )
-                return
+        struct = self.character_structs.get(character.uuid)
+        if struct:
+            remove_struct = CharacterStructRemoveStruct(struct, TIME_TO_REMOVE)
+            self.character_struct_remove_queue.append(remove_struct)
 
     def update_character_struct_remove_queue(self, dt: float):
         for struct in list(self.character_struct_remove_queue):
             struct.time_until_removal -= dt
             if struct.time_until_removal <= 0:
-                self.character_structs.remove(struct.character_struct)
+                self.character_structs.pop(struct.character_struct.character.uuid, None)
                 self.character_struct_remove_queue.remove(struct)
 
     @property

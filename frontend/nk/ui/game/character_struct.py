@@ -57,10 +57,10 @@ def update_animation(
 
 def update_character_structs(
     dt: float,
-    character_structs: list[CharacterStruct],
+    character_structs: dict[str, CharacterStruct],
     ui_interface: UIInterface,
 ):
-    for character_struct in character_structs:
+    for character_struct in character_structs.values():
         character = character_struct.character
         sprite = character_struct.sprite
         update_animation(character, sprite, character_struct)
