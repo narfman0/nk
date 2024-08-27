@@ -28,6 +28,11 @@ class Enemy(Character):
     center_y: int = None
 
 
+class WorldListener:  # pylint: disable=too-few-public-methods
+    def character_removed(self, character: Character):
+        pass
+
+
 class WorldComponentProvider(ABC):
     @abstractmethod
     async def publish(self, message: Message, **kwargs) -> None:
@@ -35,6 +40,10 @@ class WorldComponentProvider(ABC):
 
     @abstractmethod
     def get_character_by_uuid(self, uuid: str) -> Character | None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def add_listener(self, listener: WorldListener) -> None:
         raise NotImplementedError()
 
     @property

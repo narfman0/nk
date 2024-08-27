@@ -1,6 +1,6 @@
 from collections import deque
+
 import pymunk
-from loguru import logger
 from nk_shared.map import Map
 from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction

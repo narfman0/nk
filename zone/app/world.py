@@ -1,5 +1,7 @@
 """Simulates the world's characters"""
 
+from collections import deque
+
 import pymunk
 from loguru import logger
 from nk_shared import builders
@@ -10,7 +12,7 @@ from nk_shared.proto import Message
 from app.ai import Ai
 from app.medical_manager import MedicalManager
 from app.messages.handler import MessageHandler
-from app.models import Enemy, Player, WorldComponentProvider
+from app.models import Enemy, Player, WorldComponentProvider, WorldListener
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
 from app.settings import DATA_ROOT
@@ -20,6 +22,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):
+        self._listeners: deque[WorldListener] = deque()
         self._space = pymunk.Space()
         self._zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
         self._map = Map(self._zone.tmx_path, headless=True)
@@ -57,6 +60,10 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 self._space.remove(
                     character.body, character.shape, character.hitbox_shape
                 )
+                for listener in self._listeners:
+                    # make sure we tell remotes about the death, better to just send a health update
+                    await self.publish(builders.build_character_updated(character))
+                    listener.character_removed(character)
                 if character in self.players:
                     logger.info("Player killed {}", character.uuid)
                     self._medical_manager.schedule_respawn(character)
@@ -86,8 +93,11 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
     async def handle_message(self, msg: Message):
         await self._message_component.handle_message(msg)
 
-    async def publish(self, message: Message, **kwargs) -> None:
+    async def publish(self, message: Message, **kwargs):
         await publish(bytes(message), **kwargs)
+
+    def add_listener(self, listener: WorldListener):
+        self._listeners.append(listener)
 
     @property
     def map(self) -> Map:

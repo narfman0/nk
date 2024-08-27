@@ -2,7 +2,6 @@ from math import cos, sin
 from uuid import uuid4
 
 import pymunk
-from loguru import logger
 from nk_shared import builders
 from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile

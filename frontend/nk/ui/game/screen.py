@@ -2,12 +2,12 @@ from math import atan2
 
 import pygame
 from loguru import logger
-from nk.game.listeners import WorldListener
 from nk_shared import builders
 from nk_shared.models.character import Character
 from pygame import Surface
 from pygame.event import Event
 
+from nk.game.listeners import WorldListener
 from nk.game_state import GameState
 from nk.settings import HEIGHT, WIDTH
 from nk.ui.game.camera import Camera

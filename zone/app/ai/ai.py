@@ -2,17 +2,18 @@ import random
 from math import atan2
 
 from nk_shared import builders, direction_util
+from nk_shared.models.character import Character
 from nk_shared.models.zone import Zone
 from nk_shared.proto import CharacterType, Message
 
 from app.ai import incrementals
 from app.ai.spawner_manager import SpawnerManager, SpawnerProvider
-from app.models import Enemy, Player, WorldComponentProvider
+from app.models import Enemy, Player, WorldComponentProvider, WorldListener
 
 FULL_UPDATE_FREQUENCY = 10
 
 
-class Ai(SpawnerProvider):
+class Ai(SpawnerProvider, WorldListener):
     def __init__(self, world: WorldComponentProvider, zone: Zone):
         self.world = world
         self.zone = zone
@@ -20,6 +21,7 @@ class Ai(SpawnerProvider):
         self.enemies: list[Enemy] = []
         self.init_enemy_groups()
         self.spawn_manager = SpawnerManager(self, zone.environment_features)
+        self.world.add_listener(self)
 
     def init_enemy_groups(self):
         for enemy_group in self.zone.enemy_groups:
@@ -104,3 +106,7 @@ class Ai(SpawnerProvider):
 
     async def publish(self, message: Message, **kwargs) -> None:
         await self.world.publish(message, **kwargs)
+
+    def character_removed(self, character: Character):
+        if isinstance(character, Enemy):
+            self.enemies.remove(character)

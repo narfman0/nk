@@ -2,11 +2,11 @@ from typing import Protocol
 
 from betterproto import serialized_on_wire
 from loguru import logger
-from nk.game.listeners import WorldListener
 from nk_shared.models.character import Character
 from nk_shared.proto import CharacterType, Direction, Message
 from pymunk import Vec2d
 
+from nk.game.listeners import WorldListener
 from nk.game.world import World
 
 
