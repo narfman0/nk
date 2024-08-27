@@ -51,8 +51,12 @@ class GameScreen(Screen, UIInterface):
         self._camera = Camera(game_state.world, 0, 0)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
-        self.game_state.character_added_callback = self.handle_character_added
-        self.game_state.character_attacked_callback = self.handle_character_attacked
+        self.game_state.character_msg_handler.character_added_callback = (
+            self.handle_character_added
+        )
+        self.game_state.character_msg_handler.character_attacked_callback = (
+            self.handle_character_attacked
+        )
         player_sprite = CharacterSprite(self.world.player.character_type_short)
         self.player_struct = CharacterStruct(self.world.player, player_sprite)
         self.character_structs = [self.player_struct]
