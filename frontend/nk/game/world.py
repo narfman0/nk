@@ -33,8 +33,8 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
                 feature.center_y - tilemap.height // 2,
             )
 
-        self.enemies: list[Character] = []
-        self.players: list[Character] = []
+        self.enemies: dict[str, Character] = {}
+        self.players: dict[str, Character] = {}
         self.characters: dict[str, Character] = {}
         # initialize player
         self.player = self.add_character(
@@ -68,8 +68,8 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
                 self.player.handle_healing_received(HEAL_AMT * dt)
                 return
 
-    def update_characters(self, dt: float, characters: list[Character]):
-        for character in characters:
+    def update_characters(self, dt: float, characters: dict[str, Character]):
+        for character in list(characters.values()):
             character.update(dt)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
@@ -77,12 +77,12 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
 
     def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
         character = self.add_character(**character_kwargs)
-        self.enemies.append(character)
+        self.enemies[character.uuid] = character
         return character
 
     def add_player(self, **character_kwargs: Unpack[Character]) -> Character:
         character = self.add_character(**character_kwargs)
-        self.players.append(character)
+        self.players[character.uuid] = character
         return character
 
     def add_character(self, **character_kwargs: Unpack[Character]) -> Character:
@@ -96,6 +96,8 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def remove_character(self, character: Character):
         self.space.remove(character.body, character.shape, character.hitbox_shape)
         del self.characters[character.uuid]
+        self.enemies.pop(character.uuid, None)
+        self.players.pop(character.uuid, None)
         for listener in self.listeners:
             listener.character_removed(character)
 
