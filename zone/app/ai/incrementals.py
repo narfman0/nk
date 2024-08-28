@@ -22,7 +22,7 @@ async def update_position(dt: float, world: WorldComponentProvider, enemy: Enemy
         if (
             enemy.position.get_dist_sqrd((enemy_remote.x, enemy_remote.y))
             < REMOTE_UPDATE_THRESHOLD
-            and enemy.body.velocity.get_dist_sqrd((enemy_remote.dx, enemy_remote.dy))
+            and enemy.velocity.get_dist_sqrd((enemy_remote.dx, enemy_remote.dy))
             < REMOTE_UPDATE_THRESHOLD
         ):
             return  # too similar to previous update, skip
