@@ -40,6 +40,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     start_y: float = 0
     weapon: Weapon | RangedWeapon = None
     rounds_remaining: int = 0
+    _position: pymunk.Vec2d = None
 
     def __post_init__(self):
         self.apply_character_properties()
@@ -47,6 +48,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
         self.weapon = load_weapon_by_name(self.weapon_name)
         if self.weapon.attack_type == AttackType.RANGED:
             self.rounds_remaining = self.weapon.clip_size
+        self._position = pymunk.Vec2d(self.start_x, self.start_y)
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
@@ -77,6 +79,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
         self.update_reloading(dt)
 
     def update_movement(self, dt: float):
+        self._position = self.body.position
         if self.alive and self.moving_direction:
             self.facing_direction = self.moving_direction
             self.body.angle = direction_util.angle(self.facing_direction)
@@ -161,7 +164,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
 
     @property
     def position(self) -> pymunk.Vec2d:
-        return self.body.position
+        return self._position
 
     @property
     def alive(self) -> bool:
