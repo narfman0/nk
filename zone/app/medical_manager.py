@@ -40,7 +40,8 @@ class MedicalManager:
             if respawn_time <= 0:
                 del self._player_respawns[player_uuid]
                 player = self.protocol.get_character_by_uuid(player_uuid)
-                await self.respawn_player(player)
+                if player is not None:
+                    await self.respawn_player(player)
             else:
                 self._player_respawns[player_uuid] = respawn_time
 
