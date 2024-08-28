@@ -26,3 +26,6 @@ clean-pyc: ## remove Python file artifacts
 
 reqs:
 	pip install -r requirements.txt -r requirements_test.txt
+
+nkshared:
+	pip install -e shared --config-settings editable_mode=strict

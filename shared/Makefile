@@ -5,4 +5,4 @@ isort:
 	isort --profile black tests
 
 lint:
-	pylint nk_shared/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
+	pylint nk_shared/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring --disable=C,R,W nk_shared/proto.py

@@ -3,6 +3,7 @@ import asyncio
 import sentry_sdk
 from beanie import init_beanie
 from loguru import logger
+from nk_shared.profiling import begin_profiling, end_profiling
 from nk_shared.proto import Message
 from pygame.time import Clock
 
@@ -71,7 +72,13 @@ async def main():
             Character,
         ],
     )
-    await handler(World())
+    begin_profiling()
+    try:
+        await handler(World())
+    except Exception as e:
+        raise e
+    finally:
+        end_profiling()
 
 
 if __name__ == "__main__":
