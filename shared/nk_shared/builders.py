@@ -27,10 +27,10 @@ def build_character_position_updated(character: Character) -> proto.Message:
         origin_uuid=character.uuid,
         character_position_updated=proto.CharacterPositionUpdated(
             uuid=character.uuid,
-            x=character.body.position.x,
-            y=character.body.position.y,
-            dx=character.body.velocity.x,
-            dy=character.body.velocity.y,
+            x=character.position.x,
+            y=character.position.y,
+            dx=character.velocity.x,
+            dy=character.velocity.y,
         ),
     )
 
@@ -59,10 +59,10 @@ def build_character_updated(character: Character) -> proto.Message:
         origin_uuid=character.uuid,
         character_updated=proto.CharacterUpdated(
             uuid=character.uuid,
-            x=character.body.position.x,
-            y=character.body.position.y,
-            dx=character.body.velocity.x,
-            dy=character.body.velocity.y,
+            x=character.position.x,
+            y=character.position.y,
+            dx=character.velocity.x,
+            dy=character.velocity.y,
             character_type=character.character_type,
             facing_direction=character.facing_direction,
             moving_direction=character.moving_direction,

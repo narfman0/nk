@@ -170,6 +170,10 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
         return self._position
 
     @property
+    def velocity(self) -> pymunk.Vec2d:
+        return self._velocity
+
+    @property
     def alive(self) -> bool:
         return self.hp > 0
 
