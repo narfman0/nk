@@ -155,6 +155,8 @@ class GameScreen(Screen, UIInterface, WorldListener):
             dest_surface,
             len(renderables),
             endtime - curtime,
+            len(self.world.players),
+            len(self.world.enemies),
         )
 
     def recalculate_screen_scale_derivatives(self):
