@@ -41,6 +41,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     weapon: Weapon | RangedWeapon = None
     rounds_remaining: int = 0
     _position: pymunk.Vec2d = None
+    _velocity: pymunk.Vec2d = None
 
     def __post_init__(self):
         self.apply_character_properties()
@@ -49,6 +50,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
         if self.weapon.attack_type == AttackType.RANGED:
             self.rounds_remaining = self.weapon.clip_size
         self._position = pymunk.Vec2d(self.start_x, self.start_y)
+        self._velocity = pymunk.Vec2d(0, 0)
         self.body = pymunk.Body()
         self.body.position = self.start_x, self.start_y
         self.body.character = self
@@ -80,6 +82,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
 
     def update_movement(self, dt: float):
         self._position = self.body.position
+        self._velocity = self.body.velocity
         if self.alive and self.moving_direction:
             self.facing_direction = self.moving_direction
             self.body.angle = direction_util.angle(self.facing_direction)
@@ -93,14 +96,14 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
             force = (dpos.x, dpos.y)  # pylint: disable=no-member
             point = (self.position.x, self.position.y)  # pylint: disable=no-member
             self.body.apply_force_at_world_point(force=force, point=point)
-            if self.body.velocity.length > self.max_velocity * dash_scalar:
-                self.body.velocity = self.body.velocity.scale_to_length(
+            if self._velocity.length > self.max_velocity * dash_scalar:
+                self.body.velocity = self._velocity.scale_to_length(
                     self.max_velocity * dash_scalar
                 )
         else:
-            if self.body.velocity.get_length_sqrd() > self.running_stop_threshold:
-                self.body.velocity = self.body.velocity.scale_to_length(
-                    0.7 * self.body.velocity.length
+            if self._velocity.get_length_sqrd() > self.running_stop_threshold:
+                self.body.velocity = self._velocity.scale_to_length(
+                    0.7 * self._velocity.length
                 )
             else:
                 self.body.velocity = (0, 0)
