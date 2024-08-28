@@ -33,8 +33,6 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
                 feature.center_y - tilemap.height // 2,
             )
 
-        self.enemies: dict[str, Character] = {}
-        self.players: dict[str, Character] = {}
         self.characters: dict[str, Character] = {}
         # initialize player
         self.player = self.add_character(
@@ -54,8 +52,7 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
         if self.player.should_process_attack:
             self.projectile_manager.process_local_attack(self.player)
             self.player.should_process_attack = False
-        self.update_characters(dt, self.enemies)
-        self.update_characters(dt, self.players)
+        self.update_characters(dt)
         self.projectile_manager.update(dt)
         self.update_medic(dt)
         self.space.step(dt)
@@ -68,22 +65,12 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
                 self.player.handle_healing_received(HEAL_AMT * dt)
                 return
 
-    def update_characters(self, dt: float, characters: dict[str, Character]):
-        for character in list(characters.values()):
+    def update_characters(self, dt: float):
+        for character in list(self.characters.values()):
             character.update(dt)
             if not character.alive and not character.body_removal_processed:
                 character.body_removal_processed = True
                 self.remove_character(character)
-
-    def add_enemy(self, **character_kwargs: Unpack[Character]) -> Character:
-        character = self.add_character(**character_kwargs)
-        self.enemies[character.uuid] = character
-        return character
-
-    def add_player(self, **character_kwargs: Unpack[Character]) -> Character:
-        character = self.add_character(**character_kwargs)
-        self.players[character.uuid] = character
-        return character
 
     def add_character(self, **character_kwargs: Unpack[Character]) -> Character:
         character = Character(**character_kwargs)
@@ -96,8 +83,6 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def remove_character(self, character: Character):
         self.space.remove(character.body, character.shape, character.hitbox_shape)
         del self.characters[character.uuid]
-        self.enemies.pop(character.uuid, None)
-        self.players.pop(character.uuid, None)
         for listener in self.listeners:
             listener.character_removed(character)
 

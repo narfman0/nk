@@ -103,19 +103,12 @@ class CharacterMessageHandler(MessageHandler):
             character.body.position = Vec2d(details.x, details.y)
             character.body.velocity = Vec2d(details.dx, details.dy)
         else:
-            if details.character_type == CharacterType.CHARACTER_TYPE_PIGSASSIN:
-                character = self.world.add_player(
-                    uuid=details.uuid,
-                    start_x=details.x,
-                    start_y=details.y,
-                )
-            else:
-                character = self.world.add_enemy(
-                    uuid=details.uuid,
-                    start_x=details.x,
-                    start_y=details.y,
-                    character_type=CharacterType(details.character_type),
-                )
+            character = self.world.add_character(
+                uuid=details.uuid,
+                start_x=details.x,
+                start_y=details.y,
+                character_type=CharacterType(details.character_type),
+            )
         character.facing_direction = Direction(details.facing_direction)
         character.moving_direction = Direction(details.moving_direction)
         character.hp = details.hp

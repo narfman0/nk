@@ -17,8 +17,7 @@ class GameGui:
         surface: pygame.Surface,
         renderable_count: int,
         draw_ticks: int,
-        player_count: int,
-        enemy_count: int,
+        character_count: int,
     ):
         x, y = player.position
         self.manager.draw_ui(surface)
@@ -29,8 +28,7 @@ class GameGui:
             f"HP: {player.hp}",
             f"Ammo: {player.rounds_remaining}",
             f"x,y: {int(x)},{int(y)}",
-            f"Players: {player_count}",
-            f"Enemies: {enemy_count}",
+            f"Characters: {character_count}",
         ]
         draw_y = 0
         for guiable in guiables:
