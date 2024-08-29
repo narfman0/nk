@@ -31,6 +31,8 @@ class Terminal:
                 if event.key == pygame.K_RETURN:  # pylint: disable=no-member
                     self.handle_command(self.terminal_text)
                     self.terminal_text = None
+                elif event.key == pygame.K_BACKSPACE:  # pylint: disable=no-member
+                    self.terminal_text = self.terminal_text[:-1]
                 else:
                     self.terminal_text += event.unicode
         return True

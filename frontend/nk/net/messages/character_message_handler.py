@@ -4,7 +4,6 @@ from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared.models.character import Character
 from nk_shared.proto import CharacterType, Direction, Message
-from pymunk import Vec2d
 
 from nk.game.world import World
 from nk.net.messages.message_handler import MessageHandler
@@ -88,8 +87,8 @@ class CharacterMessageHandler(MessageHandler):
             return
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
-            character.body.position = Vec2d(details.x, details.y)
-            character.body.velocity = Vec2d(details.dx, details.dy)
+            character.position = (details.x, details.y)
+            character.velocity = (details.dx, details.dy)
         else:
             logger.warning("No character found with uuid: {}", details.uuid)
 
@@ -100,8 +99,8 @@ class CharacterMessageHandler(MessageHandler):
             return
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
-            character.body.position = Vec2d(details.x, details.y)
-            character.body.velocity = Vec2d(details.dx, details.dy)
+            character.position = (details.x, details.y)
+            character.velocity = (details.dx, details.dy)
         else:
             character = self.world.add_character(
                 uuid=details.uuid,

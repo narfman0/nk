@@ -60,8 +60,8 @@ async def handle_character_position_updated(
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
         return
-    character.body.position = (details.x, details.y)
-    character.body.velocity = (details.dx, details.dy)
+    character.position = (details.x, details.y)
+    character.velocity = (details.dx, details.dy)
     await world.publish(Message(origin_uuid=character.uuid, character_updated=details))
 
 
@@ -73,7 +73,6 @@ async def handle_character_reloaded(world: WorldInterface, details: CharacterRel
         logger.warning("No character maching uuid: {}", details.uuid)
         return
     character.reload()
-    logger.info("Character reloading: {}", details.uuid)
     await world.publish(Message(origin_uuid=character.uuid, character_reloaded=details))
 
 
@@ -98,8 +97,8 @@ async def handle_character_updated(world: WorldInterface, details: CharacterUpda
     if not character:
         logger.warning("No character maching uuid: {}", details.uuid)
         return
-    character.body.position = (details.x, details.y)
-    character.body.velocity = (details.dx, details.dy)
+    character.position = (details.x, details.y)
+    character.velocity = (details.dx, details.dy)
     character.moving_direction = Direction(details.moving_direction)
     character.facing_direction = Direction(details.facing_direction)
     await world.publish(Message(origin_uuid=character.uuid, character_updated=details))

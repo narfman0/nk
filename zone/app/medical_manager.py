@@ -54,7 +54,7 @@ class MedicalManager:
             if dst_sq < closest_dst_sq:
                 closest_dst_sq = dst_sq
                 spawn_point = (medic.x, medic.y)
-        player.body.position = spawn_point
+        player.position = spawn_point
         await self.protocol.publish(builders.build_player_respawned(player))
 
     def schedule_respawn(self, player: Player):

@@ -1,7 +1,6 @@
 from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared.proto import Message
-from pymunk import Vec2d
 
 from nk.game.world import World
 from nk.net.messages.message_handler import MessageHandler
@@ -21,9 +20,10 @@ class PlayerMessageHandler(MessageHandler):
     def handle_player_respawned(self, message: Message):
         details = message.player_respawned
         character = self.world.get_character_by_uuid(details.uuid)
+        logger.info("Player respawned: {}", details)
         if character:
             character.hp = character.hp_max
-            character.body.position = Vec2d(details.x, details.y)
+            character.position = (details.x, details.y)
         else:
             logger.warning(
                 "character_damaged no character found with uuid {}", details.uuid

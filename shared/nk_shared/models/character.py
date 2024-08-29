@@ -169,9 +169,19 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
     def position(self) -> pymunk.Vec2d:
         return self._position
 
+    @position.setter
+    def position(self, value: tuple[float, float]):
+        self._position = pymunk.Vec2d(*value)
+        self.body.position = self._position
+
     @property
     def velocity(self) -> pymunk.Vec2d:
         return self._velocity
+
+    @velocity.setter
+    def velocity(self, value: tuple[float, float]):
+        self._velocity = pymunk.Vec2d(*value)
+        self.body.velocity = self._velocity
 
     @property
     def alive(self) -> bool:
