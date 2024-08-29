@@ -81,6 +81,8 @@ class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
         return character
 
     def remove_character(self, character: Character):
+        if character == self.player:
+            return
         self.space.remove(character.body, character.shape, character.hitbox_shape)
         del self.characters[character.uuid]
         for listener in self.listeners:
