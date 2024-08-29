@@ -59,7 +59,7 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
                 actions.append(ActionEnum.PLAYER_INVICIBILITY)
             elif event.key == pygame.K_r:
                 actions.append(ActionEnum.RELOAD)
-            elif event.key == pygame.K_SLASH:
+            elif event.key == pygame.K_RETURN:
                 actions.append(ActionEnum.TERMINAL)
         if event.type == pygame.MOUSEWHEEL:
             if event.y < 0:

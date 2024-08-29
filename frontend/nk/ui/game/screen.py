@@ -162,6 +162,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
             len(renderables),
             len(self.world.characters),
             (mouse_x, mouse_y),
+            self.terminal.terminal_text,
         )
 
     def recalculate_screen_scale_derivatives(self):
