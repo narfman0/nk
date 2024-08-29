@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package proto;
+
+enum CharacterType {
+  CHARACTER_TYPE_UNSPECIFIED = 0;
+  CHARACTER_TYPE_PIGSASSIN = 1;
+  CHARACTER_TYPE_DROID_ASSASSIN = 2;
+  CHARACTER_TYPE_SHADOW_GUARDIAN = 3;
+}

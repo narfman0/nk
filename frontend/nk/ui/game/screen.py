@@ -38,10 +38,11 @@ from nk.ui.game.renderables_generator import (
     generate_map_renderables,
     generate_projectile_renderables,
 )
+from nk.ui.game.terminal import Terminal
 from nk.ui.screen import Screen, ScreenManager
 from nk.util.math import cartesian_to_isometric, isometric_to_cartesian
 
-DEFAULT_SCREEN_SCALE = 5
+DEFAULT_SCREEN_SCALE = 3
 TIME_TO_REMOVE = 5
 
 
@@ -55,7 +56,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
-        self.terminal_text: str | None = None
+        self.terminal = Terminal(self.network, self)
         self._camera = Camera(game_state.world, 0, 0)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
@@ -77,7 +78,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.game_gui.update(dt)
 
     def update_input(self, events: list[Event]) -> Direction | None:
-        if self.handle_terminal(events):
+        if self.terminal.update(events):
             return None
         player_actions = read_input_player_actions(events)
         self.handle_player_actions(player_actions)
@@ -85,22 +86,6 @@ class GameScreen(Screen, UIInterface, WorldListener):
         if player_move_direction:
             self.world.player.facing_direction = player_move_direction
         return player_move_direction
-
-    def handle_terminal(self, events: list[Event]) -> bool:
-        if self.terminal_text is None:
-            return False
-        for event in events:
-            if event.type == pygame.KEYDOWN:  # pylint: disable=no-member
-                if event.key == pygame.K_RETURN:  # pylint: disable=no-member
-                    self.handle_terminal_command(self.terminal_text)
-                    self.terminal_text = None
-                else:
-                    self.terminal_text += event.unicode
-        return True
-
-    def handle_terminal_command(self, command: str):
-        logger.info("Terminal command: {}", command)
-        self.network.send(builders.build_text_message(command))
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -126,8 +111,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
             self.network.send(builders.build_character_reloaded(self.world.player))
             logger.info("Player reloading")
         if ActionEnum.TERMINAL in player_actions:
-            self.terminal_text = ""
-            logger.info("Terminal activated")
+            self.terminal.activate()
         if ActionEnum.ZOOM_OUT in player_actions:
             self.change_screen_scale(-1)
         if ActionEnum.ZOOM_IN in player_actions:
@@ -169,11 +153,15 @@ class GameScreen(Screen, UIInterface, WorldListener):
 
         factor = (WIDTH / self.screen_width, HEIGHT / self.screen_height)
         pygame.transform.scale_by(surface, dest_surface=dest_surface, factor=factor)
+        mouse_x, mouse_y = self.calculate_absolute_world_coordinates(
+            *pygame.mouse.get_pos()
+        )
         self.game_gui.draw(
             self.world.player,
             dest_surface,
             len(renderables),
             len(self.world.characters),
+            (mouse_x, mouse_y),
         )
 
     def recalculate_screen_scale_derivatives(self):
@@ -210,6 +198,14 @@ class GameScreen(Screen, UIInterface, WorldListener):
             x / self.world.map.tile_width // 2,
             y / self.world.map.tile_width // 2,
         )
+
+    def calculate_absolute_world_coordinates(
+        self, x: float, y: float
+    ) -> tuple[float, float]:
+        x, y = self.calculate_world_coordinates(x, y)
+        x += self.world.player.position.x
+        y += self.world.player.position.y
+        return (x, y)
 
     def character_attacked(self, character: Character):
         struct = self.character_structs.get(character.uuid)

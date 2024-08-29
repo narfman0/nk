@@ -2,7 +2,7 @@ from nk.game.world import World
 from nk.util.math import cartesian_to_isometric
 
 
-class Camera:  # pylint: disable=too-few-public-methods
+class Camera:
     def __init__(self, world: World, screen_width: int, screen_height: int):
         self.world = world
         self.screen_width = screen_width

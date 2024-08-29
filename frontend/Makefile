@@ -31,7 +31,7 @@ isort:
 	isort --profile black tests
 
 lint: isort
-	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring
+	pylint nk/ -d missing-function-docstring,missing-class-docstring,missing-module-docstring,too-few-public-methods
 
 pyinstaller: clean
 	pyinstaller --noconfirm --onefile --console \

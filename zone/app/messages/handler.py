@@ -1,13 +1,14 @@
 from betterproto import serialized_on_wire
 from nk_shared.proto import Message
 
-from app.messages import character_handlers, player_handlers
-from app.models import WorldComponentProvider
+from app.messages import character_handlers, player_handlers, util_handlers
+from app.models import AiProtocol, WorldComponentProvider
 
 
-class MessageHandler:  # pylint: disable=too-few-public-methods
-    def __init__(self, world: WorldComponentProvider):
+class MessageHandler:
+    def __init__(self, world: WorldComponentProvider, ai: AiProtocol):
         self.world = world
+        self.ai = ai
 
     async def handle_message(self, msg: Message):
         if serialized_on_wire(msg.character_attacked):
@@ -39,4 +40,8 @@ class MessageHandler:  # pylint: disable=too-few-public-methods
                 self.world, msg.player_disconnected
             )
         elif serialized_on_wire(msg.text_message):
-            await self.world.publish(msg)
+            await util_handlers.handle_text_message(self.world, msg.text_message)
+        elif serialized_on_wire(msg.spawn_requested):
+            await util_handlers.handle_spawn_requested(
+                self.world, self.ai, msg.spawn_requested
+            )

@@ -17,6 +17,7 @@ class GameGui:
         surface: pygame.Surface,
         renderable_count: int,
         character_count: int,
+        mouse_pos: tuple[float, float],
     ):
         x, y = player.position
         self.manager.draw_ui(surface)
@@ -27,6 +28,7 @@ class GameGui:
             f"Ammo: {player.rounds_remaining}",
             f"x,y: {int(x)},{int(y)}",
             f"Characters: {character_count}",
+            f"Mouse: {int(mouse_pos[0])},{int(mouse_pos[1])}",
         ]
         draw_y = 0
         for guiable in guiables:

@@ -9,7 +9,7 @@ from app.ai.models import SpawnerStruct
 from app.models import Enemy
 
 
-class SpawnerProvider(ABC):  # pylint: disable=too-few-public-methods
+class SpawnerProvider(ABC):
     @abstractmethod
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
@@ -21,7 +21,7 @@ class SpawnerProvider(ABC):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-class SpawnerManager:  # pylint: disable=too-few-public-methods
+class SpawnerManager:
     def __init__(
         self, provider: SpawnerProvider, environment_features: list[Environment]
     ):

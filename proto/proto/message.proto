@@ -5,7 +5,7 @@ package proto;
 import "proto/character.proto";
 import "proto/player.proto";
 import "proto/projectile.proto";
-import "proto/text_message.proto";
+import "proto/util.proto";
 
 message Message {
   string destination_uuid = 10;
@@ -30,5 +30,6 @@ message Message {
     proto.ProjectileDestroyed projectile_destroyed = 301;
 
     proto.TextMessage text_message = 1;
+    proto.SpawnRequested spawn_requested = 2;
   }
 }

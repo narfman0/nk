@@ -3,6 +3,6 @@ from abc import ABC
 from nk_shared.proto import Message
 
 
-class MessageHandler(ABC):  # pylint: disable=too-few-public-methods
+class MessageHandler(ABC):
     def handle_message(self, message: Message) -> bool:
         raise NotImplementedError

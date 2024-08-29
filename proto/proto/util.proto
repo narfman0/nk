@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+
+import "proto/character_type.proto";
+
+message SpawnRequested {
+  float x = 1;
+  float y = 2;
+  int32 count = 3;
+  CharacterType character_type = 4;
+}
+
+message TextMessage {
+  string text = 1;
+}

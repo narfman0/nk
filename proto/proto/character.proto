@@ -2,16 +2,8 @@ syntax = "proto3";
 
 package proto;
 
+import "proto/character_type.proto";
 import "proto/direction.proto";
-
-enum CharacterType {
-  CHARACTER_TYPE_UNSPECIFIED = 0;
-  CHARACTER_TYPE_PIGSASSIN = 1;
-  CHARACTER_TYPE_ASSAULT_DROID = 2;
-  CHARACTER_TYPE_DROID_ASSASSIN = 3;
-  CHARACTER_TYPE_SAMURAI = 4;
-  CHARACTER_TYPE_SHADOW_GUARDIAN = 5;
-}
 
 message CharacterAttacked {
   string uuid = 1;

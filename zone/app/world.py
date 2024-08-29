@@ -28,15 +28,15 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
         self._map = Map(self._zone.tmx_path, headless=True)
         self._map.add_map_geometry_to_space(self._space)
         self._players: list[Player] = []
-        self._ai_component = Ai(self, self._zone)
+        self._ai = Ai(self, self._zone)
         self._projectile_component = ProjectileManager(self)
-        self._message_component = MessageHandler(self)
+        self._message_handler = MessageHandler(self, self._ai)
         self._medical_manager = MedicalManager(self, self._zone.medics)
 
     async def update(self, dt: float):
-        await self._ai_component.update(dt)
-        await self.update_characters(dt, self._players, self._ai_component.enemies)
-        await self.update_characters(dt, self._ai_component.enemies, self._players)
+        await self._ai.update(dt)
+        await self.update_characters(dt, self._players, self._ai.enemies)
+        await self.update_characters(dt, self._ai.enemies, self._players)
         await self._medical_manager.update(dt)
         await self._projectile_component.update(dt)
         self._space.step(dt)
@@ -85,13 +85,13 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
                 await self.publish(builders.build_character_damaged(target, damage))
 
     def get_character_by_uuid(self, uuid: str) -> Character | None:
-        for character in self._players + self._ai_component.enemies:
+        for character in self._players + self._ai.enemies:
             if character.uuid == uuid:
                 return character
         return None
 
     async def handle_message(self, msg: Message):
-        await self._message_component.handle_message(msg)
+        await self._message_handler.handle_message(msg)
 
     async def publish(self, message: Message, **kwargs):
         await publish(bytes(message), **kwargs)
@@ -105,7 +105,7 @@ class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attrib
 
     @property
     def enemies(self) -> list[Enemy]:
-        return self._ai_component.enemies
+        return self._ai.enemies
 
     @property
     def players(self) -> list[Player]:
