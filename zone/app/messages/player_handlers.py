@@ -12,10 +12,11 @@ from nk_shared.proto import (
 )
 
 from app.db import Character as DBCharacter
+from app.messages.models import BaseMessageHandler
 from app.models import Player, WorldInterface
 
 
-class PlayerHandler:
+class PlayerMessageHandler(BaseMessageHandler):
     def __init__(self, world: WorldInterface):
         self.world = world
 

@@ -3,10 +3,11 @@ from loguru import logger
 from nk_shared import builders
 from nk_shared.proto import CharacterType, Message, SpawnRequested, TextMessage
 
+from app.messages.models import BaseMessageHandler
 from app.models import AiInterface, WorldInterface
 
 
-class UtilHandler:
+class UtilMessageHandler(BaseMessageHandler):
     def __init__(self, world: WorldInterface, ai: AiInterface):
         self.world = world
         self.ai = ai

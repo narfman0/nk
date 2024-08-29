@@ -11,13 +11,14 @@ from nk_shared.proto import (
 )
 
 from app.models import WorldInterface
+from zone.app.messages.models import BaseMessageHandler
 
 
 class UnknownCharacterError(Exception):
     pass
 
 
-class CharacterHandler:
+class CharacterMessageHandler(BaseMessageHandler):
     def __init__(self, world: WorldInterface):
         self.world = world
 
