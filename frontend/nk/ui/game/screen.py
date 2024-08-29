@@ -118,7 +118,6 @@ class GameScreen(Screen, UIInterface, WorldListener):
             self.recalculate_screen_scale_derivatives()
 
     def draw(self, dest_surface: Surface):  # pylint: disable=arguments-renamed
-        curtime = pygame.time.get_ticks()
         renderables = self.map_renderables.copy()
         for renderable in generate_projectile_renderables(self.world, self):
             renderables.add(renderable)
@@ -146,15 +145,12 @@ class GameScreen(Screen, UIInterface, WorldListener):
         for renderable in renderables:
             renderable.draw(surface, self._camera)
 
-        endtime = pygame.time.get_ticks()
-        pygame.transform.scale_by(
-            surface, dest_surface=dest_surface, factor=self.screen_scale
-        )
+        factor = (WIDTH / self.screen_width, HEIGHT / self.screen_height)
+        pygame.transform.scale_by(surface, dest_surface=dest_surface, factor=factor)
         self.game_gui.draw(
             self.world.player,
             dest_surface,
             len(renderables),
-            endtime - curtime,
             len(self.world.characters),
         )
 

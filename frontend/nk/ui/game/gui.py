@@ -16,14 +16,12 @@ class GameGui:
         player: Character,
         surface: pygame.Surface,
         renderable_count: int,
-        draw_ticks: int,
         character_count: int,
     ):
         x, y = player.position
         self.manager.draw_ui(surface)
         guiables = [
             f"dt: {int(self.dt_ewma*1000)}ms",
-            f"ticks: {draw_ticks}",
             f"renderables: {renderable_count}",
             f"HP: {player.hp}",
             f"Ammo: {player.rounds_remaining}",
