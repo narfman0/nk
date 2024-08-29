@@ -1,16 +1,14 @@
 from nk_shared.proto import Message
 
-from app.messages.models import BaseHandler
-from app.models import AiInterface, WorldInterface
 from app.messages.character_handlers import CharacterHandler
+from app.messages.models import BaseHandler
 from app.messages.player_handlers import PlayerHandler
 from app.messages.util_handlers import UtilHandler
+from app.models import AiInterface, WorldInterface
 
 
 class MessageHandler:
     def __init__(self, world: WorldInterface, ai: AiInterface):
-        self.world = world
-        self.ai = ai
         self.handlers: list[BaseHandler] = [
             CharacterHandler(world),
             PlayerHandler(world),
