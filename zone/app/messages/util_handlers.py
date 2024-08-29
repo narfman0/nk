@@ -34,6 +34,5 @@ async def handle_spawn_requested(
 ):
     logger.info("Handling spawn requested: {}", details)
     character_type = CharacterType(details.character_type)
-    for _ in range(details.count):
-        enemy = ai.spawn_enemy(character_type, details.x, details.y)
+    for enemy in ai.spawn_enemies(details.count, character_type, details.x, details.y):
         await world.publish(builders.build_character_updated(enemy))

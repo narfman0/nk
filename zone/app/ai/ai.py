@@ -1,5 +1,5 @@
 import random
-from math import atan2
+from math import atan2, log2
 
 from nk_shared import builders, direction_util
 from nk_shared.models.character import Character
@@ -19,19 +19,12 @@ class Ai(SpawnerProvider, WorldListener):
         self.zone = zone
         self.next_update_time = 0
         self.enemies: list[Enemy] = []
-        self.init_enemy_groups()
         self.spawn_manager = SpawnerManager(self, zone.environment_features)
         self.world.add_listener(self)
-
-    def init_enemy_groups(self):
-        for enemy_group in self.zone.enemy_groups:
-            r = 1 + enemy_group.count // 2  # randomize where group is centered
-            for _ in range(enemy_group.count):
-                self.spawn_enemy(
-                    enemy_group.character_type,
-                    enemy_group.center_x + random.randint(-r, r),
-                    enemy_group.center_y + random.randint(-r, r),
-                )
+        for grp in self.zone.enemy_groups:
+            self.spawn_enemies(
+                grp.count, grp.character_type, grp.center_x, grp.center_y
+            )
 
     async def update(self, dt: float):
         """Update enemy behaviors. Long term refactor option (e.g. behavior trees)"""
@@ -89,6 +82,15 @@ class Ai(SpawnerProvider, WorldListener):
                     closest = player
                     min_dst = dst
         return closest
+
+    def spawn_enemies(
+        self, count: int, character_type: CharacterType, center_x: int, center_y: int
+    ):
+        r = 1 + int(log2(count))  # randomize where group is centered
+        for _ in range(count):
+            x = center_x + random.randint(-r, r)
+            y = center_y + random.randint(-r, r)
+            yield self.spawn_enemy(character_type, x, y)
 
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
