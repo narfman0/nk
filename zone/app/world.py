@@ -12,13 +12,13 @@ from nk_shared.proto import Message
 from app.ai import Ai
 from app.medical_manager import MedicalManager
 from app.messages.handler import MessageHandler
-from app.models import Enemy, Player, WorldComponentProvider, WorldListener
+from app.models import Enemy, Player, WorldInterface, WorldListener
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
 from app.settings import DATA_ROOT
 
 
-class World(WorldComponentProvider):  # pylint: disable=too-many-instance-attributes
+class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
     """Hold and simulate everything happening in the game."""
 
     def __init__(self, zone_name: str = "1"):

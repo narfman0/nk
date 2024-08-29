@@ -7,12 +7,12 @@ from nk_shared.models.character import Character
 from nk_shared.models.projectile import Projectile
 from nk_shared.models.weapon import load_weapon_by_name
 
-from app.models import WorldComponentProvider
+from app.models import WorldInterface
 
 
 class ProjectileManager:
 
-    def __init__(self, world: WorldComponentProvider):
+    def __init__(self, world: WorldInterface):
         self.world = world
         self.projectiles: list[Projectile] = []
 

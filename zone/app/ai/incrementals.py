@@ -4,7 +4,7 @@ If we have not changed (much), skip the update."""
 from nk_shared import builders
 from nk_shared.proto import CharacterDirectionUpdated, CharacterPositionUpdated
 
-from app.models import Enemy, WorldComponentProvider
+from app.models import Enemy, WorldInterface
 
 REMOTE_UPDATE_THRESHOLD = 1
 
@@ -13,7 +13,7 @@ enemy_remote_positions: dict[str, CharacterPositionUpdated] = {}
 enemy_remote_directions: dict[str, CharacterDirectionUpdated] = {}
 
 
-async def update_position(dt: float, world: WorldComponentProvider, enemy: Enemy):
+async def update_position(dt: float, world: WorldInterface, enemy: Enemy):
     proto = builders.build_character_position_updated(enemy)
     enemy_remote = enemy_remote_positions.get(enemy.uuid)
     if enemy_remote:
@@ -30,7 +30,7 @@ async def update_position(dt: float, world: WorldComponentProvider, enemy: Enemy
     await world.publish(proto)
 
 
-async def update_direction(world: WorldComponentProvider, enemy: Enemy):
+async def update_direction(world: WorldInterface, enemy: Enemy):
     proto = builders.build_character_direction_updated(enemy)
     previous = enemy_remote_directions.get(enemy.uuid)
     if (

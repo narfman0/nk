@@ -8,13 +8,13 @@ from nk_shared.proto import CharacterType, Message
 
 from app.ai import incrementals
 from app.ai.spawner_manager import SpawnerManager, SpawnerProvider
-from app.models import Enemy, Player, WorldComponentProvider, WorldListener
+from app.models import Enemy, Player, WorldInterface, WorldListener
 
 FULL_UPDATE_FREQUENCY = 10
 
 
 class Ai(SpawnerProvider, WorldListener):
-    def __init__(self, world: WorldComponentProvider, zone: Zone):
+    def __init__(self, world: WorldInterface, zone: Zone):
         self.world = world
         self.zone = zone
         self.next_update_time = 0

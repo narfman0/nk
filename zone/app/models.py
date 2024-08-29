@@ -29,18 +29,18 @@ class Enemy(Character):
     center_y: int = None
 
 
-class WorldListener:
+class WorldListener(ABC):
     def character_removed(self, character: Character):
         pass
 
 
-class AiProtocol(Protocol):
+class AiInterface(Protocol):
     def spawn_enemy(
         self, character_type: CharacterType, center_x: int, center_y: int
     ) -> Enemy: ...
 
 
-class WorldComponentProvider(ABC):
+class WorldInterface(ABC):
     @abstractmethod
     async def publish(self, message: Message, **kwargs) -> None:
         raise NotImplementedError()

@@ -1,3 +1,4 @@
+from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared.proto import (
     CharacterAttacked,
@@ -9,16 +10,38 @@ from nk_shared.proto import (
     Message,
 )
 
-from app.models import WorldComponentProvider
+from app.models import WorldInterface
 
 
 class UnknownCharacterError(Exception):
     pass
 
 
-def handle_character_attacked(
-    world: WorldComponentProvider, details: CharacterAttacked
-):
+class CharacterHandler:
+    def __init__(self, world: WorldInterface):
+        self.world = world
+
+    async def handle_message(self, msg: Message) -> bool:
+        if serialized_on_wire(msg.character_attacked):
+            handle_character_attacked(self.world, msg.character_attacked)
+        elif serialized_on_wire(msg.character_updated):
+            await handle_character_updated(self.world, msg.character_updated)
+        elif serialized_on_wire(msg.character_position_updated):
+            await handle_character_position_updated(
+                self.world, msg.character_position_updated
+            )
+        elif serialized_on_wire(msg.character_reloaded):
+            await handle_character_reloaded(self.world, msg.character_reloaded)
+        elif serialized_on_wire(msg.character_direction_updated):
+            await handle_character_direction_updated(
+                self.world, msg.character_direction_updated
+            )
+        else:
+            return False
+        return True
+
+
+def handle_character_attacked(world: WorldInterface, details: CharacterAttacked):
     """Call character attack, does nothing if character does not exist"""
     character = world.get_character_by_uuid(details.uuid)
     if not character:
@@ -28,7 +51,7 @@ def handle_character_attacked(
 
 
 async def handle_character_position_updated(
-    world: WorldComponentProvider, details: CharacterPositionUpdated
+    world: WorldInterface, details: CharacterPositionUpdated
 ):
     """Apply message details to relevant character. If character
     does not exist, do not do anything."""
@@ -41,9 +64,7 @@ async def handle_character_position_updated(
     await world.publish(Message(origin_uuid=character.uuid, character_updated=details))
 
 
-async def handle_character_reloaded(
-    world: WorldComponentProvider, details: CharacterReloaded
-):
+async def handle_character_reloaded(world: WorldInterface, details: CharacterReloaded):
     """Apply message details to relevant character. If character
     does not exist, do not do anything."""
     character = world.get_character_by_uuid(details.uuid)
@@ -56,7 +77,7 @@ async def handle_character_reloaded(
 
 
 async def handle_character_direction_updated(
-    world: WorldComponentProvider, details: CharacterDirectionUpdated
+    world: WorldInterface, details: CharacterDirectionUpdated
 ):
     character = world.get_character_by_uuid(details.uuid)
     if not character:
@@ -69,9 +90,7 @@ async def handle_character_direction_updated(
     )
 
 
-async def handle_character_updated(
-    world: WorldComponentProvider, details: CharacterUpdated
-):
+async def handle_character_updated(world: WorldInterface, details: CharacterUpdated):
     """Apply message details to relevant character. If character
     does not exist, do not do anything."""
     character = world.get_character_by_uuid(details.uuid)

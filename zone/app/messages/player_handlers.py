@@ -1,4 +1,5 @@
 from beanie import PydanticObjectId
+from betterproto import serialized_on_wire
 from loguru import logger
 from nk_shared import builders
 from nk_shared.proto import (
@@ -11,11 +12,25 @@ from nk_shared.proto import (
 )
 
 from app.db import Character as DBCharacter
-from app.models import Player, WorldComponentProvider
+from app.models import Player, WorldInterface
+
+
+class PlayerHandler:
+    def __init__(self, world: WorldInterface):
+        self.world = world
+
+    async def handle_message(self, msg: Message) -> bool:
+        if serialized_on_wire(msg.player_connected):
+            await handle_player_connected(self.world, msg.player_connected)
+        elif serialized_on_wire(msg.player_disconnected):
+            await handle_player_disconnected(self.world, msg.player_disconnected)
+        else:
+            return False
+        return True
 
 
 async def handle_player_disconnected(
-    world: WorldComponentProvider, details: PlayerDisconnected
+    world: WorldInterface, details: PlayerDisconnected
 ):
     player = world.get_character_by_uuid(details.uuid)
     await world.publish(Message(player_left=PlayerLeft(uuid=details.uuid)))
@@ -31,9 +46,7 @@ async def handle_player_disconnected(
     world.players.remove(player)
 
 
-async def handle_player_connected(
-    world: WorldComponentProvider, details: PlayerConnected
-):
+async def handle_player_connected(world: WorldInterface, details: PlayerConnected):
     """A player has joined. Handle initialization."""
     logger.info("Player joined: {}", details.uuid)
     player = await spawn_player(world, details.uuid)
@@ -52,7 +65,7 @@ async def handle_player_connected(
     await world.publish(Message(player_joined=PlayerJoined(uuid=player.uuid)))
 
 
-async def spawn_player(world: WorldComponentProvider, player_uuid: str) -> Player:
+async def spawn_player(world: WorldInterface, player_uuid: str) -> Player:
     """Player 'is' a Character, which i don't love, but its already
     created. Update relevant attrs."""
     character = await DBCharacter.find_one(
@@ -68,9 +81,7 @@ async def spawn_player(world: WorldComponentProvider, player_uuid: str) -> Playe
     return player
 
 
-async def send_player_full_character_updates(
-    world: WorldComponentProvider, player_uuid: str
-):
+async def send_player_full_character_updates(world: WorldInterface, player_uuid: str):
     for character in world.enemies + world.players:
         if character.uuid == player_uuid:
             continue
