@@ -3,12 +3,13 @@ from loguru import logger
 from nk_shared import builders
 from nk_shared.proto import CharacterType, Message, SpawnRequested, TextMessage
 
+from app.ai.ai import Ai
 from app.messages.models import BaseMessageHandler
-from app.models import AiInterface, WorldInterface
+from app.models import WorldInterface
 
 
 class UtilMessageHandler(BaseMessageHandler):
-    def __init__(self, world: WorldInterface, ai: AiInterface):
+    def __init__(self, world: WorldInterface, ai: Ai):
         self.world = world
         self.ai = ai
 
@@ -28,7 +29,7 @@ async def handle_text_message(world: WorldInterface, details: TextMessage):
 
 async def handle_spawn_requested(
     world: WorldInterface,
-    ai: AiInterface,
+    ai: Ai,
     details: SpawnRequested,
 ):
     logger.info("Handling spawn requested: {}", details)

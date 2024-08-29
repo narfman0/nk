@@ -3,9 +3,9 @@ from typing import Protocol
 import pygame
 from loguru import logger
 from nk_shared import builders
+from nk_shared.proto import CharacterType
 
 from nk.net.network import Network
-from nk_shared.proto import CharacterType
 
 
 class TerminalProtocol(Protocol):

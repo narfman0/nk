@@ -10,8 +10,8 @@ from nk_shared.proto import (
     Message,
 )
 
+from app.messages.models import BaseMessageHandler
 from app.models import WorldInterface
-from zone.app.messages.models import BaseMessageHandler
 
 
 class UnknownCharacterError(Exception):

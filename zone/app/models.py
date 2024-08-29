@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 from asyncio import Queue
 from dataclasses import dataclass, field
-from typing import Protocol
 
 import pymunk
 from nk_shared.map import Map
 from nk_shared.models import Character
-from nk_shared.proto import CharacterType, Message
+from nk_shared.proto import Message
 
 
 @dataclass
@@ -32,12 +31,6 @@ class Enemy(Character):
 class WorldListener(ABC):
     def character_removed(self, character: Character):
         pass
-
-
-class AiInterface(Protocol):
-    def spawn_enemy(
-        self, character_type: CharacterType, center_x: int, center_y: int
-    ) -> Enemy: ...
 
 
 class WorldInterface(ABC):
