@@ -24,3 +24,4 @@ def end_profiling():
         ps.print_stats()
         with open("pstats.log", "w+") as f:  # pylint: disable=unspecified-encoding
             f.write(s.getvalue())
+        profile.dump_stats("pstats.prof")

@@ -5,4 +5,5 @@ pyinstaller-hooks-contrib
 pylint
 pytest
 pytest-cov
+snakeviz
 wheel
