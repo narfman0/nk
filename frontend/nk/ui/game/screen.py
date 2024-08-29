@@ -55,6 +55,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.game_state = game_state
         self.world = game_state.world
         self.network = game_state.network
+        self.terminal_text: str | None = None
         self._camera = Camera(game_state.world, 0, 0)
         self.screen_scale = DEFAULT_SCREEN_SCALE
         self.recalculate_screen_scale_derivatives()
@@ -76,12 +77,30 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.game_gui.update(dt)
 
     def update_input(self, events: list[Event]) -> Direction | None:
+        if self.handle_terminal(events):
+            return None
         player_actions = read_input_player_actions(events)
         self.handle_player_actions(player_actions)
         player_move_direction = read_input_player_move_direction()
         if player_move_direction:
             self.world.player.facing_direction = player_move_direction
         return player_move_direction
+
+    def handle_terminal(self, events: list[Event]) -> bool:
+        if self.terminal_text is None:
+            return False
+        for event in events:
+            if event.type == pygame.KEYDOWN:  # pylint: disable=no-member
+                if event.key == pygame.K_RETURN:  # pylint: disable=no-member
+                    self.handle_terminal_command(self.terminal_text)
+                    self.terminal_text = None
+                else:
+                    self.terminal_text += event.unicode
+        return True
+
+    def handle_terminal_command(self, command: str):
+        logger.info("Terminal command: {}", command)
+        self.network.send(builders.build_text_message(command))
 
     def handle_player_actions(self, player_actions: list[ActionEnum]):
         if ActionEnum.DASH in player_actions:
@@ -106,6 +125,9 @@ class GameScreen(Screen, UIInterface, WorldListener):
             self.world.player.reload()
             self.network.send(builders.build_character_reloaded(self.world.player))
             logger.info("Player reloading")
+        if ActionEnum.TERMINAL in player_actions:
+            self.terminal_text = ""
+            logger.info("Terminal activated")
         if ActionEnum.ZOOM_OUT in player_actions:
             self.change_screen_scale(-1)
         if ActionEnum.ZOOM_IN in player_actions:

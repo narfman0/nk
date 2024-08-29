@@ -14,6 +14,7 @@ class ActionEnum(Enum):
     ZOOM_OUT = auto()
     ZOOM_IN = auto()
     RELOAD = auto()
+    TERMINAL = auto()
 
 
 def read_input_player_move_direction():
@@ -58,6 +59,8 @@ def read_input_player_actions(events: list[Event]) -> list[ActionEnum]:
                 actions.append(ActionEnum.PLAYER_INVICIBILITY)
             elif event.key == pygame.K_r:
                 actions.append(ActionEnum.RELOAD)
+            elif event.key == pygame.K_SLASH:
+                actions.append(ActionEnum.TERMINAL)
         if event.type == pygame.MOUSEWHEEL:
             if event.y < 0:
                 actions.append(ActionEnum.ZOOM_OUT)

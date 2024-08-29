@@ -1,10 +1,10 @@
 # pylint: disable=no-member
 import pygame
+from nk_shared.profiling import begin_profiling, end_profiling
 
 from nk.settings import FPS, HEIGHT, WIDTH
 from nk.ui.login_screen import LoginScreen
 from nk.ui.screen import ScreenManager
-from nk_shared.profiling import begin_profiling, end_profiling
 
 
 def main():  # pylint: disable=too-many-locals

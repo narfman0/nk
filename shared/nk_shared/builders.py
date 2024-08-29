@@ -108,3 +108,7 @@ def build_projectile(projectile: Projectile) -> proto.Message:
         dy=projectile.dy,
         weapon_name=projectile.weapon_name,
     )
+
+
+def build_text_message(contents: str) -> proto.Message:
+    return proto.Message(text_message=proto.TextMessage(contents=contents))
