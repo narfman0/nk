@@ -44,11 +44,7 @@ class Terminal:
         command_parts = command[1:].split(" ")
         try:
             if command_parts[0] == "spawn":
-                try:
-                    character_type = CharacterType(int(command_parts[1]))
-                except Exception:  # pylint: disable=broad-except
-                    character_type = CharacterType[command_parts[1]]
-                count = int(command_parts[2])
+                count, character_type = parse_spawn_command(command_parts)
                 x, y = self.protocol.calculate_absolute_world_coordinates(
                     *pygame.mouse.get_pos()
                 )
@@ -65,3 +61,16 @@ class Terminal:
 
     def activate(self):
         self.terminal_text = ""
+
+
+def parse_spawn_command(command_parts: list[str]) -> tuple[int, CharacterType]:
+    count = 10
+    character_type = CharacterType.CHARACTER_TYPE_DROID_ASSASSIN
+    if len(command_parts) > 1:
+        count = int(command_parts[1])
+    if len(command_parts) > 2:
+        try:
+            character_type = CharacterType(int(command_parts[2]))
+        except Exception:  # pylint: disable=broad-except
+            pass
+    return count, character_type
