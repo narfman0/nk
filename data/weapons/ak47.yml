@@ -1,4 +1,4 @@
-projectile_image_path: bullet
+projectile_image_path: tracer
 projectile_speed: 50
 projectile_radius: 0.3
 clip_size: 30

@@ -31,12 +31,10 @@ from nk.ui.game.models import UIInterface
 from nk.ui.game.renderables import (
     SpriteRenderable,
     create_renderable_list,
-    renderables_generate_key,
-)
-from nk.ui.game.renderables_generator import (
     generate_environment_renderables,
     generate_map_renderables,
     generate_projectile_renderables,
+    renderables_generate_key,
 )
 from nk.ui.game.terminal import Terminal
 from nk.ui.screen import Screen, ScreenManager
@@ -109,7 +107,6 @@ class GameScreen(Screen, UIInterface, WorldListener):
         if ActionEnum.RELOAD in player_actions:
             self.world.player.reload()
             self.network.send(builders.build_character_reloaded(self.world.player))
-            logger.info("Player reloading")
         if ActionEnum.TERMINAL in player_actions:
             self.terminal.activate()
         if ActionEnum.ZOOM_OUT in player_actions:
@@ -123,7 +120,8 @@ class GameScreen(Screen, UIInterface, WorldListener):
         if previous_screen_scale != self.screen_scale:
             self.recalculate_screen_scale_derivatives()
 
-    def draw(self, dest_surface: Surface):  # pylint: disable=arguments-renamed
+    # pylint: disable-next=arguments-renamed,too-many-locals
+    def draw(self, dest_surface: Surface):
         renderables = self.map_renderables.copy()
         for renderable in generate_projectile_renderables(self.world, self):
             renderables.add(renderable)

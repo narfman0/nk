@@ -12,7 +12,7 @@ class GameGui:
         self.white = pygame.Color("white")
         self.dt_ewma = 0
 
-    def draw(
+    def draw(  # pylint: disable=too-many-arguments
         self,
         player: Character,
         surface: pygame.Surface,

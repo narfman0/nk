@@ -1,9 +1,9 @@
 from abc import ABC
 from dataclasses import dataclass
 
+import pygame
 from pygame.sprite import Group as SpriteGroup
 from pygame.surface import Surface  # pylint: disable=no-name-in-module
-from sortedcontainers import SortedKeyList
 
 from nk.ui.game.camera import Camera
 
@@ -29,20 +29,23 @@ class BlittableRenderable(Renderable):
 
 
 @dataclass
+class TracerRenderable(Renderable):
+    start: tuple[float, float]
+    end: tuple[float, float]
+
+    def draw(self, surface: Surface, camera: Camera):
+        if not camera.is_visible(*self.start):
+            return
+        sx, sy = self.start
+        ex, ey = self.end
+        start = (sx - camera.x, sy - camera.y)
+        end = (ex - camera.x, ey - camera.y)
+        pygame.draw.line(surface, pygame.Color("white"), start, end)
+
+
+@dataclass
 class SpriteRenderable(Renderable):
     sprite_group: SpriteGroup
 
     def draw(self, surface: Surface, camera: Camera):
         self.sprite_group.draw(surface)
-
-
-def renderables_key(a: Renderable):
-    return a.key
-
-
-def renderables_generate_key(layer: int, bottom_y: float):
-    return (layer << 16) + int(bottom_y)
-
-
-def create_renderable_list():
-    return SortedKeyList(key=renderables_key)
