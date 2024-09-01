@@ -137,7 +137,7 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
                 self.reloading = False
                 self.rounds_remaining = self.weapon.clip_size
 
-    def attack(self, direction: float | None):
+    def attack(self, direction: float | None) -> bool:
         ranged = (
             self.weapon.attack_type != AttackType.RANGED or self.rounds_remaining > 0
         )
@@ -150,11 +150,15 @@ class Character(CharacterProperties):  # pylint: disable=too-many-instance-attri
                 self.facing_direction = self.moving_direction
             if self.weapon.attack_type == AttackType.RANGED:
                 self.rounds_remaining -= 1
+            return True
+        return False
 
-    def reload(self):
+    def reload(self) -> bool:
         if not self.reloading and self.weapon.attack_type == AttackType.RANGED:
             self.reloading = True
             self.reload_time_remaining = self.weapon.reload_time
+            return True
+        return False
 
     def dash(self):
         if not self.dashing and self.dash_cooldown_remaining <= 0:

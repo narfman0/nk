@@ -10,7 +10,9 @@ from nk.net.messages.message_handler import MessageHandler
 
 
 class CharacterMessageListener(Protocol):
+
     def character_attacked(self, character: Character): ...
+    def character_reloaded(self, character: Character): ...
 
 
 class CharacterMessageHandler(MessageHandler):
@@ -63,6 +65,8 @@ class CharacterMessageHandler(MessageHandler):
         character = self.world.get_character_by_uuid(details.uuid)
         if character:
             character.reload()
+            for listener in self.listeners:
+                listener.character_reloaded(character)
         else:
             logger.warning(
                 "character_reloaded no character found with uuid {}", details.uuid

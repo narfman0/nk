@@ -19,7 +19,6 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 ## TODO
 
 p0
-* Sound
 * Mapgen
 * Rocket launcher
 * Destroy factories

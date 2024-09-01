@@ -8,6 +8,7 @@ from nk_shared import builders
 from nk_shared.map import Map
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
+from nk_shared.settings import DATA_ROOT
 
 from app.ai import Ai
 from app.medical_manager import MedicalManager
@@ -15,7 +16,6 @@ from app.messages.handler import MessageHandler
 from app.models import Enemy, Player, WorldInterface, WorldListener
 from app.projectile_manager import ProjectileManager
 from app.pubsub import publish
-from app.settings import DATA_ROOT
 
 
 class World(WorldInterface):  # pylint: disable=too-many-instance-attributes

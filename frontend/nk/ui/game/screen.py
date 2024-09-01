@@ -3,6 +3,7 @@ from math import atan2
 import pygame
 from loguru import logger
 from nk_shared import builders
+from nk_shared.models.attack_type import AttackType
 from nk_shared.models.character import Character
 from nk_shared.proto import Direction
 from pygame import Surface
@@ -10,7 +11,7 @@ from pygame.event import Event
 
 from nk.game.listeners import WorldListener
 from nk.game_state import GameState
-from nk.settings import HEIGHT, WIDTH
+from nk.settings import HEIGHT, NK_DATA_ROOT, WIDTH
 from nk.ui.game.camera import Camera
 from nk.ui.game.character_sprite import CharacterSprite
 from nk.ui.game.character_struct import (
@@ -65,6 +66,8 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.character_structs = {self.world.player.uuid: self.player_struct}
         self.character_struct_remove_queue: list[CharacterStructRemoveStruct] = []
         self.game_gui = GameGui()
+        self.reload_sound = pygame.mixer.Sound(f"{NK_DATA_ROOT}/sounds/reload.mp3")
+        self.ak47_sound = pygame.mixer.Sound(f"{NK_DATA_ROOT}/sounds/ak47.mp3")
 
     def update(self, dt: float, events: list[Event]):
         player_move_direction = self.update_input(events)
@@ -93,11 +96,13 @@ class GameScreen(Screen, UIInterface, WorldListener):
             if self.world.player.alive and not self.world.player.attacking:
                 wx, wy = self.calculate_world_coordinates(*pygame.mouse.get_pos())
                 direction = atan2(wy, wx)
-                self.world.player.attack(direction)
-                self.network.send(
-                    builders.build_character_attacked(self.world.player, direction)
-                )
-                self.player_struct.sprite.change_animation("attack")
+                if self.world.player.attack(direction):
+                    self.network.send(
+                        builders.build_character_attacked(self.world.player, direction)
+                    )
+                    self.player_struct.sprite.change_animation("attack")
+                    if self.world.player.weapon.attack_type == AttackType.RANGED:
+                        self.ak47_sound.play()
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)
             logger.info("Player now has {} hp", self.world.player.hp)
@@ -105,8 +110,9 @@ class GameScreen(Screen, UIInterface, WorldListener):
             self.world.player.invincible = not self.world.player.invincible
             logger.info("Player invincibility set to {}", self.world.player.invincible)
         if ActionEnum.RELOAD in player_actions:
-            self.world.player.reload()
-            self.network.send(builders.build_character_reloaded(self.world.player))
+            if self.world.player.reload():
+                self.network.send(builders.build_character_reloaded(self.world.player))
+                self.reload_sound.play()
         if ActionEnum.TERMINAL in player_actions:
             self.terminal.activate()
         if ActionEnum.ZOOM_OUT in player_actions:
@@ -210,6 +216,14 @@ class GameScreen(Screen, UIInterface, WorldListener):
         struct = self.character_structs.get(character.uuid)
         if struct:
             struct.sprite.change_animation("attack")
+            if character.weapon.attack_type == AttackType.RANGED:
+                self.ak47_sound.play()
+
+    def character_reloaded(self, character: Character):
+        struct = self.character_structs.get(character.uuid)
+        if struct:
+            if character.weapon.attack_type == AttackType.RANGED:
+                self.reload_sound.play()
 
     def character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)

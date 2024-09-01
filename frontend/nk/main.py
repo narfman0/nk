@@ -10,6 +10,8 @@ from nk.ui.screen import ScreenManager
 def main():  # pylint: disable=too-many-locals
     pygame.init()
     pygame.display.set_caption("nk")
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(50)
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
     running = True
     clock = pygame.time.Clock()
