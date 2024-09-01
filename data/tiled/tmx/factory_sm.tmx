@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="isometric" renderorder="right-down" width="11" height="12" tilewidth="32" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.2" orientation="isometric" renderorder="right-down" width="11" height="12" tilewidth="32" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="1">
  <properties>
-  <property name="GroundLayerNames" value="street,ground"/>
+  <property name="GroundLayerNames" value="impassable"/>
  </properties>
  <tileset firstgid="1" source="../tsx/factory.tsx"/>
- <layer id="4" name="street" width="11" height="12">
+ <tileset firstgid="67" source="../tsx/cyberstreets.tsx"/>
+ <layer id="5" name="impassable" width="11" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,187,187,187,187,187,187,0,
+0,0,0,0,187,0,0,187,187,187,0,
+0,0,0,0,187,187,187,187,187,187,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,187,187,0,0,0,0,0,
+0,0,0,0,187,187,0,0,0,0,0,
+0,0,0,0,187,187,0,0,0,0,0,
+0,0,0,0,187,187,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="7" name="street" width="11" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
@@ -20,7 +37,7 @@
 0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="3" name="ground" width="11" height="12">
+ <layer id="6" name="ground" width="11" height="12">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,

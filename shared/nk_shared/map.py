@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from loguru import logger
 import pymunk
 import pytmx
 
@@ -30,11 +31,14 @@ class Map:
         self, space: pymunk.Space, tile_offset_x: int = 0, tile_offset_y: int = 0
     ):
         for layer in range(self.get_tile_layer_count()):
+            impassable = self.get_layer_name(layer) == "impassable"
             for y in range(self.height):
                 for x in range(self.width):
-                    tile_props = self._tmxdata.get_tile_properties(x, y, layer) or {}
+                    gid = self._tmxdata.get_tile_gid(x, y, layer)
+                    tile_props = self._tmxdata.get_tile_properties_by_gid(gid) or {}
                     colliders: list = tile_props.get("colliders", [])
-                    if colliders:
+                    impassable_tile = impassable and gid
+                    if colliders or impassable_tile:
                         body = pymunk.Body(body_type=pymunk.Body.STATIC)
                         body.position = (
                             0.5 + x + tile_offset_x,
