@@ -7,8 +7,8 @@ def renderables_key(a: Renderable):
     return a.key
 
 
-def renderables_generate_key(layer: int, bottom_y: float):
-    return (layer << 16) + int(bottom_y)
+def renderables_generate_key(y_offset: int, bottom_y: float):
+    return (-y_offset << 16) + int(bottom_y)
 
 
 def create_renderable_list():

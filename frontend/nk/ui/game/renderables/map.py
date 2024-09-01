@@ -18,6 +18,8 @@ def generate_map_renderables(  # pylint: disable=too-many-locals
     for layer in range(tilemap.get_tile_layer_count()):
         if layer not in ground_ids if ground else layer in ground_ids:
             continue
+        if tilemap.get_layer_name(layer) == "impassable":
+            continue
         x_offset, y_offset = tilemap.get_layer_offsets(layer)
         for x in range(0, tilemap.width):
             for y in range(0, tilemap.height):
@@ -30,7 +32,7 @@ def generate_map_renderables(  # pylint: disable=too-many-locals
                     img_height = blit_image.get_height()
                     bottom_y = blit_y + y_offset + img_height - 8
                     yield BlittableRenderable(
-                        renderables_generate_key(layer, bottom_y),
+                        renderables_generate_key(y_offset, bottom_y),
                         blit_image,
                         blit_coords,
                     )

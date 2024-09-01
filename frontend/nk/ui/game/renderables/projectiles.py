@@ -37,7 +37,7 @@ def generate_projectile_blittable_renderable(
         projectile.x, projectile.y, image
     )
     bottom_y = blit_y + image.get_height()
-    key = renderables_generate_key(world.map.get_1f_layer_id(), bottom_y)
+    key = renderables_generate_key(0, bottom_y)
     return BlittableRenderable(key, image, (blit_x, blit_y))
 
 
@@ -53,7 +53,7 @@ def generate_projectile_tracer_renderable(
         one_one_surface,
     )
     bottom_y = max(start[1], end[1])
-    key = renderables_generate_key(world.map.get_1f_layer_id(), bottom_y)
+    key = renderables_generate_key(0, bottom_y)
     return TracerRenderable(key, start, end)
 
 

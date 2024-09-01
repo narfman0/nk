@@ -135,7 +135,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
             bottom_y = (
                 character_struct.sprite.rect.top + img_height // 2 + self._camera.y
             )
-            key = renderables_generate_key(self.world.map.get_1f_layer_id(), bottom_y)
+            key = renderables_generate_key(0, bottom_y)
             renderables.add(SpriteRenderable(key, character_struct.sprite_group))
 
         surface = Surface(size=(self.screen_width, self.screen_height))

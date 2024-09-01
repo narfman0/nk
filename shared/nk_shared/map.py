@@ -57,13 +57,6 @@ class Map:
     def get_layer_offsets(self, layer: int) -> tuple[int, int]:
         return self._tmxdata.layers[layer].offsetx, self._tmxdata.layers[layer].offsety
 
-    @lru_cache(maxsize=1)
-    def get_1f_layer_id(self) -> int:
-        for layer in self._tmxdata.layers:
-            if layer.name == "1f":
-                return layer.id
-        return None
-
     def get_ground_layer_ids(self) -> list[int]:
         groundlayernames: str | None = self._tmxdata.properties.get("GroundLayerNames")
         if not groundlayernames:
