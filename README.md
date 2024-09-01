@@ -18,18 +18,25 @@ Tweak your IDE/vs code run configurations to mirror that behavior :D
 
 ## TODO
 
+p0
+* Sound
 * Mapgen
-* Update sprites
-* Sound effects
-* Objectives
-* Strategems
-* Leveling
-* Active reload
-* Grenades
-* Factions (all pigsassins are players)
+* Rocket launcher
+* Destroy factories
+* Win condition
+
+p1
+* Armor / reduce dmg
+* Helper bots/strategems
+* Enemy diversity
+* Sprites
+
+p2
 * AI (e.g. behavior trees)
-* AI goals/planning
-* Helpers (upgradeable bots to direct)
+* Objectives
+* Active reload
+* Leveling
+* Player count decision
 
 ## License
 
