@@ -100,9 +100,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
                     self.network.send(
                         builders.build_character_attacked(self.world.player, direction)
                     )
-                    self.player_struct.sprite.change_animation("attack")
-                    if self.world.player.weapon.attack_type == AttackType.RANGED:
-                        self.ak47_sound.play()
+                    self.character_attacked(self.world.player)
         if ActionEnum.PLAYER_HEAL in player_actions:
             self.world.player.handle_healing_received(1.0)
             logger.info("Player now has {} hp", self.world.player.hp)
@@ -112,7 +110,7 @@ class GameScreen(Screen, UIInterface, WorldListener):
         if ActionEnum.RELOAD in player_actions:
             if self.world.player.reload():
                 self.network.send(builders.build_character_reloaded(self.world.player))
-                self.reload_sound.play()
+                self.character_reloaded(self.world.player)
         if ActionEnum.TERMINAL in player_actions:
             self.terminal.activate()
         if ActionEnum.ZOOM_OUT in player_actions:
@@ -216,14 +214,12 @@ class GameScreen(Screen, UIInterface, WorldListener):
         struct = self.character_structs.get(character.uuid)
         if struct:
             struct.sprite.change_animation("attack")
-            if character.weapon.attack_type == AttackType.RANGED:
-                self.ak47_sound.play()
+        if character.weapon.attack_type == AttackType.RANGED:
+            self.ak47_sound.play()
 
     def character_reloaded(self, character: Character):
-        struct = self.character_structs.get(character.uuid)
-        if struct:
-            if character.weapon.attack_type == AttackType.RANGED:
-                self.reload_sound.play()
+        if character.weapon.attack_type == AttackType.RANGED:
+            self.reload_sound.play()
 
     def character_added(self, character: Character):
         sprite = CharacterSprite(character.character_type_short)
