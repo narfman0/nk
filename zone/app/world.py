@@ -32,6 +32,16 @@ class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
         self._projectile_component = ProjectileManager(self)
         self._message_handler = MessageHandler(self, self._ai)
         self._medical_manager = MedicalManager(self, self._zone.medics)
+        self.init_environment_features()
+
+    def init_environment_features(self):
+        for feature in self._zone.environment_features:
+            tilemap = Map(feature.tmx_name, headless=True)
+            tilemap.add_map_geometry_to_space(
+                self.space,
+                feature.center_x - tilemap.width // 2,
+                feature.center_y - tilemap.height // 2,
+            )
 
     async def update(self, dt: float):
         await self._ai.update(dt)
