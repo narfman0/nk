@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-from loguru import logger
 import pymunk
 import pytmx
 

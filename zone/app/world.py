@@ -5,7 +5,7 @@ from collections import deque
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 from nk_shared.settings import DATA_ROOT

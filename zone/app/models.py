@@ -3,7 +3,7 @@ from asyncio import Queue
 from dataclasses import dataclass, field
 
 import pymunk
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 from nk_shared.models import Character
 from nk_shared.proto import Message
 

@@ -1,7 +1,7 @@
 from collections import deque
 
 import pymunk
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction
 from typing_extensions import Unpack

@@ -1,4 +1,4 @@
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 from nk_shared.models.zone import Environment
 
 from nk.ui.game.models import UIInterface

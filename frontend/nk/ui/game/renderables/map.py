@@ -1,4 +1,4 @@
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 
 from nk.ui.game.models import UIInterface
 from nk.ui.game.renderables.models import BlittableRenderable

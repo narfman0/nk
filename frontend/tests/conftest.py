@@ -1,5 +1,5 @@
 import pytest
-from nk_shared.map import Tilemap
+from nk_shared.map.tilemap import Tilemap
 from nk_shared.proto import Projectile
 
 from nk.game.world import World
