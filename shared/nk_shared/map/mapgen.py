@@ -3,21 +3,16 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-from lloyd import Field
 from scipy.spatial import Voronoi, voronoi_plot_2d
 
 from nk_shared.settings import PROJECT_ROOT
-from nk_shared.map.math import perlin
+from nk_shared.map.math import lloyds_algorithm, perlin
 
 DEFAULT_WIDTH = 1000
 
 
 def generate_points(width: int = DEFAULT_WIDTH, relax_steps: int = 4) -> np.array:
-    points = np.random.rand(width, 2) * width
-    field = Field(points)
-    for _ in range(relax_steps):
-        field.relax()
-    return field.get_points()
+    return lloyds_algorithm(np.random.rand(width, 2) * width, relax_steps)
 
 
 def create_elevation(width: int = DEFAULT_WIDTH) -> np.array:

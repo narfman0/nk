@@ -1,4 +1,13 @@
+from lloyd import Field
 import numpy as np
+
+
+def lloyds_algorithm(points, relax_steps: int = 1):
+    """https://en.wikipedia.org/wiki/Lloyd%27s_algorithm"""
+    field = Field(points)
+    for _ in range(relax_steps):
+        field.relax()
+    return field.get_points()
 
 
 def perlin(x, y):
