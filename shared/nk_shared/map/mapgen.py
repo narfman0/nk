@@ -8,14 +8,10 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 from nk_shared.settings import PROJECT_ROOT
 from nk_shared.map.math import lloyds_algorithm, perlin
 
-DEFAULT_WIDTH = 1000
+WIDTH = 1000
 
 
-def generate_points(width: int = DEFAULT_WIDTH, relax_steps: int = 4) -> np.array:
-    return lloyds_algorithm(np.random.rand(width, 2) * width, relax_steps)
-
-
-def create_elevation(width: int = DEFAULT_WIDTH) -> np.array:
+def create_elevation(width: int = WIDTH) -> np.array:
     """from https://stackoverflow.com/a/42154921"""
     p = np.zeros((width, width))
     for i in range(4):
@@ -34,9 +30,14 @@ if __name__ == "__main__":
     np.random.seed(0)
 
     start = time.time()
-    vor = Voronoi(generate_points())
+    points = lloyds_algorithm(np.random.rand(WIDTH, 2) * WIDTH, 4)
     end = time.time()
-    print(f"Voronoi time: {end - start:.2f}s")
+    print(f"Generate points + Lloyd's: {end - start:.2f}s")
+
+    start = time.time()
+    vor = Voronoi(points)
+    end = time.time()
+    print(f"Voronoi: {end - start:.2f}s")
     voronoi_plot_2d(vor)
     plt.show()
 
@@ -44,5 +45,5 @@ if __name__ == "__main__":
     p = create_elevation()
     end = time.time()
     plt.imshow(p, origin="upper")
-    print(f"Elevations time: {end - start:.2f}s")
+    print(f"Elevations: {end - start:.2f}s")
     plt.show()
