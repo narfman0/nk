@@ -1,2 +1,2 @@
-foronoi
 lloyd
+scipy
