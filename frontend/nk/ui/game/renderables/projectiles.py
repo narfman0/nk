@@ -26,11 +26,11 @@ def generate_projectile_renderables(
             method = generate_projectile_tracer_renderable
         else:
             method = generate_projectile_blittable_renderable
-        yield method(world, ui_interface, projectile)
+        yield method(ui_interface, projectile)
 
 
 def generate_projectile_blittable_renderable(
-    world: World, ui_interface: UIInterface, projectile: Projectile
+    ui_interface: UIInterface, projectile: Projectile
 ) -> BlittableRenderable:
     image = load_projectile_image(projectile.weapon.projectile_image_path)
     blit_x, blit_y = ui_interface.calculate_draw_coordinates(
@@ -42,7 +42,7 @@ def generate_projectile_blittable_renderable(
 
 
 def generate_projectile_tracer_renderable(
-    world: World, ui_interface: UIInterface, projectile: Projectile
+    ui_interface: UIInterface, projectile: Projectile
 ) -> TracerRenderable:
     start = ui_interface.calculate_draw_coordinates(
         projectile.x, projectile.y, one_one_surface

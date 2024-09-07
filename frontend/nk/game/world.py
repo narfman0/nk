@@ -1,7 +1,7 @@
 from collections import deque
 
 import pymunk
-from nk_shared.map import Map
+from nk_shared.map import Tilemap
 from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction
 from typing_extensions import Unpack
@@ -16,17 +16,17 @@ HEAL_AMT = 10.0
 
 class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def __init__(
-        self, uuid: str, x: float, y: float, zone_name="1", tmxmap: Map = None
+        self, uuid: str, x: float, y: float, zone_name="1", tmxmap: Tilemap = None
     ):
         self.listeners: deque[WorldListener] = deque()
         self.projectile_manager: ProjectileManager = ProjectileManager(self)
         self.weapons: dict[str, Weapon] = {}
         self.space = pymunk.Space()
         self.zone = Zone.from_yaml_file(f"{NK_DATA_ROOT}/zones/{zone_name}.yml")
-        self.map = tmxmap if tmxmap else Map(self.zone.tmx_path)
+        self.map = tmxmap if tmxmap else Tilemap(self.zone.tmx_path)
         self.map.add_map_geometry_to_space(self.space)
         for feature in self.zone.environment_features:
-            tilemap = Map(feature.tmx_name, headless=True)
+            tilemap = Tilemap(feature.tmx_name, headless=True)
             tilemap.add_map_geometry_to_space(
                 self.space,
                 feature.center_x - tilemap.width // 2,

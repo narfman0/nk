@@ -5,7 +5,7 @@ from collections import deque
 import pymunk
 from loguru import logger
 from nk_shared import builders
-from nk_shared.map import Map
+from nk_shared.map import Tilemap
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
 from nk_shared.settings import DATA_ROOT
@@ -25,7 +25,7 @@ class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
         self._listeners: deque[WorldListener] = deque()
         self._space = pymunk.Space()
         self._zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
-        self._map = Map(self._zone.tmx_path, headless=True)
+        self._map = Tilemap(self._zone.tmx_path, headless=True)
         self._map.add_map_geometry_to_space(self._space)
         self._players: list[Player] = []
         self._ai = Ai(self, self._zone)
@@ -36,7 +36,7 @@ class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
 
     def init_environment_features(self):
         for feature in self._zone.environment_features:
-            tilemap = Map(feature.tmx_name, headless=True)
+            tilemap = Tilemap(feature.tmx_name, headless=True)
             tilemap.add_map_geometry_to_space(
                 self.space,
                 feature.center_x - tilemap.width // 2,
@@ -110,7 +110,7 @@ class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
         self._listeners.append(listener)
 
     @property
-    def map(self) -> Map:
+    def map(self) -> Tilemap:
         return self._map
 
     @property

@@ -1,5 +1,5 @@
 import pytest
-from nk_shared.map import Map
+from nk_shared.map import Tilemap
 from nk_shared.proto import Projectile
 
 from nk.game.world import World
@@ -7,7 +7,7 @@ from nk.game.world import World
 
 @pytest.fixture
 def tmxmap():
-    return Map("1", headless=True)
+    return Tilemap("1", headless=True)
 
 
 @pytest.fixture

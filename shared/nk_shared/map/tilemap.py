@@ -7,7 +7,7 @@ import pytmx
 from nk_shared.settings import DATA_ROOT
 
 
-class Map:
+class Tilemap:
     def __init__(self, area: str, headless=False):
         self.area = area
         path = f"{DATA_ROOT}/tiled/tmx/{area}.tmx"

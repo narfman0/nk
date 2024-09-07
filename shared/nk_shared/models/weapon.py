@@ -3,8 +3,8 @@ from functools import lru_cache
 
 from dataclass_wizard import YAMLWizard
 
-from nk_shared.map import DATA_ROOT
 from nk_shared.models.attack_type import AttackType
+from nk_shared.settings import DATA_ROOT
 
 
 @dataclass

@@ -4,4 +4,5 @@ betterproto[compiler]
 -r api/requirements.txt
 -r auth/requirements.txt
 -r frontend/requirements.txt
+-r shared/requirements.txt
 -r zone/requirements.txt

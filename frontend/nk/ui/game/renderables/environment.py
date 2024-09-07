@@ -1,4 +1,4 @@
-from nk_shared.map import Map
+from nk_shared.map import Tilemap
 from nk_shared.models.zone import Environment
 
 from nk.ui.game.models import UIInterface
@@ -9,7 +9,7 @@ def generate_environment_renderables(
     ui_interface: UIInterface, environment_features: list[Environment]
 ):
     for environment in environment_features:
-        tilemap = Map(environment.tmx_name)
+        tilemap = Tilemap(environment.tmx_name)
         yield from generate_map_renderables(
             ui_interface=ui_interface,
             ground=False,

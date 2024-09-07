@@ -1,4 +1,4 @@
-from nk_shared.map import Map
+from nk_shared.map import Tilemap
 
 from nk.ui.game.models import UIInterface
 from nk.ui.game.renderables.models import BlittableRenderable
@@ -8,7 +8,7 @@ from nk.ui.game.renderables.util import renderables_generate_key
 def generate_map_renderables(  # pylint: disable=too-many-locals
     ui_interface: UIInterface,
     ground: bool,
-    tilemap: Map,
+    tilemap: Tilemap,
     tile_offset_x: int = 0,
     tile_offset_y: int = 0,
 ):
