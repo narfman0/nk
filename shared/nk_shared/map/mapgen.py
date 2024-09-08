@@ -68,15 +68,11 @@ def generate_map(point_count: int, width: int, visualize: bool = False):
     # p = create_elevation()
     perimeter_regions, voronoi_kdtree = get_perimeter_regions(width, points)
     tilemap = generate_tilemap(perimeter_regions, voronoi_kdtree, width)
-    write_tmx_file(tilemap)
-
     # TODO
-    # mark edge regions as water
     # flood fill lower 10% of regions with water from elevation map
-    # generate a 2d grid of test points equidistant from each other
-    # figure out moisture levels for each region
-    #   - moisture levels are based on distance from water
-    #   - might need to build a graph of regions to determine distance
+    # fill top 15% with snow
+    # fill far from water with dirt
+    write_tmx_file(tilemap)
 
 
 if __name__ == "__main__":
