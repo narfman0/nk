@@ -1,5 +1,5 @@
-from lloyd import Field
 import numpy as np
+from lloyd import Field
 
 
 def lloyds_algorithm(points, relax_steps: int = 1):

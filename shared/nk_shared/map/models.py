@@ -4,8 +4,4 @@ from enum import Enum, auto
 class Biome(Enum):
     UNKNOWN = auto()
     PLAINS = auto()
-    DESERT = auto()
-    FOREST = auto()
-    TUNDRA = auto()
-    WASTELAND = auto()
     WATER = auto()
