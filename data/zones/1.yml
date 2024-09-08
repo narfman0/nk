@@ -9,8 +9,8 @@ enemy_groups:
     center_x: 16
     center_y: 12
 medics:
-  - x: 14
-    y: 23
+  - x: 31
+    y: 27
 environment_features:
   - tmx_name: factory_sm
     center_x: 41
@@ -19,6 +19,9 @@ environment_features:
       - character_type_str: droid_assassin
         offset_x: 0
         offset_y: 5
+  - tmx_name: medic
+    center_x: 31
+    center_y: 27
   - tmx_name: factory_sm
     center_x: 10
     center_y: 50
