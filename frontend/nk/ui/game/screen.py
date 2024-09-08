@@ -67,7 +67,9 @@ class GameScreen(Screen, UIInterface, WorldListener):
         self.character_struct_remove_queue: list[CharacterStructRemoveStruct] = []
         self.game_gui = GameGui()
         self.reload_sound = pygame.mixer.Sound(f"{NK_DATA_ROOT}/sounds/reload.mp3")
+        self.reload_sound.set_volume(0.3)
         self.ak47_sound = pygame.mixer.Sound(f"{NK_DATA_ROOT}/sounds/ak47.mp3")
+        self.ak47_sound.set_volume(0.05)
 
     def update(self, dt: float, events: list[Event]):
         player_move_direction = self.update_input(events)

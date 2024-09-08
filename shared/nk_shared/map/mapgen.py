@@ -81,16 +81,16 @@ def generate_tiled_tmx(width: int, tilemap: np.array):
         line_arr = []
         for y in range(width):
             line_arr.append(str(int(tilemap[x, y])))
-        lines.append(",".join(line_arr) + ",")
+        lines.append(",".join(line_arr))
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="isometric" renderorder="right-down" width="{width}" height="{width}" tilewidth="32" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="1">
  <properties>
   <property name="StartXY" value="45,30"/>
  </properties>
- <tileset firstgid="1" source="../tsx/jumpstart.tsx"/>
+ <tileset firstgid="0" source="../tsx/jumpstart.tsx"/>
  <layer id="1" name="1" width="{width}" height="{width}" offsetx="0" offsety="0">
   <data encoding="csv">
-{"\n".join(lines)}
+{",\n".join(lines)}
 </data>
  </layer>
 </map>"""
