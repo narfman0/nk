@@ -19,7 +19,6 @@ class LoginScreen(Screen):
         self.game_state = GameState()
         self.manager = pygame_gui.UIManager((WIDTH, HEIGHT))
         self.init_ui()
-        self.autologin = AUTOLOGIN and self.email_field.get_text()
 
     def init_ui(self):
         top, left = HEIGHT // 2 - 128, WIDTH // 2 - ELEMENT_WIDTH // 2
@@ -74,7 +73,7 @@ class LoginScreen(Screen):
                 if event.ui_element == self.login_button or register:
                     self.save_login()
                     self.handle_login_clicked(register)
-        if self.autologin:
+        if AUTOLOGIN and self.email_field.get_text():
             self.handle_login_clicked(False)
         self.manager.update(dt)
 

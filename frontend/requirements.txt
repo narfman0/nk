@@ -5,6 +5,7 @@ loguru
 pygame-ce
 pygame_gui
 pymunk
+python-dotenv
 pytmx
 pyyaml
 sortedcontainers
