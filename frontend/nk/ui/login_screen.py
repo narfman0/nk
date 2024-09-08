@@ -9,6 +9,7 @@ from nk.ui.load_screen import LoadScreen
 from nk.ui.screen import Screen, ScreenManager
 
 ELEMENT_WIDTH = 256
+AUTOLOGIN = os.environ.get("AUTOLOGIN", "false").lower() == "true"
 
 
 class LoginScreen(Screen):
@@ -18,6 +19,7 @@ class LoginScreen(Screen):
         self.game_state = GameState()
         self.manager = pygame_gui.UIManager((WIDTH, HEIGHT))
         self.init_ui()
+        self.autologin = AUTOLOGIN and self.email_field.get_text()
 
     def init_ui(self):
         top, left = HEIGHT // 2 - 128, WIDTH // 2 - ELEMENT_WIDTH // 2
@@ -71,17 +73,22 @@ class LoginScreen(Screen):
                 register = event.ui_element == self.register_button
                 if event.ui_element == self.login_button or register:
                     self.save_login()
-                    self.screen_manager.pop()
-                    self.screen_manager.push(
-                        LoadScreen(
-                            self.screen_manager,
-                            self.game_state,
-                            self.email_field.get_text(),
-                            self.password_field.get_text(),
-                            register,
-                        )
-                    )
+                    self.handle_login_clicked(register)
+        if self.autologin:
+            self.handle_login_clicked(False)
         self.manager.update(dt)
+
+    def handle_login_clicked(self, register: bool):
+        self.screen_manager.pop()
+        self.screen_manager.push(
+            LoadScreen(
+                self.screen_manager,
+                self.game_state,
+                self.email_field.get_text(),
+                self.password_field.get_text(),
+                register,
+            )
+        )
 
     def load_login(self):
         os.makedirs(self.save_root(), exist_ok=True)
