@@ -4,6 +4,7 @@ import pymunk
 from nk_shared.map.tilemap import Tilemap
 from nk_shared.models import Character, Weapon, Zone
 from nk_shared.proto import CharacterType, Direction
+from nk_shared.settings import ZONE_NAME
 from typing_extensions import Unpack
 
 from nk.game.listeners import WorldListener
@@ -16,7 +17,7 @@ HEAL_AMT = 10.0
 
 class World:  # pylint: disable=too-many-instance-attributes,too-many-arguments
     def __init__(
-        self, uuid: str, x: float, y: float, zone_name="1", tmxmap: Tilemap = None
+        self, uuid: str, x: float, y: float, zone_name=ZONE_NAME, tmxmap: Tilemap = None
     ):
         self.listeners: deque[WorldListener] = deque()
         self.projectile_manager: ProjectileManager = ProjectileManager(self)

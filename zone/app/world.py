@@ -8,7 +8,7 @@ from nk_shared import builders
 from nk_shared.map.tilemap import Tilemap
 from nk_shared.models import AttackType, Character, Zone
 from nk_shared.proto import Message
-from nk_shared.settings import DATA_ROOT
+from nk_shared.settings import DATA_ROOT, ZONE_NAME
 
 from app.ai import Ai
 from app.medical_manager import MedicalManager
@@ -21,7 +21,7 @@ from app.pubsub import publish
 class World(WorldInterface):  # pylint: disable=too-many-instance-attributes
     """Hold and simulate everything happening in the game."""
 
-    def __init__(self, zone_name: str = "1"):
+    def __init__(self, zone_name: str = ZONE_NAME):
         self._listeners: deque[WorldListener] = deque()
         self._space = pymunk.Space()
         self._zone = Zone.from_yaml_file(f"{DATA_ROOT}/zones/{zone_name}.yml")
