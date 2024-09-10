@@ -11,9 +11,8 @@ from nk_shared.map.helpers import (
 )
 from nk_shared.map.helpers import get_perimeter_points
 from nk_shared.map.math import lloyds_algorithm
-from nk_shared.map.models import Biome
 from nk_shared.map.tiled import write_tmx_file
-from nk_shared.settings import MAP_WIDTH, PROJECT_ROOT
+from nk_shared.settings import MAPGEN_WIDTH, PROJECT_ROOT
 
 
 def create_points(count: int, width: int) -> np.ndarray:
@@ -76,4 +75,4 @@ def generate_map(point_count: int, width: int, visualize: bool = False):
 
 
 if __name__ == "__main__":
-    generate_map(MAP_WIDTH // 10, MAP_WIDTH, True)
+    generate_map(MAPGEN_WIDTH // 10, MAPGEN_WIDTH, True)
