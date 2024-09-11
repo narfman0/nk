@@ -1,4 +1,7 @@
 from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 PROJECT_ROOT = environ.get("NK_PROJECT_ROOT", "..")
 DATA_ROOT = environ.get("NK_DATA_ROOT", f"{PROJECT_ROOT}/data")
